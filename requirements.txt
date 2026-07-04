@@ -1,0 +1,6 @@
+vnstock==4.0.3
+pandas==2.3.3
+pyarrow==19.0.0
+pytest==8.3.4
+tenacity==9.0.0
+pydantic==2.13.4

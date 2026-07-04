@@ -1,0 +1,10 @@
+[project]
+name = "sector-cycle-monitor"
+version = "0.1.0"
+description = "M0 skeleton and universe builder for Vietnam sector-cycle monitoring."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
