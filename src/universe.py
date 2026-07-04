@@ -28,6 +28,8 @@ OUTPUT_COLUMNS = REQUIRED_COLUMNS + ["data_status"]
 MIN_ADTV_20D = 500_000_000
 MIN_ACCEPTED_SYMBOLS = 700
 EXPECTED_ICB2_COUNT = 19
+SUPPORTED_EXCHANGES = {"HOSE", "HNX", "UPCOM"}
+UNSUPPORTED_EXCHANGE_REASON = "UNSUPPORTED_EXCHANGE"
 
 
 @dataclass(frozen=True)
@@ -80,6 +82,9 @@ def build_universe(
         if not exchange:
             rows.append(_reject(row, "MISSING_EXCHANGE", "MISSING_DATA"))
             continue
+        if exchange not in SUPPORTED_EXCHANGES:
+            rows.append(_reject(row, UNSUPPORTED_EXCHANGE_REASON, "MISSING_DATA"))
+            continue
 
         icb_row = _lookup_icb(icb, ticker)
         row.update({key: icb_row.get(key) for key in ("icb2", "icb3", "icb4")})
@@ -126,7 +131,10 @@ def build_universe(
 
         market_cap_result = _as_result(client.get_market_cap(ticker), source=source)
         if market_cap_result.ok:
-            row["market_cap"] = _extract_market_cap(market_cap_result.data)
+            market_cap, market_cap_source = _extract_market_cap_with_source(market_cap_result.data)
+            row["market_cap"] = market_cap
+            if market_cap_source:
+                row["source"] = _combine_sources(row["source"], market_cap_source)
             if market_cap_result.status == "STALE_DATA":
                 row["data_status"] = "STALE_DATA"
 
@@ -194,6 +202,10 @@ def _normalize_symbols(data: Any) -> pd.DataFrame:
     if frame.empty:
         return pd.DataFrame(columns=["ticker", "exchange"])
 
+    type_col = _first_existing(frame, ["type", "security_type", "securityType"])
+    if type_col:
+        frame = frame[frame[type_col].map(_clean_text) == "STOCK"].copy()
+
     ticker_col = _first_existing(
         frame,
         ["ticker", "symbol", "code", "stock_symbol", "stockSymbol", "organ_code", "organCode"],
@@ -215,6 +227,12 @@ def _normalize_icb(data: Any) -> pd.DataFrame:
         return pd.DataFrame(columns=["ticker", "icb2", "icb3", "icb4", "source"])
 
     ticker_col = _first_existing(frame, ["ticker", "symbol", "code", "stock_symbol", "stockSymbol"])
+    level_col = _first_existing(frame, ["icb_level", "icbLevel", "level"])
+    long_value_col = _first_existing(frame, ["icb_name", "icbName", "icb_code", "icbCode"])
+    if ticker_col and level_col and long_value_col:
+        source_col = _first_existing(frame, ["source"])
+        return _pivot_icb_long(frame, ticker_col, level_col, long_value_col, source_col)
+
     icb2_col = _first_existing(frame, ["icb2", "icb_code2", "icbCode2", "icb_name2", "icbName2", "industry2"])
     icb3_col = _first_existing(frame, ["icb3", "icb_code3", "icbCode3", "icb_name3", "icbName3", "industry3"])
     icb4_col = _first_existing(frame, ["icb4", "icb_code4", "icbCode4", "icb_name4", "icbName4", "industry4"])
@@ -227,6 +245,56 @@ def _normalize_icb(data: Any) -> pd.DataFrame:
     result["icb4"] = frame[icb4_col].map(_clean_text) if icb4_col else ""
     result["source"] = frame[source_col].map(_clean_text) if source_col else ""
     return result[result["ticker"] != ""].drop_duplicates(subset=["ticker"], keep="last")
+
+
+def _pivot_icb_long(
+    frame: pd.DataFrame,
+    ticker_col: str,
+    level_col: str,
+    value_col: str,
+    source_col: str | None = None,
+) -> pd.DataFrame:
+    work = pd.DataFrame()
+    work["ticker"] = frame[ticker_col].map(_clean_text)
+    work["level"] = pd.to_numeric(frame[level_col], errors="coerce")
+    work["value"] = frame[value_col].map(_clean_text)
+    work = work[
+        (work["ticker"] != "")
+        & (work["value"] != "")
+        & work["level"].isin([2, 3, 4])
+    ].copy()
+    if work.empty:
+        return pd.DataFrame(columns=["ticker", "icb2", "icb3", "icb4", "source"])
+
+    work["field"] = "icb" + work["level"].astype(int).astype(str)
+    wide = (
+        work.pivot_table(
+            index="ticker",
+            columns="field",
+            values="value",
+            aggfunc=lambda values: next((value for value in reversed(list(values)) if value), ""),
+        )
+        .reset_index()
+        .rename_axis(None, axis=1)
+    )
+    for column in ("icb2", "icb3", "icb4"):
+        if column not in wide.columns:
+            wide[column] = ""
+
+    if source_col and source_col in frame.columns:
+        sources = pd.DataFrame(
+            {
+                "ticker": frame[ticker_col].map(_clean_text),
+                "source": frame[source_col].map(_clean_text),
+            }
+        )
+        sources = sources[sources["ticker"] != ""].drop_duplicates(subset=["ticker"], keep="last")
+        wide = wide.merge(sources, on="ticker", how="left")
+        wide["source"] = wide["source"].replace("", "vnstock_vci_symbols_by_industries")
+    else:
+        wide["source"] = "vnstock_vci_symbols_by_industries"
+
+    return wide[["ticker", "icb2", "icb3", "icb4", "source"]].drop_duplicates(subset=["ticker"], keep="last")
 
 
 def _merge_icb_overrides(icb: pd.DataFrame, path: Path) -> pd.DataFrame:
@@ -292,19 +360,35 @@ def _has_six_month_span(price: pd.DataFrame) -> bool:
 
 
 def _extract_market_cap(data: Any) -> float | None:
+    value, _source = _extract_market_cap_with_source(data)
+    return value
+
+
+def _extract_market_cap_with_source(data: Any) -> tuple[float | None, str | None]:
     frame = _to_frame(data)
     if frame.empty:
-        return None
+        return None, None
     col = _first_existing(
         frame,
         ["market_cap", "marketCap", "market_capitalization", "marketCapitalization", "listedValue"],
     )
-    if not col:
-        return None
-    values = _numeric(frame[col]).dropna()
-    if values.empty:
-        return None
-    return float(values.iloc[-1])
+    if col:
+        values = _numeric(frame[col]).dropna()
+        if not values.empty:
+            return float(values.iloc[-1]), None
+
+    shares_col = _first_existing(frame, ["issue_share", "issueShare", "outstanding_share", "outstandingShare"])
+    close_col = _first_existing(frame, ["last_close", "lastClose", "current_price", "currentPrice", "close"])
+    if shares_col and close_col:
+        shares = _numeric(frame[shares_col]).dropna()
+        closes = _numeric(frame[close_col]).dropna()
+        if not shares.empty and not closes.empty:
+            shares_value = float(shares.iloc[-1])
+            close_value = float(closes.iloc[-1])
+            if shares_value > 0 and close_value > 0:
+                return shares_value * close_value, "mktcap_shares_x_close_proxy"
+
+    return None, None
 
 
 def _build_summary(
@@ -324,6 +408,9 @@ def _build_summary(
         warnings.append(f"accepted {len(accepted)} < {MIN_ACCEPTED_SYMBOLS}")
     if len(icb2_counts) < EXPECTED_ICB2_COUNT:
         warnings.append(f"ICB2 coverage {len(icb2_counts)} < {EXPECTED_ICB2_COUNT}")
+    api_error_count = int((rejects["reject_reason"] == "API_ERROR").sum()) if not rejects.empty else 0
+    if api_error_count:
+        warnings.append(f"API_ERROR rejects {api_error_count}; check vnstock rate limits/source access")
     if symbols_status in {"API_ERROR", "STALE_DATA"}:
         warnings.append(f"symbol source status {symbols_status}")
     if icb_status in {"API_ERROR", "STALE_DATA"}:
@@ -400,11 +487,11 @@ def _clean_text(value: Any) -> str:
 
 def _normalize_exchange(value: Any) -> str:
     text = _clean_text(value)
-    if "HOSE" in text or text in {"HSX", "VNINDEX"}:
+    if text in {"HOSE", "HSX"}:
         return "HOSE"
-    if "HNX" in text:
+    if text == "HNX":
         return "HNX"
-    if "UPCOM" in text or "UPCoM".upper() in text:
+    if text in {"UPCOM", "UPCoM".upper()}:
         return "UPCOM"
     return text
 

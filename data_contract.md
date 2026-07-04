@@ -70,6 +70,7 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 - `MISSING_TICKER`
 - `API_ERROR`
 - `MISSING_ICB_CLASSIFICATION`
+- `UNSUPPORTED_EXCHANGE`
 
 ## Valid `data_status` Values
 
@@ -82,6 +83,24 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 
 The pipeline must never invent financial values. If a value is missing from the public source, it stays empty or the row is rejected. `adtv_20d` may use `close * volume` only when traded value is absent and both fields exist; this is marked in `source` as `adtv_close_x_volume_proxy`.
 
+`market_cap` may use `issue_share * last_close` only when both fields exist and no direct market cap field is available. Proxy market cap rows must include `mktcap_shares_x_close_proxy` in `source`.
+
+## ICB Classification Shape
+
+The real VCI `symbols_by_industries()` source returns ICB in long format:
+
+```text
+symbol | icb_level | icb_code | icb_name
+```
+
+The pipeline pivots levels 2, 3, and 4 into:
+
+```text
+ticker | icb2 | icb3 | icb4
+```
+
+Rows must not be mass-rejected simply because VCI does not return wide columns such as `icb_code2` or `icb_name2`.
+
 ## Run Tests
 
 ```bash
@@ -89,6 +108,14 @@ pytest
 ```
 
 Tests use fixture data and must not import or call the real `vnstock` API.
+
+## Run Smoke Test
+
+```bash
+python scripts/smoke_vnstock.py
+```
+
+The smoke test calls the real VCI listing and industry APIs, validates their shape, and prints `SMOKE TEST PASSED` only when normalization can map tickers to `icb2`.
 
 ## Check Real Outputs
 

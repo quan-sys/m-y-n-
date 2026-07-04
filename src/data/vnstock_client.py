@@ -35,9 +35,9 @@ class VnstockClient:
         self,
         cache_dir: str | Path = CACHE_DIR,
         source: str = "vnstock",
-        listing_source: str = "kbs",
+        listing_source: str = "VCI",
         quote_source: str = "VCI",
-        company_source: str = "KBS",
+        company_source: str = "VCI",
         min_sleep_seconds: float = 0.15,
         max_sleep_seconds: float = 0.65,
         use_cache: bool = True,
@@ -51,8 +51,11 @@ class VnstockClient:
         self.min_sleep_seconds = min_sleep_seconds
         self.max_sleep_seconds = max_sleep_seconds
         self.use_cache = use_cache
+        self._terminal_api_error: str | None = None
 
     def list_symbols(self, exchanges: Iterable[str] = ("HOSE", "HNX", "UPCOM")) -> FetchResult:
+        if self._terminal_api_error:
+            return self._terminal_error_result()
         cache_path = self._cache_path("symbols", "all")
         cached = self._read_cache(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=7):
@@ -62,12 +65,15 @@ class VnstockClient:
             data = self._fetch_symbols(tuple(exchanges))
             self._write_cache(cache_path, data)
             return FetchResult(True, data, source=self.source, as_of=self._today())
-        except Exception as exc:  # noqa: BLE001 - API failures are converted to data status.
+        except BaseException as exc:  # noqa: BLE001 - API failures are converted to data status.
+            self._record_terminal_error(exc)
             if cached is not None:
                 return FetchResult(True, cached, status="STALE_DATA", error=str(exc), source=self.source)
-            return FetchResult(False, pd.DataFrame(), status="API_ERROR", error=str(exc), source=self.source)
+            return self._error_result(exc)
 
     def get_icb_classification(self, tickers: Iterable[str] | None = None) -> FetchResult:
+        if self._terminal_api_error:
+            return self._terminal_error_result()
         cache_path = self._cache_path("icb", "classification")
         cached = self._read_cache(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=30):
@@ -75,17 +81,21 @@ class VnstockClient:
 
         try:
             data = self._fetch_icb_classification()
-            if tickers is not None and not data.empty and "ticker" in data.columns:
+            ticker_col = self._first_existing(data, ["ticker", "symbol", "code", "stock_symbol", "stockSymbol"])
+            if tickers is not None and not data.empty and ticker_col:
                 wanted = {str(t).strip().upper() for t in tickers}
-                data = data[data["ticker"].astype(str).str.upper().isin(wanted)]
+                data = data[data[ticker_col].astype(str).str.upper().isin(wanted)]
             self._write_cache(cache_path, data)
             return FetchResult(True, data, source=self.source, as_of=self._today())
-        except Exception as exc:  # noqa: BLE001
+        except BaseException as exc:  # noqa: BLE001
+            self._record_terminal_error(exc)
             if cached is not None:
                 return FetchResult(True, cached, status="STALE_DATA", error=str(exc), source=self.source)
-            return FetchResult(False, pd.DataFrame(), status="API_ERROR", error=str(exc), source=self.source)
+            return self._error_result(exc)
 
     def get_price_history(self, ticker: str, months: int = 6) -> FetchResult:
+        if self._terminal_api_error:
+            return self._terminal_error_result()
         normalized = self._safe_key(ticker)
         cache_path = self._cache_path("prices", normalized)
         cached = self._read_cache(cache_path)
@@ -96,7 +106,8 @@ class VnstockClient:
             data = self._fetch_price_history(ticker=ticker, months=months)
             self._write_cache(cache_path, data)
             return FetchResult(True, data, source=self.source, as_of=self._latest_date(data))
-        except Exception as exc:  # noqa: BLE001
+        except BaseException as exc:  # noqa: BLE001
+            self._record_terminal_error(exc)
             if cached is not None:
                 return FetchResult(
                     True,
@@ -106,9 +117,11 @@ class VnstockClient:
                     source=self.source,
                     as_of=self._latest_date(cached),
                 )
-            return FetchResult(False, pd.DataFrame(), status="API_ERROR", error=str(exc), source=self.source)
+            return self._error_result(exc)
 
     def get_market_cap(self, ticker: str) -> FetchResult:
+        if self._terminal_api_error:
+            return self._terminal_error_result()
         normalized = self._safe_key(ticker)
         cache_path = self._cache_path("market_cap", normalized)
         cached = self._read_cache(cache_path)
@@ -119,10 +132,11 @@ class VnstockClient:
             data = self._fetch_market_cap(ticker)
             self._write_cache(cache_path, data)
             return FetchResult(True, data, source=self.source, as_of=self._today())
-        except Exception as exc:  # noqa: BLE001
+        except BaseException as exc:  # noqa: BLE001
+            self._record_terminal_error(exc)
             if cached is not None:
                 return FetchResult(True, cached, status="STALE_DATA", error=str(exc), source=self.source)
-            return FetchResult(False, pd.DataFrame(), status="API_ERROR", error=str(exc), source=self.source)
+            return self._error_result(exc)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
     def _fetch_symbols(self, exchanges: tuple[str, ...]) -> pd.DataFrame:
@@ -130,22 +144,11 @@ class VnstockClient:
         vnstock = self._vnstock_module()
         listing_cls = getattr(vnstock, "Listing")
         listing = self._quiet_call(listing_cls, source=self.listing_source, random_agent=True, show_log=False)
-
-        frames: list[pd.DataFrame] = []
-        for exchange in exchanges:
-            try:
-                raw = self._quiet_call(listing.symbols_by_exchange, exchange=exchange)
-            except TypeError:
-                raw = self._quiet_call(listing.symbols_by_exchange, exchange)
-            frame = self._to_frame(raw)
-            if not frame.empty and "exchange" not in {c.lower() for c in frame.columns}:
-                frame["exchange"] = exchange
-            frames.append(frame)
-
-        combined = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
-        if combined.empty:
-            combined = self._to_frame(self._quiet_call(listing.all_symbols))
-        return combined
+        raw = self._quiet_call(listing.symbols_by_exchange)
+        frame = self._to_frame(raw)
+        if frame.empty:
+            frame = self._to_frame(self._quiet_call(listing.all_symbols))
+        return self._filter_stock_rows(frame)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
     def _fetch_icb_classification(self) -> pd.DataFrame:
@@ -154,17 +157,8 @@ class VnstockClient:
         listing_cls = getattr(vnstock, "Listing")
         listing = self._quiet_call(listing_cls, source=self.listing_source, random_agent=True, show_log=False)
 
-        frames: list[pd.DataFrame] = []
-        for method_name in ("symbols_by_industries", "industries_icb"):
-            method = getattr(listing, method_name, None)
-            if method is None:
-                continue
-            try:
-                frames.append(self._to_frame(self._quiet_call(method)))
-            except Exception:
-                continue
-
-        return pd.concat([f for f in frames if not f.empty], ignore_index=True) if frames else pd.DataFrame()
+        method = getattr(listing, "symbols_by_industries")
+        return self._to_frame(self._quiet_call(method))
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
     def _fetch_price_history(self, ticker: str, months: int) -> pd.DataFrame:
@@ -207,6 +201,27 @@ class VnstockClient:
     def _vnstock_module(self) -> Any:
         return importlib.import_module("vnstock")
 
+    def _record_terminal_error(self, exc: BaseException) -> None:
+        if isinstance(exc, KeyboardInterrupt):
+            raise exc
+        if isinstance(exc, SystemExit):
+            self._terminal_api_error = (
+                "vnstock terminated the request, likely due to API rate limit or access limits"
+            )
+
+    def _terminal_error_result(self) -> FetchResult:
+        return FetchResult(
+            False,
+            pd.DataFrame(),
+            status="API_ERROR",
+            error=self._terminal_api_error,
+            source=self.source,
+        )
+
+    def _error_result(self, exc: BaseException) -> FetchResult:
+        message = self._terminal_api_error or str(exc) or type(exc).__name__
+        return FetchResult(False, pd.DataFrame(), status="API_ERROR", error=message, source=self.source)
+
     def _polite_sleep(self) -> None:
         time.sleep(random.uniform(self.min_sleep_seconds, self.max_sleep_seconds))
 
@@ -228,6 +243,28 @@ class VnstockClient:
         if isinstance(value, list):
             return pd.DataFrame(value)
         return pd.DataFrame(value)
+
+    @classmethod
+    def _filter_stock_rows(cls, frame: pd.DataFrame) -> pd.DataFrame:
+        if frame.empty:
+            return frame
+        type_col = cls._first_existing(frame, ["type", "security_type", "securityType"])
+        if not type_col:
+            return frame
+        return frame[frame[type_col].astype(str).str.upper() == "STOCK"].reset_index(drop=True)
+
+    @staticmethod
+    def _first_existing(frame: pd.DataFrame, candidates: list[str]) -> str | None:
+        if frame.empty:
+            return None
+        exact = {str(col): str(col) for col in frame.columns}
+        lower = {str(col).lower(): str(col) for col in frame.columns}
+        for candidate in candidates:
+            if candidate in exact:
+                return exact[candidate]
+            if candidate.lower() in lower:
+                return lower[candidate.lower()]
+        return None
 
     def _cache_path(self, namespace: str, key: str) -> Path:
         path = self.cache_dir / namespace

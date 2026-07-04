@@ -21,6 +21,14 @@ The script writes:
 - `data/universe.csv`
 - `data/universe_rejects.csv`
 
+## Smoke Test Vnstock
+
+```bash
+python scripts/smoke_vnstock.py
+```
+
+The smoke test checks the real VCI symbol and ICB shapes without building the full universe.
+
 ## Run Tests
 
 ```bash
