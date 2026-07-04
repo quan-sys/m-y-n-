@@ -1,0 +1,19 @@
+{
+  "run_id": "weekly-mvp-2026-07-04T11:53:10.917388+00:00",
+  "generated_at": "2026-07-04T11:53:10.917388+00:00",
+  "as_of": "2026-07-03",
+  "git_commit_if_available": "afd9738",
+  "python_version": "3.13.5",
+  "package_versions": {
+    "pandas": "2.3.3",
+    "pyarrow": "19.0.0",
+    "pytest": "8.3.4",
+    "tenacity": "9.0.0",
+    "pydantic": "2.13.4",
+    "vnstock": "4.0.3"
+  },
+  "universe_row_count": 378,
+  "universe_hash": "68711ceaf4c968b6ee2e1084eb238b5d3944fbed19ffc20f0005eb08ee48e702",
+  "source": "vnstock_vci_quote_history",
+  "output_dir": "C:\\Users\\Admin\\Documents\\Codex\\2026-07-04\\files-mentioned-by-the-user-codex\\work\\sprint2-m-y-n-\\reports\\2026-07-04"
+}

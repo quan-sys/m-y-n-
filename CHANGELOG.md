@@ -16,3 +16,8 @@
 - Fixed VCI price-history unit handling for ADTV proxy by using `close * volume * 1000` when prices are quoted in thousand VND.
 - Made market cap fetching optional via `--fetch-market-cap` to reduce M0 API pressure; default outputs leave `market_cap` blank instead of fabricating it.
 - Verified full `scripts/run_universe.py` run: 3,467 raw symbols, 1,745 stock symbols, 1,729 tickers with ICB2, 378 accepted rows, 1,367 rejected rows, and all 19 ICB2 sectors covered. Top rejects were `LOW_LIQUIDITY`, `UNSUPPORTED_EXCHANGE`, `MISSING_PRICE_6M`, and 1 `API_ERROR`.
+- Added Sprint 2 MVP `scripts/run_weekly_mvp.py` and `src/weekly.py` for indicator-only weekly ICB2 sector reporting.
+- Added Sprint 2 outputs under `reports/<YYYY-MM-DD>/`: `WEEKLY_REPORT.md`, `sector_summary.csv`, `sector_indicators_tier1.csv`, `data_quality.csv`, and `run_metadata.json`.
+- Added sector-level tier 1 indicators: equal-weight returns, optional cap-weight returns, VN-Index relative strength, MA breadth, 52w drawdown/low distance, liquidity trend, and non-annualized 20d volatility.
+- Added data quality coverage gates and `confidence_lite` as a data-confidence measure, not an investment score.
+- Added Sprint 2 unit tests for indicators, missing-data handling, report safety, quality coverage, and run metadata.
