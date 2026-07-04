@@ -16,8 +16,6 @@ M0 is limited to:
 
 M0 must not include indicators, scoring, weekly reports, BCTC, Tier 2 drivers, deep-dive analysis, dashboards, databases, or GitHub Actions.
 
-Sprint 2 may add a market-only Tier 1 weekly MVP report. Sprint 2 still must not include BCTC, valuation percentile, earnings trend, margin trend, foreign flow from uncertain sources, Tier 2 drivers, GitHub Actions, deep-dive analysis, dashboards, transaction recommendations, or target prices.
-
 ## Data Rules
 
 - Never fabricate financial data.
@@ -56,10 +54,4 @@ python -m py_compile src/universe.py src/data/vnstock_client.py scripts/run_univ
 pip install -r requirements.txt
 pytest
 python scripts/run_universe.py
-```
-
-Sprint 2 check:
-
-```bash
-python scripts/run_weekly_mvp.py
 ```
