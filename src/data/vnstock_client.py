@@ -87,7 +87,7 @@ class VnstockClient:
 
     def get_price_history(self, ticker: str, months: int = 6) -> FetchResult:
         normalized = self._safe_key(ticker)
-        cache_path = self._cache_path("prices", normalized)
+        cache_path = self._cache_path("prices", f"{normalized}_{months}m")
         cached = self._read_cache(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=2):
             return FetchResult(True, cached, source=self.source, as_of=self._latest_date(cached))
