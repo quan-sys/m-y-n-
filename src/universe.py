@@ -45,6 +45,9 @@ def build_universe(
     config_dir: str | Path = "config",
     write_outputs: bool = True,
     min_adtv_20d: float = MIN_ADTV_20D,
+    limit: int | None = None,
+    max_consecutive_api_errors: int = 10,
+    fetch_market_cap: bool = False,
 ) -> UniverseBuildResult:
     client = client or VnstockClient()
     output_dir = Path(output_dir)
@@ -56,13 +59,20 @@ def build_universe(
     symbols = _normalize_symbols(symbols_result.data)
     if symbols_result.status == "STALE_DATA":
         symbols["data_status"] = "STALE_DATA"
+    stock_symbol_count = len(symbols)
+    raw_symbol_count = _metadata_int(symbols_result, "raw_count", fallback=stock_symbol_count)
+    if limit is not None:
+        symbols = symbols.head(max(limit, 0)).copy()
 
     tickers = symbols["ticker"].dropna().astype(str).tolist() if "ticker" in symbols else []
     icb_result = _as_result(client.get_icb_classification(tickers), source=source)
     icb = _normalize_icb(icb_result.data)
     icb = _merge_icb_overrides(icb, config_dir / "icb_overrides.csv")
+    tickers_with_icb2 = _count_tickers_with_icb2(symbols, icb)
 
     rows: list[dict[str, Any]] = []
+    consecutive_api_errors = 0
+    soft_stop_reason = ""
     for _, symbol_row in symbols.iterrows():
         ticker = _clean_text(symbol_row.get("ticker"))
         exchange = _clean_text(symbol_row.get("exchange"))
@@ -95,10 +105,20 @@ def build_universe(
             rows.append(_reject(row, "MISSING_ICB_CLASSIFICATION", "MISSING_DATA"))
             continue
 
+        if soft_stop_reason:
+            rows.append(_reject(row, "API_ERROR", "API_ERROR"))
+            continue
+
         price_result = _as_result(client.get_price_history(ticker, months=6), source=source)
         if not price_result.ok:
             rows.append(_reject(row, "API_ERROR", "API_ERROR"))
+            consecutive_api_errors += 1
+            if consecutive_api_errors >= max_consecutive_api_errors:
+                soft_stop_reason = (
+                    f"stopped API calls after {consecutive_api_errors} consecutive API_ERROR results"
+                )
             continue
+        consecutive_api_errors = 0
 
         price = _normalize_prices(price_result.data)
         if price.empty:
@@ -122,21 +142,29 @@ def build_universe(
 
         adtv_20d = float(valid_value.tail(20)["trading_value"].mean())
         row["adtv_20d"] = adtv_20d
-        if bool(valid_value.tail(20)["trading_value_is_proxy"].any()):
-            row["source"] = _combine_sources(row["source"], "adtv_close_x_volume_proxy")
+        proxy_tail = valid_value.tail(20)
+        if bool(proxy_tail["trading_value_is_proxy"].any()):
+            proxy_source = (
+                "adtv_close_x_volume_x1000_proxy"
+                if "trading_value_proxy_scale" in proxy_tail
+                and float(proxy_tail["trading_value_proxy_scale"].max()) == 1000.0
+                else "adtv_close_x_volume_proxy"
+            )
+            row["source"] = _combine_sources(row["source"], proxy_source)
 
         if adtv_20d < min_adtv_20d:
             rows.append(_reject(row, "LOW_LIQUIDITY", row["data_status"]))
             continue
 
-        market_cap_result = _as_result(client.get_market_cap(ticker), source=source)
-        if market_cap_result.ok:
-            market_cap, market_cap_source = _extract_market_cap_with_source(market_cap_result.data)
-            row["market_cap"] = market_cap
-            if market_cap_source:
-                row["source"] = _combine_sources(row["source"], market_cap_source)
-            if market_cap_result.status == "STALE_DATA":
-                row["data_status"] = "STALE_DATA"
+        if fetch_market_cap:
+            market_cap_result = _as_result(client.get_market_cap(ticker), source=source)
+            if market_cap_result.ok:
+                market_cap, market_cap_source = _extract_market_cap_with_source(market_cap_result.data)
+                row["market_cap"] = market_cap
+                if market_cap_source:
+                    row["source"] = _combine_sources(row["source"], market_cap_source)
+                if market_cap_result.status == "STALE_DATA":
+                    row["data_status"] = "STALE_DATA"
 
         row["status"] = "ACCEPTED"
         row["reject_reason"] = ""
@@ -153,17 +181,27 @@ def build_universe(
 
     summary = _build_summary(
         total_symbols=len(symbols),
+        raw_symbol_count=raw_symbol_count,
+        stock_symbol_count=stock_symbol_count,
+        tickers_with_icb2=tickers_with_icb2,
         accepted=accepted,
         rejects=rejects,
         output_dir=output_dir,
         symbols_status=symbols_result.status,
         icb_status=icb_result.status,
+        limit=limit,
+        soft_stop_reason=soft_stop_reason,
     )
     return UniverseBuildResult(accepted=accepted, rejects=rejects, summary=summary)
 
 
 def print_summary(summary: dict[str, Any]) -> None:
-    print(f"Total symbols fetched: {summary['total_symbols']}")
+    print(f"Total raw symbols fetched: {summary['raw_symbol_count']}")
+    print(f"Stock symbols after filtering: {summary['stock_symbol_count']}")
+    print(f"Symbols processed: {summary['total_symbols']}")
+    if summary.get("limit") is not None:
+        print(f"Limit applied: {summary['limit']}")
+    print(f"Tickers with ICB2: {summary['tickers_with_icb2']}")
     print(f"Accepted symbols: {summary['accepted_count']}")
     print(f"Rejected symbols: {summary['rejected_count']}")
     print(f"ICB2 sectors covered: {summary['icb2_covered']}")
@@ -197,6 +235,15 @@ def _as_result(value: Any, source: str) -> FetchResult:
     return FetchResult(True, value, source=source)
 
 
+def _metadata_int(result: FetchResult, key: str, fallback: int) -> int:
+    if result.metadata and key in result.metadata:
+        try:
+            return int(result.metadata[key])
+        except (TypeError, ValueError):
+            return fallback
+    return fallback
+
+
 def _normalize_symbols(data: Any) -> pd.DataFrame:
     frame = _to_frame(data)
     if frame.empty:
@@ -218,7 +265,11 @@ def _normalize_symbols(data: Any) -> pd.DataFrame:
     result = pd.DataFrame()
     result["ticker"] = frame[ticker_col].map(_clean_text) if ticker_col else ""
     result["exchange"] = frame[exchange_col].map(_normalize_exchange) if exchange_col else ""
-    return result.drop_duplicates(subset=["ticker"], keep="first").reset_index(drop=True)
+    result = result.drop_duplicates(subset=["ticker"], keep="first")
+    exchange_rank = {"HOSE": 0, "HNX": 1, "UPCOM": 2}
+    result["_exchange_rank"] = result["exchange"].map(exchange_rank).fillna(9)
+    result = result.sort_values(["_exchange_rank", "ticker"]).drop(columns=["_exchange_rank"])
+    return result.reset_index(drop=True)
 
 
 def _normalize_icb(data: Any) -> pd.DataFrame:
@@ -317,6 +368,17 @@ def _lookup_icb(icb: pd.DataFrame, ticker: str) -> dict[str, Any]:
     return match.iloc[-1].to_dict()
 
 
+def _count_tickers_with_icb2(symbols: pd.DataFrame, icb: pd.DataFrame) -> int:
+    if symbols.empty or icb.empty or "ticker" not in icb.columns or "icb2" not in icb.columns:
+        return 0
+    wanted = set(symbols["ticker"].dropna().astype(str).str.upper())
+    has_icb2 = icb[
+        icb["ticker"].astype(str).str.upper().isin(wanted)
+        & (icb["icb2"].astype(str).str.strip() != "")
+    ]
+    return int(has_icb2["ticker"].nunique())
+
+
 def _normalize_prices(data: Any) -> pd.DataFrame:
     frame = _to_frame(data)
     if frame.empty:
@@ -343,11 +405,17 @@ def _with_trading_value(price: pd.DataFrame) -> pd.DataFrame:
     result = price.copy()
     result["trading_value"] = result["value"]
     result["trading_value_is_proxy"] = False
+    result["trading_value_proxy_scale"] = 1.0
     missing = result["trading_value"].isna()
     proxy_ready = missing & result["close"].notna() & result["volume"].notna()
+    # VCI history prices are often quoted in thousand VND, while volume is shares.
+    proxy_scale = 1000.0 if result.loc[proxy_ready, "close"].median() < 1000 else 1.0
     # Fallback uses close * volume only when vnstock does not provide traded value.
-    result.loc[proxy_ready, "trading_value"] = result.loc[proxy_ready, "close"] * result.loc[proxy_ready, "volume"]
+    result.loc[proxy_ready, "trading_value"] = (
+        result.loc[proxy_ready, "close"] * result.loc[proxy_ready, "volume"] * proxy_scale
+    )
     result.loc[proxy_ready, "trading_value_is_proxy"] = True
+    result.loc[proxy_ready, "trading_value_proxy_scale"] = proxy_scale
     return result
 
 
@@ -393,11 +461,16 @@ def _extract_market_cap_with_source(data: Any) -> tuple[float | None, str | None
 
 def _build_summary(
     total_symbols: int,
+    raw_symbol_count: int,
+    stock_symbol_count: int,
+    tickers_with_icb2: int,
     accepted: pd.DataFrame,
     rejects: pd.DataFrame,
     output_dir: Path,
     symbols_status: str,
     icb_status: str,
+    limit: int | None,
+    soft_stop_reason: str,
 ) -> dict[str, Any]:
     icb2_counts = accepted["icb2"].replace("", pd.NA).dropna().value_counts() if not accepted.empty else pd.Series()
     top_rejects = list(rejects["reject_reason"].value_counts().head(10).items()) if not rejects.empty else []
@@ -415,9 +488,15 @@ def _build_summary(
         warnings.append(f"symbol source status {symbols_status}")
     if icb_status in {"API_ERROR", "STALE_DATA"}:
         warnings.append(f"ICB source status {icb_status}")
+    if soft_stop_reason:
+        warnings.append(soft_stop_reason)
 
     return {
+        "raw_symbol_count": raw_symbol_count,
+        "stock_symbol_count": stock_symbol_count,
         "total_symbols": total_symbols,
+        "limit": limit,
+        "tickers_with_icb2": tickers_with_icb2,
         "accepted_count": len(accepted),
         "rejected_count": len(rejects),
         "icb2_covered": int(len(icb2_counts)),

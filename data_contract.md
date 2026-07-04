@@ -81,9 +81,11 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 
 ## No Fabricated Data
 
-The pipeline must never invent financial values. If a value is missing from the public source, it stays empty or the row is rejected. `adtv_20d` may use `close * volume` only when traded value is absent and both fields exist; this is marked in `source` as `adtv_close_x_volume_proxy`.
+The pipeline must never invent financial values. If a value is missing from the public source, it stays empty or the row is rejected. `adtv_20d` may use `close * volume` only when traded value is absent and both fields exist; this is marked in `source` as `adtv_close_x_volume_proxy`. For VCI history where prices are quoted in thousand VND, the proxy uses `close * volume * 1000` and marks `source` with `adtv_close_x_volume_x1000_proxy`.
 
 `market_cap` may use `issue_share * last_close` only when both fields exist and no direct market cap field is available. Proxy market cap rows must include `mktcap_shares_x_close_proxy` in `source`.
+
+M0 runtime disables market cap fetching by default to reduce API pressure. Blank `market_cap` values mean missing or intentionally not fetched source data, not zero and not an estimate.
 
 ## ICB Classification Shape
 
@@ -116,6 +118,17 @@ python scripts/smoke_vnstock.py
 ```
 
 The smoke test calls the real VCI listing and industry APIs, validates their shape, and prints `SMOKE TEST PASSED` only when normalization can map tickers to `icb2`.
+
+## Runtime Hardening
+
+`scripts/run_universe.py` supports smaller checks before a full run:
+
+```bash
+python scripts/run_universe.py --limit 20
+python scripts/run_universe.py --limit 100
+```
+
+Live ticker fetches are sequential in M0. The client sleeps randomly between requests, retries with exponential backoff, caches OHLCV and overview by ticker, and resumes from fresh cache when available. If consecutive ticker-level API errors exceed the configured threshold, the runner stops live API calls softly and marks remaining eligible tickers as `API_ERROR`.
 
 ## Check Real Outputs
 

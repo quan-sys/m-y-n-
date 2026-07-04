@@ -113,7 +113,12 @@ def test_market_cap_proxy_uses_issue_share_times_last_close_with_source_marker()
 
 
 def test_valid_long_icb_shape_does_not_mass_reject_missing_icb():
-    result = build_universe(client=VciShapeClient(), write_outputs=False, min_adtv_20d=0)
+    result = build_universe(
+        client=VciShapeClient(),
+        write_outputs=False,
+        min_adtv_20d=0,
+        fetch_market_cap=True,
+    )
 
     assert len(result.accepted) == 2
     assert "MISSING_ICB_CLASSIFICATION" not in set(result.rejects["reject_reason"])

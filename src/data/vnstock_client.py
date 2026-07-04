@@ -6,6 +6,7 @@ from pathlib import Path
 import contextlib
 import importlib
 import io
+import json
 import random
 import re
 import time
@@ -26,6 +27,7 @@ class FetchResult:
     error: str | None = None
     source: str = "vnstock"
     as_of: str | None = None
+    metadata: dict[str, Any] | None = None
 
 
 class VnstockClient:
@@ -38,8 +40,8 @@ class VnstockClient:
         listing_source: str = "VCI",
         quote_source: str = "VCI",
         company_source: str = "VCI",
-        min_sleep_seconds: float = 0.15,
-        max_sleep_seconds: float = 0.65,
+        min_sleep_seconds: float = 2.8,
+        max_sleep_seconds: float = 3.6,
         use_cache: bool = True,
     ) -> None:
         self.cache_dir = Path(cache_dir)
@@ -58,13 +60,21 @@ class VnstockClient:
             return self._terminal_error_result()
         cache_path = self._cache_path("symbols", "all")
         cached = self._read_cache(cache_path)
+        cached_metadata = self._read_cache_metadata(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=7):
-            return FetchResult(True, cached, source=self.source, as_of=self._today())
+            return FetchResult(
+                True,
+                cached,
+                source=self.source,
+                as_of=self._today(),
+                metadata=cached_metadata or {"raw_count": len(cached), "stock_count": len(cached), "cache": True},
+            )
 
         try:
             data = self._fetch_symbols(tuple(exchanges))
             self._write_cache(cache_path, data)
-            return FetchResult(True, data, source=self.source, as_of=self._today())
+            self._write_cache_metadata(cache_path, dict(data.attrs))
+            return FetchResult(True, data, source=self.source, as_of=self._today(), metadata=dict(data.attrs))
         except BaseException as exc:  # noqa: BLE001 - API failures are converted to data status.
             self._record_terminal_error(exc)
             if cached is not None:
@@ -76,17 +86,29 @@ class VnstockClient:
             return self._terminal_error_result()
         cache_path = self._cache_path("icb", "classification")
         cached = self._read_cache(cache_path)
+        cached_metadata = self._read_cache_metadata(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=30):
-            return FetchResult(True, cached, source=self.source, as_of=self._today())
+            data = self._filter_tickers(cached, tickers)
+            return FetchResult(
+                True,
+                data,
+                source=self.source,
+                as_of=self._today(),
+                metadata=cached_metadata or {"raw_count": len(cached), "cache": True},
+            )
 
         try:
-            data = self._fetch_icb_classification()
-            ticker_col = self._first_existing(data, ["ticker", "symbol", "code", "stock_symbol", "stockSymbol"])
-            if tickers is not None and not data.empty and ticker_col:
-                wanted = {str(t).strip().upper() for t in tickers}
-                data = data[data[ticker_col].astype(str).str.upper().isin(wanted)]
-            self._write_cache(cache_path, data)
-            return FetchResult(True, data, source=self.source, as_of=self._today())
+            raw_data = self._fetch_icb_classification()
+            self._write_cache(cache_path, raw_data)
+            self._write_cache_metadata(cache_path, {"raw_count": len(raw_data)})
+            data = self._filter_tickers(raw_data, tickers)
+            return FetchResult(
+                True,
+                data,
+                source=self.source,
+                as_of=self._today(),
+                metadata={"raw_count": len(raw_data)},
+            )
         except BaseException as exc:  # noqa: BLE001
             self._record_terminal_error(exc)
             if cached is not None:
@@ -148,7 +170,11 @@ class VnstockClient:
         frame = self._to_frame(raw)
         if frame.empty:
             frame = self._to_frame(self._quiet_call(listing.all_symbols))
-        return self._filter_stock_rows(frame)
+        raw_count = len(frame)
+        stock_frame = self._filter_stock_rows(frame)
+        stock_frame.attrs["raw_count"] = raw_count
+        stock_frame.attrs["stock_count"] = len(stock_frame)
+        return stock_frame
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8), reraise=True)
     def _fetch_icb_classification(self) -> pd.DataFrame:
@@ -200,6 +226,16 @@ class VnstockClient:
 
     def _vnstock_module(self) -> Any:
         return importlib.import_module("vnstock")
+
+    @classmethod
+    def _filter_tickers(cls, data: pd.DataFrame, tickers: Iterable[str] | None) -> pd.DataFrame:
+        if tickers is None or data.empty:
+            return data
+        ticker_col = cls._first_existing(data, ["ticker", "symbol", "code", "stock_symbol", "stockSymbol"])
+        if not ticker_col:
+            return data
+        wanted = {str(t).strip().upper() for t in tickers}
+        return data[data[ticker_col].astype(str).str.upper().isin(wanted)].copy()
 
     def _record_terminal_error(self, exc: BaseException) -> None:
         if isinstance(exc, KeyboardInterrupt):
@@ -300,6 +336,26 @@ class VnstockClient:
             data.to_parquet(path, index=False)
         except Exception:
             data.to_csv(path.with_suffix(".csv"), index=False)
+
+    @staticmethod
+    def _metadata_path(path: Path) -> Path:
+        return path.with_suffix(".metadata.json")
+
+    @classmethod
+    def _read_cache_metadata(cls, path: Path) -> dict[str, Any] | None:
+        metadata_path = cls._metadata_path(path)
+        if not metadata_path.exists():
+            return None
+        try:
+            return json.loads(metadata_path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+
+    @classmethod
+    def _write_cache_metadata(cls, path: Path, metadata: dict[str, Any]) -> None:
+        if not metadata:
+            return
+        cls._metadata_path(path).write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
 
     @staticmethod
     def _latest_date(data: pd.DataFrame) -> str | None:

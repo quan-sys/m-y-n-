@@ -21,6 +21,19 @@ The script writes:
 - `data/universe.csv`
 - `data/universe_rejects.csv`
 
+For a smaller runtime check:
+
+```bash
+python scripts/run_universe.py --limit 20
+python scripts/run_universe.py --limit 100
+```
+
+Market cap fetching is disabled by default to reduce M0 API rate-limit pressure. Enable it only when needed:
+
+```bash
+python scripts/run_universe.py --fetch-market-cap
+```
+
 ## Smoke Test Vnstock
 
 ```bash
@@ -48,3 +61,5 @@ See `data_contract.md` for output schemas, valid `reject_reason` values, valid `
 - Public data sources can be missing, stale, delayed, wrong, or temporarily unavailable.
 - Missing data is rejected or marked; the pipeline must not invent financial values.
 - M0 does not include indicators, scoring, weekly reports, BCTC, valuation, Tier 2 drivers, dashboards, or transaction recommendations.
+- Live API calls run sequentially with random sleep, per-ticker cache/resume, and a soft stop after consecutive ticker-level API errors.
+- `market_cap` can be blank in default M0 runs; blank means missing/not fetched data, not a fabricated value.
