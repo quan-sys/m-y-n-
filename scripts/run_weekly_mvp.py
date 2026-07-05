@@ -47,6 +47,9 @@ def main() -> int:
     valid_price_total = int(result.data_quality["valid_price_count"].sum())
     index_source = "|".join(sorted(result.data_quality["index_source"].dropna().astype(str).unique()))
     cap_weight_available = int((result.data_quality["cap_weight_available"].astype(str) == "yes").sum())
+    cap_weight_status = "|".join(sorted(result.data_quality["cap_weight_status"].dropna().astype(str).unique()))
+    market_cap_available = int(result.data_quality["market_cap_available_count"].sum())
+    market_cap_coverage_min = float(result.data_quality["market_cap_coverage_pct"].min())
     print("Sprint 2 weekly MVP summary:")
     print(f"- sector count: {result.indicators['icb2'].nunique()}")
     print(f"- universe row count: {result.metadata['universe_row_count']}")
@@ -59,6 +62,9 @@ def main() -> int:
     print(f"- API_ERROR count: {api_error_total}")
     print(f"- index source: {index_source}")
     print(f"- cap-weight available sectors: {cap_weight_available}")
+    print(f"- cap-weight status: {cap_weight_status}")
+    print(f"- market cap available count: {market_cap_available}")
+    print(f"- market cap min sector coverage: {market_cap_coverage_min:.4f}")
     print(f"- output directory: {result.output_dir.resolve()}")
     return 0
 

@@ -2,6 +2,10 @@
 
 ## 2026-07-05
 
+- Added Sprint 2.2 market-cap investigation support in weekly reporting.
+- Added weekly market-cap enrichment from company overview with `SOURCE_REPORTED_MARKET_CAP` and `SHARES_X_LAST_CLOSE_PROXY` markers.
+- Added controlled cap-weight skip fields: market-cap coverage, `cap_weight_status`, and `cap_weight_reason`.
+- Updated market-cap source markers and tests to avoid unflagged proxy data.
 - Hardened Sprint 2.1 weekly OHLCV fetch accounting with fetched/cached/stale/API_ERROR counts.
 - Added quote-source fallback for ticker and index history fetches.
 - Added `UNIVERSE_EQUAL_WEIGHT_PROXY` relative-strength fallback when VNINDEX/VN30 are unavailable.

@@ -14,6 +14,7 @@ from typing import Any
 import pandas as pd
 
 from src.data.vnstock_client import FetchResult, VnstockClient
+from src.universe import _extract_market_cap_with_source
 
 
 MISSING = "N/A (MISSING_DATA)"
@@ -21,10 +22,18 @@ API_ERROR = "API_ERROR"
 STALE_DATA = "STALE_DATA"
 LIMITED_HISTORY = "LIMITED_HISTORY"
 SOURCE = "vnstock_vci_quote_history"
+MARKET_CAP_SOURCE = "vnstock_vci_company_overview"
 VNINDEX_SYMBOLS = ("VNINDEX", "VN30")
 INDEX_SOURCE_PROXY = "UNIVERSE_EQUAL_WEIGHT_PROXY"
 CACHE_STATE_CACHED = "CACHED"
 CACHE_STATE_FETCHED = "FETCHED"
+MARKET_CAP_SOURCE_REPORTED = "SOURCE_REPORTED_MARKET_CAP"
+MARKET_CAP_SOURCE_PROXY = "SHARES_X_LAST_CLOSE_PROXY"
+MARKET_CAP_SOURCE_MISSING = "N/A"
+MARKET_CAP_STATUS_OK = "OK"
+MARKET_CAP_STATUS_MISSING = "MISSING_DATA"
+CAP_WEIGHT_STATUS_OK = "OK"
+CAP_WEIGHT_STATUS_SKIPPED = "SKIPPED_MISSING_MARKET_CAP"
 
 INDICATOR_COLUMNS = [
     "as_of",
@@ -70,6 +79,11 @@ QUALITY_COLUMNS = [
     "valid_ma50_count",
     "valid_ma200_count",
     "valid_market_cap_count",
+    "market_cap_available_count",
+    "market_cap_missing_count",
+    "market_cap_coverage_pct",
+    "market_cap_source",
+    "market_cap_status",
     "missing_price_count",
     "api_error_count",
     "api_error_tickers",
@@ -78,6 +92,8 @@ QUALITY_COLUMNS = [
     "coverage_warning",
     "index_source",
     "cap_weight_available",
+    "cap_weight_status",
+    "cap_weight_reason",
     "source",
 ]
 
@@ -154,6 +170,8 @@ def run_weekly_mvp(
     )
 
     price_results = _fetch_ticker_prices(universe, client=client, progress=progress)
+    market_cap_results = _fetch_market_caps(universe, client=client, progress=progress)
+    universe = enrich_universe_market_caps(universe, market_cap_results)
     index_result = _fetch_index_prices(client)
     outputs = build_weekly_outputs(universe, price_results, index_result=index_result, source=SOURCE)
 
@@ -330,6 +348,54 @@ def price_cache_state(result: FetchResult) -> str:
     return "UNKNOWN"
 
 
+def enrich_universe_market_caps(universe: pd.DataFrame, market_cap_results: dict[str, Any]) -> pd.DataFrame:
+    frame = _accepted_universe(universe)
+    for column, default in (
+        ("market_cap_source", MARKET_CAP_SOURCE_MISSING),
+        ("market_cap_status", MARKET_CAP_STATUS_MISSING),
+    ):
+        if column not in frame.columns:
+            frame[column] = default
+
+    for index, row in frame.iterrows():
+        ticker = str(row["ticker"]).strip().upper()
+        existing_cap = _single_positive_number(row.get("market_cap"))
+        if existing_cap is not None:
+            frame.at[index, "market_cap"] = existing_cap
+            if str(row.get("market_cap_source", "")).strip() in {"", MARKET_CAP_SOURCE_MISSING}:
+                frame.at[index, "market_cap_source"] = MARKET_CAP_SOURCE_REPORTED
+            if str(row.get("market_cap_status", "")).strip() in {"", MARKET_CAP_STATUS_MISSING}:
+                frame.at[index, "market_cap_status"] = MARKET_CAP_STATUS_OK
+            continue
+
+        result = _as_fetch_result(market_cap_results.get(ticker), source=MARKET_CAP_SOURCE)
+        value, source = extract_market_cap_from_result(result)
+        if value is not None and source is not None:
+            frame.at[index, "market_cap"] = value
+            frame.at[index, "market_cap_source"] = source
+            frame.at[index, "market_cap_status"] = result.status if result.status == STALE_DATA else MARKET_CAP_STATUS_OK
+        else:
+            frame.at[index, "market_cap"] = ""
+            frame.at[index, "market_cap_source"] = MARKET_CAP_SOURCE_MISSING
+            frame.at[index, "market_cap_status"] = market_cap_missing_status(result)
+    return frame
+
+
+def extract_market_cap_from_result(result: FetchResult) -> tuple[float | None, str | None]:
+    if not result.ok:
+        return None, None
+    value, source = _extract_market_cap_with_source(result.data)
+    if value is None or source is None:
+        return None, None
+    return float(value), source
+
+
+def market_cap_missing_status(result: FetchResult) -> str:
+    if result.status in {API_ERROR, STALE_DATA}:
+        return result.status
+    return MARKET_CAP_STATUS_MISSING
+
+
 def calculate_sector_indicators(
     icb2: str,
     universe_rows: pd.DataFrame,
@@ -407,7 +473,15 @@ def build_data_quality_row(
     stale_price_count = sum(1 for status in price_statuses.values() if status == STALE_DATA)
     valid_ma50_count = sum(1 for frame in price_histories.values() if _has_valid_close(frame, min_rows=50))
     valid_ma200_count = sum(1 for frame in price_histories.values() if _has_valid_close(frame, min_rows=200))
-    valid_market_cap_count = int((_market_caps(universe_rows) > 0).sum())
+    market_caps = _market_caps(universe_rows)
+    valid_market_cap_count = int((market_caps > 0).sum())
+    market_cap_available_count = valid_market_cap_count
+    market_cap_missing_count = max(accepted_count - market_cap_available_count, 0)
+    market_cap_coverage_pct = (
+        market_cap_available_count / accepted_count if accepted_count else 0.0
+    )
+    market_cap_source = _combine_unique_values(universe_rows, "market_cap_source")
+    market_cap_status = _combine_unique_values(universe_rows, "market_cap_status")
     api_error_count = sum(1 for status in price_statuses.values() if status == API_ERROR)
     api_error_tickers = sorted(ticker for ticker, status in price_statuses.items() if status == API_ERROR)
     missing_price_count = max(accepted_count - valid_price_count, 0)
@@ -417,6 +491,14 @@ def build_data_quality_row(
     cap_weight_available = (
         indicator_row["sector_return_1w_cap_weight"] != MISSING
         and indicator_row["sector_return_1m_cap_weight"] != MISSING
+    )
+    cap_weight_status = CAP_WEIGHT_STATUS_OK if cap_weight_available else CAP_WEIGHT_STATUS_SKIPPED
+    cap_weight_reason = cap_weight_reason_for(
+        cap_weight_available=cap_weight_available,
+        market_cap_available_count=market_cap_available_count,
+        accepted_count=accepted_count,
+        valid_price_count=valid_price_count,
+        market_cap_status=market_cap_status,
     )
 
     return {
@@ -429,6 +511,11 @@ def build_data_quality_row(
         "valid_ma50_count": valid_ma50_count,
         "valid_ma200_count": valid_ma200_count,
         "valid_market_cap_count": valid_market_cap_count,
+        "market_cap_available_count": market_cap_available_count,
+        "market_cap_missing_count": market_cap_missing_count,
+        "market_cap_coverage_pct": market_cap_coverage_pct,
+        "market_cap_source": market_cap_source,
+        "market_cap_status": market_cap_status,
         "missing_price_count": missing_price_count,
         "api_error_count": api_error_count,
         "api_error_tickers": "|".join(api_error_tickers) if api_error_tickers else "NONE",
@@ -437,6 +524,8 @@ def build_data_quality_row(
         "coverage_warning": coverage_warning,
         "index_source": index_source,
         "cap_weight_available": "yes" if cap_weight_available else "no",
+        "cap_weight_status": cap_weight_status,
+        "cap_weight_reason": cap_weight_reason,
         "source": source,
     }
 
@@ -742,6 +831,17 @@ def render_weekly_report(
     cap_weight_available_count = int(
         (data_quality.get("cap_weight_available", pd.Series(dtype=str)).astype(str) == "yes").sum()
     )
+    market_cap_available_total = quality_total(data_quality, "market_cap_available_count")
+    market_cap_missing_total = quality_total(data_quality, "market_cap_missing_count")
+    market_cap_sources = quality_unique_values(data_quality, "market_cap_source")
+    cap_weight_statuses = quality_unique_values(data_quality, "cap_weight_status")
+    market_cap_min_coverage = quality_min(data_quality, "market_cap_coverage_pct")
+    cap_weight_note = (
+        "Cap-weight indicators are unavailable because reliable market_cap/share-count data is missing. "
+        "The report does not substitute equal-weight data as cap-weight."
+        if cap_weight_available_count == 0
+        else "Cap-weight indicators are shown only for sectors with complete market_cap coverage for the return window."
+    )
 
     lines = [
         "# Báo cáo tuần Sector Cycle Monitor",
@@ -756,6 +856,10 @@ def render_weekly_report(
         f"- Tổng ticker API_ERROR: {api_error_total}",
         f"- Index source đang dùng: {index_sources}",
         f"- Cap-weight available: {'yes' if cap_weight_available_count else 'no'} ({cap_weight_available_count}/{sector_count} sectors)",
+        f"- Cap-weight status: {cap_weight_statuses}",
+        f"- Market-cap source: {market_cap_sources}",
+        f"- Market-cap available/missing: {market_cap_available_total}/{market_cap_missing_total}",
+        f"- Market-cap min sector coverage: {format_value(market_cap_min_coverage)}",
         "",
         "Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải chỉ dẫn giao dịch.",
         "",
@@ -826,8 +930,13 @@ def render_weekly_report(
             f"cached_price={row.get('cached_price_count', 0)}; stale_price={row.get('stale_price_count', 0)}; "
             f"api_error={row.get('api_error_count', 0)}; "
             f"valid_ma50={row['valid_ma50_count']}; valid_ma200={row['valid_ma200_count']}; "
+            f"market_cap_available={row.get('market_cap_available_count', 0)}; "
+            f"market_cap_coverage={format_value(row.get('market_cap_coverage_pct', MISSING))}; "
+            f"market_cap_source={row.get('market_cap_source', MISSING)}; "
+            f"market_cap_status={row.get('market_cap_status', MISSING)}; "
             f"index_source={row.get('index_source', MISSING)}; "
             f"cap_weight_available={row.get('cap_weight_available', 'no')}; "
+            f"cap_weight_status={row.get('cap_weight_status', MISSING)}; "
             f"missing_indicator_count={row['missing_indicator_count']}."
         )
 
@@ -838,6 +947,7 @@ def render_weekly_report(
             "",
             f"- `{MISSING}` nghĩa là nguồn dữ liệu chưa đủ để tính chỉ báo.",
             "- Cap-weight return cần market_cap từ universe; nếu market_cap trống thì chỉ báo cap-weight được để thiếu dữ liệu.",
+            f"- {cap_weight_note}",
             "- Relative strength dùng `index_source` trong `data_quality.csv`: VNINDEX, VN30, hoặc UNIVERSE_EQUAL_WEIGHT_PROXY khi index thật không lấy được.",
             "- M0 mặc định không bật `--fetch-market-cap`, vì vậy cap-weight không dùng equal-weight thay thế khi market_cap trống.",
             "- Volatility 20d là độ lệch chuẩn 20 phiên của daily sector returns, không annualize.",
@@ -890,6 +1000,13 @@ def run_quality_metadata(data_quality: pd.DataFrame) -> dict[str, Any]:
         "stale_price_total": int(pd.to_numeric(data_quality["stale_price_count"], errors="coerce").fillna(0).sum()),
         "index_source": ";".join(sorted(data_quality["index_source"].dropna().astype(str).unique())),
         "cap_weight_available_sectors": int((data_quality["cap_weight_available"].astype(str) == "yes").sum()),
+        "market_cap_available_total": int(
+            pd.to_numeric(data_quality["market_cap_available_count"], errors="coerce").fillna(0).sum()
+        ),
+        "market_cap_coverage_min": float(
+            pd.to_numeric(data_quality["market_cap_coverage_pct"], errors="coerce").fillna(0).min()
+        ),
+        "cap_weight_status": ";".join(sorted(data_quality["cap_weight_status"].dropna().astype(str).unique())),
     }
 
 
@@ -909,6 +1026,41 @@ def _fetch_ticker_prices(universe: pd.DataFrame, client: Any, progress: bool) ->
             error_count = sum(1 for item in results.values() if item.status == API_ERROR)
             print(
                 "weekly price progress: "
+                f"{index}/{total}; ok={ok_count}; fetched={fetched_count}; "
+                f"cached={cached_count}; stale={stale_count}; api_error={error_count}",
+                flush=True,
+            )
+    return results
+
+
+def _fetch_market_caps(universe: pd.DataFrame, client: Any, progress: bool) -> dict[str, FetchResult]:
+    tickers = universe["ticker"].dropna().astype(str).str.upper().drop_duplicates().tolist()
+    results: dict[str, FetchResult] = {}
+    total = len(tickers)
+    for index, ticker in enumerate(tickers, start=1):
+        existing_rows = universe[universe["ticker"].astype(str).str.upper() == ticker]
+        existing_cap = None
+        if not existing_rows.empty:
+            existing_cap = _single_positive_number(existing_rows.iloc[0].get("market_cap"))
+        if existing_cap is not None:
+            results[ticker] = FetchResult(
+                True,
+                pd.DataFrame([{"market_cap": existing_cap}]),
+                source=MARKET_CAP_SOURCE,
+                metadata={"cache_state": "EXISTING_UNIVERSE"},
+            )
+        else:
+            results[ticker] = _as_fetch_result(client.get_market_cap(ticker), source=MARKET_CAP_SOURCE)
+        if results[ticker].status == API_ERROR:
+            _clear_terminal_api_error(client)
+        if progress and (index % 25 == 0 or index == total):
+            ok_count = sum(1 for item in results.values() if item.ok)
+            fetched_count = sum(1 for item in results.values() if price_cache_state(item) == CACHE_STATE_FETCHED)
+            cached_count = sum(1 for item in results.values() if price_cache_state(item) == CACHE_STATE_CACHED)
+            stale_count = sum(1 for item in results.values() if item.status == STALE_DATA)
+            error_count = sum(1 for item in results.values() if item.status == API_ERROR)
+            print(
+                "market cap progress: "
                 f"{index}/{total}; ok={ok_count}; fetched={fetched_count}; "
                 f"cached={cached_count}; stale={stale_count}; api_error={error_count}",
                 flush=True,
@@ -994,11 +1146,23 @@ def _accepted_universe(universe: pd.DataFrame) -> pd.DataFrame:
     frame = universe.copy()
     if "status" in frame.columns:
         frame = frame[frame["status"].astype(str).str.upper() == "ACCEPTED"].copy()
-    for column in ("ticker", "icb2", "market_cap"):
+    for column in ("ticker", "icb2", "market_cap", "market_cap_source", "market_cap_status"):
         if column not in frame.columns:
             frame[column] = ""
     frame["ticker"] = frame["ticker"].astype(str).str.strip().str.upper()
     frame["icb2"] = frame["icb2"].astype(str).str.strip()
+    frame["market_cap_source"] = frame["market_cap_source"].replace("", MARKET_CAP_SOURCE_MISSING)
+    frame["market_cap_status"] = frame["market_cap_status"].replace("", MARKET_CAP_STATUS_MISSING)
+    caps = _market_caps(frame)
+    valid_cap = caps > 0
+    frame.loc[
+        valid_cap & frame["market_cap_source"].isin(["", MARKET_CAP_SOURCE_MISSING]),
+        "market_cap_source",
+    ] = MARKET_CAP_SOURCE_REPORTED
+    frame.loc[
+        valid_cap & frame["market_cap_status"].isin(["", MARKET_CAP_STATUS_MISSING]),
+        "market_cap_status",
+    ] = MARKET_CAP_STATUS_OK
     return frame[frame["ticker"] != ""].reset_index(drop=True)
 
 
@@ -1046,6 +1210,50 @@ def _market_caps(universe_rows: pd.DataFrame) -> pd.Series:
     if "market_cap" not in universe_rows.columns:
         return pd.Series([pd.NA] * len(universe_rows), index=universe_rows.index)
     return numeric(universe_rows["market_cap"])
+
+
+def _single_positive_number(value: Any) -> float | None:
+    if isinstance(value, pd.Series):
+        values = numeric(value).dropna()
+    else:
+        values = numeric(pd.Series([value])).dropna()
+    if values.empty:
+        return None
+    number = float(values.iloc[-1])
+    return number if math.isfinite(number) and number > 0 else None
+
+
+def _combine_unique_values(frame: pd.DataFrame, column: str) -> str:
+    if column not in frame:
+        return MARKET_CAP_SOURCE_MISSING
+    values = []
+    for value in frame[column].dropna().astype(str):
+        text = value.strip()
+        if text and text not in values:
+            values.append(text)
+    return "|".join(values) if values else MARKET_CAP_SOURCE_MISSING
+
+
+def cap_weight_reason_for(
+    cap_weight_available: bool,
+    market_cap_available_count: int,
+    accepted_count: int,
+    valid_price_count: int,
+    market_cap_status: str,
+) -> str:
+    if cap_weight_available:
+        return "OK: cap-weight uses market_cap for every ticker included in the sector return window."
+    if market_cap_available_count <= 0:
+        return (
+            "SKIPPED_MISSING_MARKET_CAP: reliable market_cap/share-count data is missing; "
+            "equal-weight data is not substituted as cap-weight."
+        )
+    return (
+        "SKIPPED_MISSING_MARKET_CAP: market_cap coverage "
+        f"{market_cap_available_count}/{accepted_count} is not complete for cap-weight returns "
+        f"with {valid_price_count} valid price series; market_cap_status={market_cap_status}; "
+        "equal-weight data is not substituted as cap-weight."
+    )
 
 
 def latest_price_date(histories: dict[str, pd.DataFrame]) -> str | None:
@@ -1138,6 +1346,15 @@ def quality_total(data_quality: pd.DataFrame, column: str) -> int:
     if data_quality.empty or column not in data_quality:
         return 0
     return int(pd.to_numeric(data_quality[column], errors="coerce").fillna(0).sum())
+
+
+def quality_min(data_quality: pd.DataFrame, column: str) -> float | str:
+    if data_quality.empty or column not in data_quality:
+        return MISSING
+    values = pd.to_numeric(data_quality[column], errors="coerce").dropna()
+    if values.empty:
+        return MISSING
+    return float(values.min())
 
 
 def quality_unique_values(data_quality: pd.DataFrame, column: str) -> str:

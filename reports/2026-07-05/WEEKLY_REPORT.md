@@ -1,15 +1,19 @@
 # Báo cáo tuần Sector Cycle Monitor
 
-- Ngày chạy: 2026-07-05T03:14:58.943958+00:00
+- Ngày chạy: 2026-07-05T04:06:57.175115+00:00
 - As of: 2026-07-03
 - Số mã trong universe: 378
 - Số ngành ICB2: 19
-- Cảnh báo dữ liệu chung: LOW_COVERAGE=1; OK=17; WATCH=1; cap_weight_missing=19; api_error=6; index_source=VNINDEX
+- Cảnh báo dữ liệu chung: LOW_COVERAGE=1; OK=17; WATCH=1; cap_weight_missing=19; index_source=VNINDEX
 - Số ngành OK: 17
 - Số ngành DATA_WEAK: 0
-- Tổng ticker API_ERROR: 6
+- Tổng ticker API_ERROR: 0
 - Index source đang dùng: VNINDEX
 - Cap-weight available: no (0/19 sectors)
+- Cap-weight status: SKIPPED_MISSING_MARKET_CAP
+- Market-cap source: N/A|SOURCE_REPORTED_MARKET_CAP|SOURCE_REPORTED_MARKET_CAP|N/A
+- Market-cap available/missing: 131/247
+- Market-cap min sector coverage: 0.1250
 
 Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải chỉ dẫn giao dịch.
 
@@ -26,23 +30,23 @@ Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải c
 
 | ICB2 | Return 1w | Return 1m | Relative strength | Breadth MA50 | Drawdown 52w | Liquidity 4w | confidence_lite | data_quality_status |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| BÁN LẺ | 0.0156 | 0.0392 | 0.0226 | 0.4286 | -0.0555 | 0.0147 | 90 | OK |
+| BÁN LẺ | -0.0300 | -0.0093 | -0.0260 | 0.3750 | -0.0899 | -0.0505 | 90 | OK |
 | BẢO HIỂM | -0.0059 | -0.0495 | -0.0662 | 0.0000 | -0.1952 | -0.4203 | 75 | WATCH |
 | BẤT ĐỘNG SẢN | -0.0080 | -0.0250 | -0.0416 | 0.2105 | -0.1613 | -0.0672 | 90 | OK |
 | CÔNG NGHỆ THÔNG TIN | 0.0109 | -0.0204 | -0.0371 | 0.1667 | -0.2386 | -0.1540 | 90 | OK |
 | DU LỊCH VÀ GIẢI TRÍ | 0.0136 | 0.0340 | 0.0173 | 0.5000 | -0.1452 | 0.7497 | 90 | OK |
 | DẦU KHÍ | 0.0110 | -0.0722 | -0.0889 | 0.1250 | -0.3306 | -0.5718 | 90 | OK |
 | DỊCH VỤ TÀI CHÍNH | 0.0512 | 0.0804 | 0.0637 | 0.7714 | -0.1879 | 1.0585 | 90 | OK |
-| HÀNG & DỊCH VỤ CÔNG NGHIỆP | -0.0078 | 0.0255 | 0.0089 | 0.3750 | -0.0358 | 1.2940 | 90 | OK |
-| HÀNG CÁ NHÂN & GIA DỤNG | -0.0011 | 0.0634 | 0.0468 | 0.2727 | -0.0818 | 1.6139 | 90 | OK |
+| HÀNG & DỊCH VỤ CÔNG NGHIỆP | -0.0076 | 0.0244 | 0.0078 | 0.3636 | -0.0393 | 1.2458 | 90 | OK |
+| HÀNG CÁ NHÂN & GIA DỤNG | -0.0085 | 0.0419 | 0.0252 | 0.2500 | -0.0871 | 1.5514 | 90 | OK |
 | HÓA CHẤT | 0.0073 | -0.0473 | -0.0640 | 0.1739 | -0.1762 | 0.0202 | 90 | OK |
 | NGÂN HÀNG | 0.0129 | 0.0663 | 0.0496 | 0.8696 | -0.0575 | 0.2998 | 90 | OK |
 | THỰC PHẨM VÀ ĐỒ UỐNG | -0.0164 | 0.0040 | -0.0126 | 0.4054 | -0.0686 | 0.4513 | 90 | OK |
 | TRUYỀN THÔNG | 0.0464 | 0.1400 | 0.1234 | 0.8333 | 0.0000 | 0.8333 | 90 | OK |
 | TÀI NGUYÊN CƠ BẢN | 0.0170 | -0.0037 | -0.0204 | 0.3913 | -0.0952 | 0.4532 | 90 | OK |
 | VIỄN THÔNG | 0.0032 | -0.0874 | -0.1041 | 0.0000 | -0.3076 | -0.6890 | 60 | LOW_COVERAGE |
-| XÂY DỰNG VÀ VẬT LIỆU | -0.0079 | -0.0188 | -0.0355 | 0.2982 | -0.0967 | 1.6292 | 90 | OK |
-| Y TẾ | 0.0476 | 0.0044 | -0.0123 | 0.4545 | -0.0687 | 0.0778 | 90 | OK |
+| XÂY DỰNG VÀ VẬT LIỆU | -0.0071 | -0.0170 | -0.0337 | 0.3220 | -0.0982 | 1.5881 | 90 | OK |
+| Y TẾ | 0.0387 | -0.0044 | -0.0211 | 0.4167 | -0.0838 | 0.0676 | 90 | OK |
 | Ô TÔ VÀ PHỤ TÙNG | 0.0100 | 0.0077 | -0.0090 | 0.2857 | -0.0516 | -0.1922 | 90 | OK |
 | ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT | 0.0274 | -0.0259 | -0.0426 | 0.4375 | -0.0465 | 8.4445 | 90 | OK |
 
@@ -50,11 +54,11 @@ Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải c
 
 ### BÁN LẺ
 
-- Tín hiệu chính: Tín hiệu còn pha trộn, ngành đáng theo dõi thêm.
-- Bằng chứng ủng hộ: sector_return_1w_equal_weight=0.0156; sector_return_1m_equal_weight=0.0392; relative_strength_1m_vs_vnindex=0.0226; breadth_ma50_pct=0.4286
-- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0555; volatility_20d=0.0103; liquidity_trend_4w=0.0147; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
+- Tín hiệu chính: Tín hiệu suy yếu khi lợi suất 1 tháng kém hơn VN-Index.
+- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0300; sector_return_1m_equal_weight=-0.0093; relative_strength_1m_vs_vnindex=-0.0260; breadth_ma50_pct=0.3750
+- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0899; volatility_20d=0.0118; liquidity_trend_4w=-0.0505; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
 - Dữ liệu thiếu: sector_return_1w_cap_weight|sector_return_1m_cap_weight
-- Cảnh báo coverage: OK: 7/8 mã có dữ liệu giá hợp lệ.
+- Cảnh báo coverage: OK: 8/8 mã có dữ liệu giá hợp lệ.
 
 ### BẢO HIỂM
 
@@ -107,18 +111,18 @@ Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải c
 ### HÀNG & DỊCH VỤ CÔNG NGHIỆP
 
 - Tín hiệu chính: Tín hiệu còn pha trộn, ngành đáng theo dõi thêm.
-- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0078; sector_return_1m_equal_weight=0.0255; relative_strength_1m_vs_vnindex=0.0089; breadth_ma50_pct=0.3750
-- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0358; volatility_20d=0.0081; liquidity_trend_4w=1.2940; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
+- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0076; sector_return_1m_equal_weight=0.0244; relative_strength_1m_vs_vnindex=0.0078; breadth_ma50_pct=0.3636
+- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0393; volatility_20d=0.0079; liquidity_trend_4w=1.2458; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
 - Dữ liệu thiếu: sector_return_1w_cap_weight|sector_return_1m_cap_weight
-- Cảnh báo coverage: OK: 32/33 mã có dữ liệu giá hợp lệ.
+- Cảnh báo coverage: OK: 33/33 mã có dữ liệu giá hợp lệ.
 
 ### HÀNG CÁ NHÂN & GIA DỤNG
 
 - Tín hiệu chính: Tín hiệu còn pha trộn, ngành đáng theo dõi thêm.
-- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0011; sector_return_1m_equal_weight=0.0634; relative_strength_1m_vs_vnindex=0.0468; breadth_ma50_pct=0.2727
-- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0818; volatility_20d=0.0089; liquidity_trend_4w=1.6139; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
+- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0085; sector_return_1m_equal_weight=0.0419; relative_strength_1m_vs_vnindex=0.0252; breadth_ma50_pct=0.2500
+- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0871; volatility_20d=0.0091; liquidity_trend_4w=1.5514; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
 - Dữ liệu thiếu: sector_return_1w_cap_weight|sector_return_1m_cap_weight
-- Cảnh báo coverage: OK: 11/12 mã có dữ liệu giá hợp lệ.
+- Cảnh báo coverage: OK: 12/12 mã có dữ liệu giá hợp lệ.
 
 ### HÓA CHẤT
 
@@ -171,18 +175,18 @@ Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải c
 ### XÂY DỰNG VÀ VẬT LIỆU
 
 - Tín hiệu chính: Tín hiệu suy yếu khi lợi suất 1 tháng kém hơn VN-Index.
-- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0079; sector_return_1m_equal_weight=-0.0188; relative_strength_1m_vs_vnindex=-0.0355; breadth_ma50_pct=0.2982
-- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0967; volatility_20d=0.0056; liquidity_trend_4w=1.6292; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
+- Bằng chứng ủng hộ: sector_return_1w_equal_weight=-0.0071; sector_return_1m_equal_weight=-0.0170; relative_strength_1m_vs_vnindex=-0.0337; breadth_ma50_pct=0.3220
+- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0982; volatility_20d=0.0055; liquidity_trend_4w=1.5881; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
 - Dữ liệu thiếu: sector_return_1w_cap_weight|sector_return_1m_cap_weight
-- Cảnh báo coverage: OK: 57/59 mã có dữ liệu giá hợp lệ.
+- Cảnh báo coverage: OK: 59/59 mã có dữ liệu giá hợp lệ.
 
 ### Y TẾ
 
-- Tín hiệu chính: Tín hiệu còn pha trộn, ngành đáng theo dõi thêm.
-- Bằng chứng ủng hộ: sector_return_1w_equal_weight=0.0476; sector_return_1m_equal_weight=0.0044; relative_strength_1m_vs_vnindex=-0.0123; breadth_ma50_pct=0.4545
-- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0687; volatility_20d=0.0078; liquidity_trend_4w=0.0778; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
+- Tín hiệu chính: Tín hiệu suy yếu khi lợi suất 1 tháng kém hơn VN-Index.
+- Bằng chứng ủng hộ: sector_return_1w_equal_weight=0.0387; sector_return_1m_equal_weight=-0.0044; relative_strength_1m_vs_vnindex=-0.0211; breadth_ma50_pct=0.4167
+- Bằng chứng mâu thuẫn: drawdown_from_52w_high=-0.0838; volatility_20d=0.0072; liquidity_trend_4w=0.0676; missing_fields=sector_return_1w_cap_weight|sector_return_1m_cap_weight
 - Dữ liệu thiếu: sector_return_1w_cap_weight|sector_return_1m_cap_weight
-- Cảnh báo coverage: OK: 11/12 mã có dữ liệu giá hợp lệ.
+- Cảnh báo coverage: OK: 12/12 mã có dữ liệu giá hợp lệ.
 
 ### Ô TÔ VÀ PHỤ TÙNG
 
@@ -204,30 +208,31 @@ Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải c
 
 ### Data Quality
 
-- BÁN LẺ: OK; valid_price=7/8; cached_price=7; stale_price=0; api_error=1; valid_ma50=7; valid_ma200=7; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- BẢO HIỂM: WATCH; valid_price=5/5; cached_price=5; stale_price=0; api_error=0; valid_ma50=5; valid_ma200=5; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- BẤT ĐỘNG SẢN: OK; valid_price=57/57; cached_price=51; stale_price=0; api_error=0; valid_ma50=57; valid_ma200=57; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- CÔNG NGHỆ THÔNG TIN: OK; valid_price=6/6; cached_price=5; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- DU LỊCH VÀ GIẢI TRÍ: OK; valid_price=6/6; cached_price=6; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- DẦU KHÍ: OK; valid_price=8/8; cached_price=8; stale_price=0; api_error=0; valid_ma50=8; valid_ma200=8; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- DỊCH VỤ TÀI CHÍNH: OK; valid_price=35/35; cached_price=35; stale_price=0; api_error=0; valid_ma50=35; valid_ma200=32; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- HÀNG & DỊCH VỤ CÔNG NGHIỆP: OK; valid_price=32/33; cached_price=30; stale_price=0; api_error=1; valid_ma50=32; valid_ma200=31; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- HÀNG CÁ NHÂN & GIA DỤNG: OK; valid_price=11/12; cached_price=11; stale_price=0; api_error=1; valid_ma50=11; valid_ma200=11; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- HÓA CHẤT: OK; valid_price=23/23; cached_price=20; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- NGÂN HÀNG: OK; valid_price=23/23; cached_price=21; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- THỰC PHẨM VÀ ĐỒ UỐNG: OK; valid_price=37/37; cached_price=32; stale_price=0; api_error=0; valid_ma50=37; valid_ma200=37; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- TRUYỀN THÔNG: OK; valid_price=6/6; cached_price=5; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- TÀI NGUYÊN CƠ BẢN: OK; valid_price=23/23; cached_price=20; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- VIỄN THÔNG: LOW_COVERAGE; valid_price=2/2; cached_price=2; stale_price=0; api_error=0; valid_ma50=2; valid_ma200=2; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- XÂY DỰNG VÀ VẬT LIỆU: OK; valid_price=57/59; cached_price=54; stale_price=0; api_error=2; valid_ma50=57; valid_ma200=57; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- Y TẾ: OK; valid_price=11/12; cached_price=9; stale_price=0; api_error=1; valid_ma50=11; valid_ma200=11; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- Ô TÔ VÀ PHỤ TÙNG: OK; valid_price=7/7; cached_price=6; stale_price=0; api_error=0; valid_ma50=7; valid_ma200=7; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
-- ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT: OK; valid_price=16/16; cached_price=15; stale_price=0; api_error=0; valid_ma50=16; valid_ma200=16; index_source=VNINDEX; cap_weight_available=no; missing_indicator_count=2.
+- BÁN LẺ: OK; valid_price=8/8; cached_price=7; stale_price=0; api_error=0; valid_ma50=8; valid_ma200=8; market_cap_available=4; market_cap_coverage=0.5000; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- BẢO HIỂM: WATCH; valid_price=5/5; cached_price=5; stale_price=0; api_error=0; valid_ma50=5; valid_ma200=5; market_cap_available=1; market_cap_coverage=0.2000; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- BẤT ĐỘNG SẢN: OK; valid_price=57/57; cached_price=57; stale_price=0; api_error=0; valid_ma50=57; valid_ma200=57; market_cap_available=19; market_cap_coverage=0.3333; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- CÔNG NGHỆ THÔNG TIN: OK; valid_price=6/6; cached_price=6; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; market_cap_available=2; market_cap_coverage=0.3333; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- DU LỊCH VÀ GIẢI TRÍ: OK; valid_price=6/6; cached_price=6; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; market_cap_available=2; market_cap_coverage=0.3333; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- DẦU KHÍ: OK; valid_price=8/8; cached_price=8; stale_price=0; api_error=0; valid_ma50=8; valid_ma200=8; market_cap_available=1; market_cap_coverage=0.1250; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- DỊCH VỤ TÀI CHÍNH: OK; valid_price=35/35; cached_price=35; stale_price=0; api_error=0; valid_ma50=35; valid_ma200=32; market_cap_available=13; market_cap_coverage=0.3714; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- HÀNG & DỊCH VỤ CÔNG NGHIỆP: OK; valid_price=33/33; cached_price=32; stale_price=0; api_error=0; valid_ma50=33; valid_ma200=32; market_cap_available=13; market_cap_coverage=0.3939; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- HÀNG CÁ NHÂN & GIA DỤNG: OK; valid_price=12/12; cached_price=11; stale_price=0; api_error=0; valid_ma50=12; valid_ma200=12; market_cap_available=6; market_cap_coverage=0.5000; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- HÓA CHẤT: OK; valid_price=23/23; cached_price=23; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; market_cap_available=7; market_cap_coverage=0.3043; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- NGÂN HÀNG: OK; valid_price=23/23; cached_price=23; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; market_cap_available=7; market_cap_coverage=0.3043; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- THỰC PHẨM VÀ ĐỒ UỐNG: OK; valid_price=37/37; cached_price=37; stale_price=0; api_error=0; valid_ma50=37; valid_ma200=37; market_cap_available=15; market_cap_coverage=0.4054; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- TRUYỀN THÔNG: OK; valid_price=6/6; cached_price=6; stale_price=0; api_error=0; valid_ma50=6; valid_ma200=6; market_cap_available=3; market_cap_coverage=0.5000; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- TÀI NGUYÊN CƠ BẢN: OK; valid_price=23/23; cached_price=23; stale_price=0; api_error=0; valid_ma50=23; valid_ma200=23; market_cap_available=8; market_cap_coverage=0.3478; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- VIỄN THÔNG: LOW_COVERAGE; valid_price=2/2; cached_price=2; stale_price=0; api_error=0; valid_ma50=2; valid_ma200=2; market_cap_available=1; market_cap_coverage=0.5000; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- XÂY DỰNG VÀ VẬT LIỆU: OK; valid_price=59/59; cached_price=57; stale_price=0; api_error=0; valid_ma50=59; valid_ma200=59; market_cap_available=19; market_cap_coverage=0.3220; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- Y TẾ: OK; valid_price=12/12; cached_price=11; stale_price=0; api_error=0; valid_ma50=12; valid_ma200=12; market_cap_available=4; market_cap_coverage=0.3333; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- Ô TÔ VÀ PHỤ TÙNG: OK; valid_price=7/7; cached_price=7; stale_price=0; api_error=0; valid_ma50=7; valid_ma200=7; market_cap_available=2; market_cap_coverage=0.2857; market_cap_source=N/A|SOURCE_REPORTED_MARKET_CAP; market_cap_status=API_ERROR|OK; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
+- ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT: OK; valid_price=16/16; cached_price=16; stale_price=0; api_error=0; valid_ma50=16; valid_ma200=16; market_cap_available=4; market_cap_coverage=0.2500; market_cap_source=SOURCE_REPORTED_MARKET_CAP|N/A; market_cap_status=OK|API_ERROR; index_source=VNINDEX; cap_weight_available=no; cap_weight_status=SKIPPED_MISSING_MARKET_CAP; missing_indicator_count=2.
 
 ### Missing Data
 
 - `N/A (MISSING_DATA)` nghĩa là nguồn dữ liệu chưa đủ để tính chỉ báo.
 - Cap-weight return cần market_cap từ universe; nếu market_cap trống thì chỉ báo cap-weight được để thiếu dữ liệu.
+- Cap-weight indicators are unavailable because reliable market_cap/share-count data is missing. The report does not substitute equal-weight data as cap-weight.
 - Relative strength dùng `index_source` trong `data_quality.csv`: VNINDEX, VN30, hoặc UNIVERSE_EQUAL_WEIGHT_PROXY khi index thật không lấy được.
 - M0 mặc định không bật `--fetch-market-cap`, vì vậy cap-weight không dùng equal-weight thay thế khi market_cap trống.
 - Volatility 20d là độ lệch chuẩn 20 phiên của daily sector returns, không annualize.

@@ -443,9 +443,23 @@ def _extract_market_cap_with_source(data: Any) -> tuple[float | None, str | None
     if col:
         values = _numeric(frame[col]).dropna()
         if not values.empty:
-            return float(values.iloc[-1]), None
+            value = float(values.iloc[-1])
+            if value > 0:
+                return value, "SOURCE_REPORTED_MARKET_CAP"
 
-    shares_col = _first_existing(frame, ["issue_share", "issueShare", "outstanding_share", "outstandingShare"])
+    shares_col = _first_existing(
+        frame,
+        [
+            "issue_share",
+            "issueShare",
+            "outstanding_share",
+            "outstandingShare",
+            "listed_share",
+            "listedShare",
+            "shares_outstanding",
+            "sharesOutstanding",
+        ],
+    )
     close_col = _first_existing(frame, ["last_close", "lastClose", "current_price", "currentPrice", "close"])
     if shares_col and close_col:
         shares = _numeric(frame[shares_col]).dropna()
@@ -454,7 +468,7 @@ def _extract_market_cap_with_source(data: Any) -> tuple[float | None, str | None
             shares_value = float(shares.iloc[-1])
             close_value = float(closes.iloc[-1])
             if shares_value > 0 and close_value > 0:
-                return shares_value * close_value, "mktcap_shares_x_close_proxy"
+                return shares_value * close_value, "SHARES_X_LAST_CLOSE_PROXY"
 
     return None, None
 

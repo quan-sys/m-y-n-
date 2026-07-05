@@ -109,7 +109,7 @@ def test_market_cap_proxy_uses_issue_share_times_last_close_with_source_marker()
 
     assert _extract_market_cap(overview) == 1_250_000_000_000
     assert value == 1_250_000_000_000
-    assert source == "mktcap_shares_x_close_proxy"
+    assert source == "SHARES_X_LAST_CLOSE_PROXY"
 
 
 def test_valid_long_icb_shape_does_not_mass_reject_missing_icb():
@@ -123,7 +123,7 @@ def test_valid_long_icb_shape_does_not_mass_reject_missing_icb():
     assert len(result.accepted) == 2
     assert "MISSING_ICB_CLASSIFICATION" not in set(result.rejects["reject_reason"])
     assert set(result.accepted["icb2"]) == {"MATERIALS", "BANKS"}
-    assert result.accepted["source"].str.contains("mktcap_shares_x_close_proxy").all()
+    assert result.accepted["source"].str.contains("SHARES_X_LAST_CLOSE_PROXY").all()
 
 
 def test_shape_tests_do_not_import_real_vnstock(monkeypatch):

@@ -64,6 +64,13 @@ Sprint 2.1 hardens this run by:
 - using `UNIVERSE_EQUAL_WEIGHT_PROXY` for relative strength when VNINDEX/VN30 are unavailable;
 - adding `cached_price_count`, `stale_price_count`, `api_error_tickers`, `index_source`, and `cap_weight_available` to `data_quality.csv`.
 
+Sprint 2.2 checks market-cap availability in the weekly run:
+
+- direct company overview market cap is marked `SOURCE_REPORTED_MARKET_CAP`;
+- share-count times close fallback is marked `SHARES_X_LAST_CLOSE_PROXY`;
+- cap-weight returns stay `N/A (MISSING_DATA)` unless market-cap coverage is complete for the sector return window;
+- controlled skips are marked with `cap_weight_status=SKIPPED_MISSING_MARKET_CAP` and a reason in `data_quality.csv`.
+
 For a quick local check only:
 
 ```bash
@@ -93,3 +100,4 @@ See `data_contract.md` for output schemas, valid `reject_reason` values, valid `
 - `market_cap` can be blank in default M0 runs; blank means missing/not fetched data, not a fabricated value.
 - If `market_cap` is blank, Sprint 2 cap-weight indicators are reported as `N/A (MISSING_DATA)` rather than silently falling back to equal-weight.
 - If VNINDEX/VN30 history is unavailable, Sprint 2.1 reports relative strength versus the `UNIVERSE_EQUAL_WEIGHT_PROXY` and flags that source explicitly.
+- Sprint 2.2 does not fabricate share counts or use zero-filled market caps; cap-weight is skipped when reliable coverage is incomplete.

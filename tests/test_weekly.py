@@ -8,6 +8,8 @@ from src.data.vnstock_client import FetchResult
 from src.weekly import (
     BANNED_REPORT_PHRASES,
     INDEX_SOURCE_PROXY,
+    MARKET_CAP_SOURCE_PROXY,
+    MARKET_CAP_SOURCE_REPORTED,
     MISSING,
     breadth_ma_pct,
     build_run_metadata,
@@ -22,6 +24,7 @@ from src.weekly import (
     cap_weighted_return_or_missing,
     compute_confidence_lite,
     coverage_status_for,
+    enrich_universe_market_caps,
     render_weekly_report,
 )
 
@@ -233,6 +236,63 @@ def test_report_mentions_sprint_2_1_quality_context():
     assert "Index source" in report
     assert INDEX_SOURCE_PROXY in report
     assert "Cap-weight available" in report
+
+
+def test_enrich_universe_uses_reported_market_cap_before_proxy():
+    universe = _universe([("AAA", "BANKS", ""), ("BBB", "BANKS", "")])
+    market_caps = {
+        "AAA": FetchResult(
+            True,
+            pd.DataFrame([{"market_cap": 123_000_000, "issue_share": 10, "current_price": 10}]),
+            source="fixture",
+        ),
+        "BBB": FetchResult(
+            True,
+            pd.DataFrame([{"issue_share": 100_000_000, "current_price": 12_500}]),
+            source="fixture",
+        ),
+    }
+
+    enriched = enrich_universe_market_caps(universe, market_caps)
+
+    assert enriched.loc[enriched["ticker"] == "AAA", "market_cap"].iloc[0] == 123_000_000
+    assert enriched.loc[enriched["ticker"] == "AAA", "market_cap_source"].iloc[0] == MARKET_CAP_SOURCE_REPORTED
+    assert enriched.loc[enriched["ticker"] == "BBB", "market_cap"].iloc[0] == 1_250_000_000_000
+    assert enriched.loc[enriched["ticker"] == "BBB", "market_cap_source"].iloc[0] == MARKET_CAP_SOURCE_PROXY
+
+
+def test_data_quality_records_cap_weight_controlled_skip_when_market_cap_missing():
+    universe = _universe([("AAA", "BANKS", ""), ("BBB", "BANKS", ""), ("CCC", "BANKS", "")])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(90, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(90, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(90, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, _index_result())
+    row = result.data_quality.iloc[0]
+
+    assert row["market_cap_available_count"] == 0
+    assert row["market_cap_missing_count"] == 3
+    assert row["market_cap_coverage_pct"] == 0
+    assert row["cap_weight_available"] == "no"
+    assert row["cap_weight_status"] == "SKIPPED_MISSING_MARKET_CAP"
+    assert "equal-weight data is not substituted" in row["cap_weight_reason"]
+
+
+def test_data_quality_marks_cap_weight_ok_when_market_cap_complete():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(90, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(90, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(90, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, _index_result())
+    row = result.data_quality.iloc[0]
+
+    assert row["market_cap_available_count"] == 3
+    assert row["market_cap_coverage_pct"] == 1
+    assert row["cap_weight_available"] == "yes"
+    assert row["cap_weight_status"] == "OK"
 
 
 def _universe(rows: list[tuple[str, str, object]]) -> pd.DataFrame:

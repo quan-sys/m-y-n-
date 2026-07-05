@@ -83,7 +83,7 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 
 The pipeline must never invent financial values. If a value is missing from the public source, it stays empty or the row is rejected. `adtv_20d` may use `close * volume` only when traded value is absent and both fields exist; this is marked in `source` as `adtv_close_x_volume_proxy`. For VCI history where prices are quoted in thousand VND, the proxy uses `close * volume * 1000` and marks `source` with `adtv_close_x_volume_x1000_proxy`.
 
-`market_cap` may use `issue_share * last_close` only when both fields exist and no direct market cap field is available. Proxy market cap rows must include `mktcap_shares_x_close_proxy` in `source`.
+`market_cap` may use `issue_share * last_close` or equivalent share-count and close fields only when both fields exist and no direct market cap field is available. Direct source values must be marked `SOURCE_REPORTED_MARKET_CAP`; proxy market cap values must be marked `SHARES_X_LAST_CLOSE_PROXY` in `source` or the downstream market-cap source field.
 
 M0 runtime disables market cap fetching by default to reduce API pressure. Blank `market_cap` values mean missing or intentionally not fetched source data, not zero and not an estimate.
 
