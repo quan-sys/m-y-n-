@@ -7,6 +7,7 @@ import pandas as pd
 from src.data.vnstock_client import FetchResult
 from src.weekly import (
     BANNED_REPORT_PHRASES,
+    INDEX_SOURCE_PROXY,
     MISSING,
     breadth_ma_pct,
     build_run_metadata,
@@ -174,6 +175,64 @@ def test_sector_index_is_equal_weight_from_daily_returns():
 
     assert round(float(returns.iloc[0]), 6) == 0.0
     assert round(float(index.iloc[-1]), 6) == 1.0
+
+
+def test_proxy_index_fills_relative_strength_when_index_fetch_fails():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(90, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(90, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(90, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, FetchResult(False, pd.DataFrame(), status="API_ERROR"))
+    row = result.indicators.iloc[0]
+
+    assert row["relative_strength_1m_vs_vnindex"] != MISSING
+    assert result.data_quality.iloc[0]["index_source"] == INDEX_SOURCE_PROXY
+
+
+def test_data_quality_tracks_cache_stale_api_and_cap_weight():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(
+            True,
+            _price_frame(90, start=100, step=1),
+            source="fixture",
+            metadata={"cache_state": "CACHED"},
+        ),
+        "BBB": FetchResult(
+            True,
+            _price_frame(90, start=100, step=0.5),
+            status="STALE_DATA",
+            source="fixture",
+            metadata={"cache_state": "STALE_DATA"},
+        ),
+        "CCC": FetchResult(False, pd.DataFrame(), status="API_ERROR", source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, _index_result())
+    row = result.data_quality.iloc[0]
+
+    assert row["valid_price_count"] == 2
+    assert row["cached_price_count"] == 1
+    assert row["stale_price_count"] == 1
+    assert row["api_error_count"] == 1
+    assert row["api_error_tickers"] == "CCC"
+    assert row["cap_weight_available"] == "yes"
+
+
+def test_report_mentions_sprint_2_1_quality_context():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(90, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(90, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(90, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, FetchResult(False, pd.DataFrame(), status="API_ERROR"))
+    report = render_weekly_report(result.indicators, result.summary, result.data_quality, _metadata(len(universe)))
+
+    assert "Index source" in report
+    assert INDEX_SOURCE_PROXY in report
+    assert "Cap-weight available" in report
 
 
 def _universe(rows: list[tuple[str, str, object]]) -> pd.DataFrame:

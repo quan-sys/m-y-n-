@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-07-05
+
+- Hardened Sprint 2.1 weekly OHLCV fetch accounting with fetched/cached/stale/API_ERROR counts.
+- Added quote-source fallback for ticker and index history fetches.
+- Added `UNIVERSE_EQUAL_WEIGHT_PROXY` relative-strength fallback when VNINDEX/VN30 are unavailable.
+- Extended `data_quality.csv` with cache/stale/error tickers, `index_source`, and `cap_weight_available`.
+- Clarified in the weekly report that cap-weight returns remain `N/A (MISSING_DATA)` when M0 `market_cap` is blank.
+- Added Sprint 2.1 unit tests for index proxy fallback, data-quality cache/error fields, and report context.
+
 ## 2026-07-04
 
 - Added M0 hardening documentation in `docs/SPEC_MVP.md`.

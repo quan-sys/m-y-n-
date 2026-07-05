@@ -122,12 +122,24 @@ class VnstockClient:
         cache_path = self._cache_path("prices", normalized)
         cached = self._read_cache(cache_path)
         if self.use_cache and cached is not None and self._is_fresh(cache_path, max_age_days=2):
-            return FetchResult(True, cached, source=self.source, as_of=self._latest_date(cached))
+            return FetchResult(
+                True,
+                cached,
+                source=self.source,
+                as_of=self._latest_date(cached),
+                metadata={"cache_state": "CACHED", "cache_hit": True},
+            )
 
         try:
             data = self._fetch_price_history(ticker=ticker, months=months)
             self._write_cache(cache_path, data)
-            return FetchResult(True, data, source=self.source, as_of=self._latest_date(data))
+            return FetchResult(
+                True,
+                data,
+                source=self.source,
+                as_of=self._latest_date(data),
+                metadata={"cache_state": "FETCHED", "cache_hit": False},
+            )
         except BaseException as exc:  # noqa: BLE001
             self._record_terminal_error(exc)
             if cached is not None:
@@ -138,6 +150,7 @@ class VnstockClient:
                     error=str(exc),
                     source=self.source,
                     as_of=self._latest_date(cached),
+                    metadata={"cache_state": "STALE_DATA", "cache_hit": True, "stale": True},
                 )
             return self._error_result(exc)
 

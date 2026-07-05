@@ -22,6 +22,9 @@ STALE_DATA = "STALE_DATA"
 LIMITED_HISTORY = "LIMITED_HISTORY"
 SOURCE = "vnstock_vci_quote_history"
 VNINDEX_SYMBOLS = ("VNINDEX", "VN30")
+INDEX_SOURCE_PROXY = "UNIVERSE_EQUAL_WEIGHT_PROXY"
+CACHE_STATE_CACHED = "CACHED"
+CACHE_STATE_FETCHED = "FETCHED"
 
 INDICATOR_COLUMNS = [
     "as_of",
@@ -62,14 +65,19 @@ QUALITY_COLUMNS = [
     "icb2",
     "accepted_ticker_count",
     "valid_price_count",
+    "cached_price_count",
+    "stale_price_count",
     "valid_ma50_count",
     "valid_ma200_count",
     "valid_market_cap_count",
     "missing_price_count",
     "api_error_count",
+    "api_error_tickers",
     "missing_indicator_count",
     "coverage_status",
     "coverage_warning",
+    "index_source",
+    "cap_weight_available",
     "source",
 ]
 
@@ -98,6 +106,7 @@ BANNED_REPORT_PHRASES = [
     "nên bán",
     "mã x hấp dẫn",
     "target price",
+    "mục tiêu giá",
     "khuyến nghị mua",
     "khuyến nghị bán",
 ]
@@ -110,6 +119,13 @@ class WeeklyMvpResult:
     summary: pd.DataFrame
     data_quality: pd.DataFrame
     metadata: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class IndexContext:
+    return_1m: float | None
+    source: str
+    missing: bool
 
 
 def run_weekly_mvp(
@@ -155,6 +171,7 @@ def run_weekly_mvp(
         as_of=as_of,
         source=SOURCE,
         output_dir=output_dir,
+        extra=run_quality_metadata(data_quality),
     )
 
     indicators.to_csv(output_dir / "sector_indicators_tier1.csv", index=False)
@@ -187,10 +204,7 @@ def build_weekly_outputs(
     if universe.empty:
         raise ValueError("universe has no accepted rows")
 
-    index_fetch = _as_fetch_result(index_result, source=source)
-    index_prices = _normalize_prices(index_fetch.data)
-    index_return_1m = calc_return(index_prices, 21)
-    index_missing = index_return_1m is None
+    index_context = build_index_context(price_results, index_result=index_result, source=source)
 
     indicator_rows: list[dict[str, Any]] = []
     quality_rows: list[dict[str, Any]] = []
@@ -200,6 +214,7 @@ def build_weekly_outputs(
         sector_name = str(icb2).strip() or MISSING
         histories: dict[str, pd.DataFrame] = {}
         statuses: dict[str, str] = {}
+        cache_states: dict[str, str] = {}
         sources: dict[str, str] = {}
 
         for _, universe_row in group.iterrows():
@@ -207,6 +222,7 @@ def build_weekly_outputs(
             result = _as_fetch_result(price_results.get(ticker), source=source)
             histories[ticker] = _normalize_prices(result.data)
             statuses[ticker] = result.status
+            cache_states[ticker] = price_cache_state(result)
             sources[ticker] = result.source or source
 
         indicator_row = calculate_sector_indicators(
@@ -214,20 +230,27 @@ def build_weekly_outputs(
             universe_rows=group,
             price_histories=histories,
             price_statuses=statuses,
-            index_return_1m=index_return_1m,
-            index_missing=index_missing,
-            source=_combine_sources(source, index_fetch.source),
+            index_return_1m=index_context.return_1m,
+            index_missing=index_context.missing,
+            source=_combine_sources(source, index_context.source),
         )
         quality_row = build_data_quality_row(
             icb2=sector_name,
             universe_rows=group,
             price_histories=histories,
             price_statuses=statuses,
+            price_cache_states=cache_states,
             indicator_row=indicator_row,
+            index_source=index_context.source,
             source=_combine_sources(source, *sources.values()),
         )
         indicator_row["data_quality_status"] = quality_row["coverage_status"]
-        summary_row = build_summary_row(indicator_row, quality_row, index_missing=index_missing, source=source)
+        summary_row = build_summary_row(
+            indicator_row,
+            quality_row,
+            index_missing=index_context.missing,
+            source=_combine_sources(source, index_context.source),
+        )
 
         indicator_rows.append(indicator_row)
         quality_rows.append(quality_row)
@@ -240,6 +263,71 @@ def build_weekly_outputs(
         data_quality=pd.DataFrame(quality_rows, columns=QUALITY_COLUMNS),
         metadata={},
     )
+
+
+def build_index_context(
+    price_results: dict[str, Any],
+    index_result: Any | None = None,
+    source: str = SOURCE,
+) -> IndexContext:
+    index_fetch = _as_fetch_result(index_result, source=source)
+    index_prices = _normalize_prices(index_fetch.data)
+    index_return_1m = calc_return(index_prices, 21)
+    index_source = index_source_from_fetch(index_fetch)
+    if index_return_1m is not None:
+        return IndexContext(return_1m=index_return_1m, source=index_source, missing=False)
+
+    proxy_prices = build_universe_equal_weight_proxy_index(price_results)
+    proxy_return_1m = calc_return(proxy_prices, 21)
+    if proxy_return_1m is not None:
+        return IndexContext(return_1m=proxy_return_1m, source=INDEX_SOURCE_PROXY, missing=False)
+
+    return IndexContext(return_1m=None, source=index_source, missing=True)
+
+
+def build_universe_equal_weight_proxy_index(price_results: dict[str, Any]) -> pd.DataFrame:
+    histories: dict[str, pd.DataFrame] = {}
+    for ticker, value in price_results.items():
+        result = _as_fetch_result(value, source=SOURCE)
+        price = _normalize_prices(result.data)
+        if _has_valid_close(price, min_rows=22):
+            histories[str(ticker).upper()] = price
+    proxy_returns = build_sector_daily_returns(histories)
+    proxy_index = build_sector_index(proxy_returns)
+    if proxy_index.empty:
+        return pd.DataFrame(columns=["date", "close", "volume", "value"])
+    return pd.DataFrame(
+        {
+            "date": pd.to_datetime(proxy_index.index),
+            "close": proxy_index.to_numpy(dtype=float),
+            "volume": pd.NA,
+            "value": pd.NA,
+        }
+    )
+
+
+def index_source_from_fetch(index_fetch: FetchResult) -> str:
+    metadata = index_fetch.metadata or {}
+    metadata_source = str(metadata.get("index_source", "")).strip()
+    if metadata_source:
+        return metadata_source
+    source_text = str(index_fetch.source or "").upper()
+    for symbol in VNINDEX_SYMBOLS:
+        if symbol in source_text:
+            return symbol
+    return "MISSING_INDEX"
+
+
+def price_cache_state(result: FetchResult) -> str:
+    metadata = result.metadata or {}
+    state = str(metadata.get("cache_state", "")).strip().upper()
+    if state:
+        return state
+    if result.status == STALE_DATA:
+        return STALE_DATA
+    if result.status == API_ERROR:
+        return API_ERROR
+    return "UNKNOWN"
 
 
 def calculate_sector_indicators(
@@ -307,33 +395,48 @@ def build_data_quality_row(
     universe_rows: pd.DataFrame,
     price_histories: dict[str, pd.DataFrame],
     price_statuses: dict[str, str],
+    price_cache_states: dict[str, str] | None,
     indicator_row: dict[str, Any],
+    index_source: str,
     source: str = SOURCE,
 ) -> dict[str, Any]:
     accepted_count = len(universe_rows)
     valid_price_count = int(indicator_row["valid_price_count"])
+    price_cache_states = price_cache_states or {}
+    cached_price_count = sum(1 for state in price_cache_states.values() if state == CACHE_STATE_CACHED)
+    stale_price_count = sum(1 for status in price_statuses.values() if status == STALE_DATA)
     valid_ma50_count = sum(1 for frame in price_histories.values() if _has_valid_close(frame, min_rows=50))
     valid_ma200_count = sum(1 for frame in price_histories.values() if _has_valid_close(frame, min_rows=200))
     valid_market_cap_count = int((_market_caps(universe_rows) > 0).sum())
     api_error_count = sum(1 for status in price_statuses.values() if status == API_ERROR)
+    api_error_tickers = sorted(ticker for ticker, status in price_statuses.items() if status == API_ERROR)
     missing_price_count = max(accepted_count - valid_price_count, 0)
     missing_indicator_count = count_missing_indicators(indicator_row)
     coverage_status = coverage_status_for(accepted_count, valid_price_count)
     coverage_warning = coverage_warning_for(coverage_status, accepted_count, valid_price_count)
+    cap_weight_available = (
+        indicator_row["sector_return_1w_cap_weight"] != MISSING
+        and indicator_row["sector_return_1m_cap_weight"] != MISSING
+    )
 
     return {
         "as_of": indicator_row["as_of"],
         "icb2": icb2,
         "accepted_ticker_count": accepted_count,
         "valid_price_count": valid_price_count,
+        "cached_price_count": cached_price_count,
+        "stale_price_count": stale_price_count,
         "valid_ma50_count": valid_ma50_count,
         "valid_ma200_count": valid_ma200_count,
         "valid_market_cap_count": valid_market_cap_count,
         "missing_price_count": missing_price_count,
         "api_error_count": api_error_count,
+        "api_error_tickers": "|".join(api_error_tickers) if api_error_tickers else "NONE",
         "missing_indicator_count": missing_indicator_count,
         "coverage_status": coverage_status,
         "coverage_warning": coverage_warning,
+        "index_source": index_source,
+        "cap_weight_available": "yes" if cap_weight_available else "no",
         "source": source,
     }
 
@@ -353,7 +456,7 @@ def build_summary_row(
         ),
         core_missing_count=sum(1 for field in CORE_INDICATORS if indicator_row.get(field) == MISSING),
         vnindex_missing=index_missing and indicator_row["relative_strength_1m_vs_vnindex"] == MISSING,
-        stale_price_data=is_stale_as_of(indicator_row["as_of"]),
+        stale_price_data=_is_positive(quality_row.get("stale_price_count", 0)) or is_stale_as_of(indicator_row["as_of"]),
     )
     return {
         "as_of": indicator_row["as_of"],
@@ -633,6 +736,12 @@ def render_weekly_report(
     universe_count = metadata.get("universe_row_count", 0)
     sector_count = int(indicators["icb2"].nunique()) if not indicators.empty else 0
     quality_warning = general_quality_warning(data_quality, indicators)
+    quality_counts = quality_status_counts(data_quality)
+    api_error_total = quality_total(data_quality, "api_error_count")
+    index_sources = quality_unique_values(data_quality, "index_source")
+    cap_weight_available_count = int(
+        (data_quality.get("cap_weight_available", pd.Series(dtype=str)).astype(str) == "yes").sum()
+    )
 
     lines = [
         "# Báo cáo tuần Sector Cycle Monitor",
@@ -642,6 +751,11 @@ def render_weekly_report(
         f"- Số mã trong universe: {universe_count}",
         f"- Số ngành ICB2: {sector_count}",
         f"- Cảnh báo dữ liệu chung: {quality_warning}",
+        f"- Số ngành OK: {quality_counts.get('OK', 0)}",
+        f"- Số ngành DATA_WEAK: {quality_counts.get('DATA_WEAK', 0)}",
+        f"- Tổng ticker API_ERROR: {api_error_total}",
+        f"- Index source đang dùng: {index_sources}",
+        f"- Cap-weight available: {'yes' if cap_weight_available_count else 'no'} ({cap_weight_available_count}/{sector_count} sectors)",
         "",
         "Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải chỉ dẫn giao dịch.",
         "",
@@ -709,7 +823,11 @@ def render_weekly_report(
         lines.append(
             f"- {row['icb2']}: {row['coverage_status']}; "
             f"valid_price={row['valid_price_count']}/{row['accepted_ticker_count']}; "
+            f"cached_price={row.get('cached_price_count', 0)}; stale_price={row.get('stale_price_count', 0)}; "
+            f"api_error={row.get('api_error_count', 0)}; "
             f"valid_ma50={row['valid_ma50_count']}; valid_ma200={row['valid_ma200_count']}; "
+            f"index_source={row.get('index_source', MISSING)}; "
+            f"cap_weight_available={row.get('cap_weight_available', 'no')}; "
             f"missing_indicator_count={row['missing_indicator_count']}."
         )
 
@@ -720,6 +838,8 @@ def render_weekly_report(
             "",
             f"- `{MISSING}` nghĩa là nguồn dữ liệu chưa đủ để tính chỉ báo.",
             "- Cap-weight return cần market_cap từ universe; nếu market_cap trống thì chỉ báo cap-weight được để thiếu dữ liệu.",
+            "- Relative strength dùng `index_source` trong `data_quality.csv`: VNINDEX, VN30, hoặc UNIVERSE_EQUAL_WEIGHT_PROXY khi index thật không lấy được.",
+            "- M0 mặc định không bật `--fetch-market-cap`, vì vậy cap-weight không dùng equal-weight thay thế khi market_cap trống.",
             "- Volatility 20d là độ lệch chuẩn 20 phiên của daily sector returns, không annualize.",
             "- Liquidity trend 4w dùng trading value nếu có, nếu thiếu thì dùng proxy close * volume và ghi rõ trong source.",
             "",
@@ -727,7 +847,7 @@ def render_weekly_report(
             "",
             "- `confidence_lite` đo độ tin cậy dữ liệu, không đo mức hấp dẫn đầu tư.",
             "- Các tín hiệu ngành nên được đọc cùng coverage warning và missing_fields.",
-            "- Báo cáo này không đưa chỉ dẫn giao dịch hay mục tiêu giá.",
+            "- Báo cáo này không đưa chỉ dẫn giao dịch.",
             "",
         ]
     )
@@ -740,9 +860,10 @@ def build_run_metadata(
     as_of: str,
     source: str,
     output_dir: Path,
+    extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     generated_at = datetime.now(timezone.utc).isoformat()
-    return {
+    metadata = {
         "run_id": f"weekly-mvp-{generated_at}",
         "generated_at": generated_at,
         "as_of": as_of,
@@ -754,6 +875,22 @@ def build_run_metadata(
         "source": source,
         "output_dir": str(output_dir),
     }
+    if extra:
+        metadata.update(extra)
+    return metadata
+
+
+def run_quality_metadata(data_quality: pd.DataFrame) -> dict[str, Any]:
+    if data_quality.empty:
+        return {}
+    return {
+        "valid_price_total": int(pd.to_numeric(data_quality["valid_price_count"], errors="coerce").fillna(0).sum()),
+        "api_error_total": int(pd.to_numeric(data_quality["api_error_count"], errors="coerce").fillna(0).sum()),
+        "cached_price_total": int(pd.to_numeric(data_quality["cached_price_count"], errors="coerce").fillna(0).sum()),
+        "stale_price_total": int(pd.to_numeric(data_quality["stale_price_count"], errors="coerce").fillna(0).sum()),
+        "index_source": ";".join(sorted(data_quality["index_source"].dropna().astype(str).unique())),
+        "cap_weight_available_sectors": int((data_quality["cap_weight_available"].astype(str) == "yes").sum()),
+    }
 
 
 def _fetch_ticker_prices(universe: pd.DataFrame, client: Any, progress: bool) -> dict[str, FetchResult]:
@@ -761,26 +898,82 @@ def _fetch_ticker_prices(universe: pd.DataFrame, client: Any, progress: bool) ->
     results: dict[str, FetchResult] = {}
     total = len(tickers)
     for index, ticker in enumerate(tickers, start=1):
-        results[ticker] = _as_fetch_result(client.get_price_history(ticker, months=14), source=SOURCE)
+        results[ticker] = _fetch_price_history_with_source_fallbacks(client, ticker, months=14)
         if results[ticker].status == API_ERROR:
             _clear_terminal_api_error(client)
         if progress and (index % 25 == 0 or index == total):
             ok_count = sum(1 for item in results.values() if item.ok)
+            fetched_count = sum(1 for item in results.values() if price_cache_state(item) == CACHE_STATE_FETCHED)
+            cached_count = sum(1 for item in results.values() if price_cache_state(item) == CACHE_STATE_CACHED)
+            stale_count = sum(1 for item in results.values() if item.status == STALE_DATA)
             error_count = sum(1 for item in results.values() if item.status == API_ERROR)
-            print(f"weekly price progress: {index}/{total}; ok={ok_count}; api_error={error_count}", flush=True)
+            print(
+                "weekly price progress: "
+                f"{index}/{total}; ok={ok_count}; fetched={fetched_count}; "
+                f"cached={cached_count}; stale={stale_count}; api_error={error_count}",
+                flush=True,
+            )
     return results
 
 
 def _fetch_index_prices(client: Any) -> FetchResult:
     last_error: FetchResult | None = None
     for symbol in VNINDEX_SYMBOLS:
-        result = _as_fetch_result(client.get_price_history(symbol, months=14), source=f"{SOURCE}_{symbol}")
+        result = _fetch_price_history_with_source_fallbacks(client, symbol, months=14, source=f"{SOURCE}_{symbol}")
         if result.ok and not _normalize_prices(result.data).empty:
-            return result
+            metadata = dict(result.metadata or {})
+            metadata["index_source"] = symbol
+            return FetchResult(
+                result.ok,
+                result.data,
+                status=result.status,
+                error=result.error,
+                source=f"{SOURCE}_{symbol}",
+                as_of=result.as_of,
+                metadata=metadata,
+            )
         if result.status == API_ERROR:
             _clear_terminal_api_error(client)
         last_error = result
     return last_error or FetchResult(False, pd.DataFrame(), status=API_ERROR, source=SOURCE)
+
+
+def _fetch_price_history_with_source_fallbacks(
+    client: Any,
+    ticker: str,
+    months: int,
+    source: str = SOURCE,
+) -> FetchResult:
+    result = _as_fetch_result(client.get_price_history(ticker, months=months), source=source)
+    if result.ok or not hasattr(client, "quote_source"):
+        return result
+
+    primary_quote_source = getattr(client, "quote_source")
+    fallback_sources = ["TCBS", "VCI"]
+    for quote_source in fallback_sources:
+        if quote_source == primary_quote_source:
+            continue
+        _clear_terminal_api_error(client)
+        try:
+            setattr(client, "quote_source", quote_source)
+            fallback = _as_fetch_result(client.get_price_history(ticker, months=months), source=f"{source}_{quote_source}")
+        finally:
+            setattr(client, "quote_source", primary_quote_source)
+        if fallback.ok:
+            metadata = dict(fallback.metadata or {})
+            metadata["fallback_quote_source"] = quote_source
+            return FetchResult(
+                True,
+                fallback.data,
+                status=fallback.status,
+                error=fallback.error,
+                source=f"{source}_{quote_source}",
+                as_of=fallback.as_of,
+                metadata=metadata,
+            )
+        result = fallback
+
+    return result
 
 
 def _clear_terminal_api_error(client: Any) -> None:
@@ -927,7 +1120,31 @@ def general_quality_warning(data_quality: pd.DataFrame, indicators: pd.DataFrame
     parts = [f"{status}={count}" for status, count in sorted(counts.items())]
     if missing_cap:
         parts.append(f"cap_weight_missing={missing_cap}")
+    api_errors = quality_total(data_quality, "api_error_count")
+    if api_errors:
+        parts.append(f"api_error={api_errors}")
+    if "index_source" in data_quality:
+        parts.append(f"index_source={quality_unique_values(data_quality, 'index_source')}")
     return "; ".join(parts)
+
+
+def quality_status_counts(data_quality: pd.DataFrame) -> dict[str, int]:
+    if data_quality.empty or "coverage_status" not in data_quality:
+        return {}
+    return {str(key): int(value) for key, value in data_quality["coverage_status"].value_counts().to_dict().items()}
+
+
+def quality_total(data_quality: pd.DataFrame, column: str) -> int:
+    if data_quality.empty or column not in data_quality:
+        return 0
+    return int(pd.to_numeric(data_quality[column], errors="coerce").fillna(0).sum())
+
+
+def quality_unique_values(data_quality: pd.DataFrame, column: str) -> str:
+    if data_quality.empty or column not in data_quality:
+        return MISSING
+    values = sorted(value for value in data_quality[column].dropna().astype(str).unique() if value)
+    return "|".join(values) if values else MISSING
 
 
 def find_row(frame: pd.DataFrame, column: str, value: Any) -> dict[str, Any]:

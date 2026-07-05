@@ -56,6 +56,14 @@ The script reads `data/universe.csv`, fetches/resumes OHLCV cache for accepted t
 - `reports/<YYYY-MM-DD>/data_quality.csv`
 - `reports/<YYYY-MM-DD>/run_metadata.json`
 
+Sprint 2.1 hardens this run by:
+
+- skipping fresh per-ticker OHLCV cache hits and logging fetched/cached/stale/API_ERROR counts;
+- using stale OHLCV cache with `STALE_DATA` when a new fetch fails;
+- trying a quote-source fallback for ticker and index history fetches;
+- using `UNIVERSE_EQUAL_WEIGHT_PROXY` for relative strength when VNINDEX/VN30 are unavailable;
+- adding `cached_price_count`, `stale_price_count`, `api_error_tickers`, `index_source`, and `cap_weight_available` to `data_quality.csv`.
+
 For a quick local check only:
 
 ```bash
@@ -84,3 +92,4 @@ See `data_contract.md` for output schemas, valid `reject_reason` values, valid `
 - Live API calls run sequentially with random sleep, per-ticker cache/resume, and a soft stop after consecutive ticker-level API errors.
 - `market_cap` can be blank in default M0 runs; blank means missing/not fetched data, not a fabricated value.
 - If `market_cap` is blank, Sprint 2 cap-weight indicators are reported as `N/A (MISSING_DATA)` rather than silently falling back to equal-weight.
+- If VNINDEX/VN30 history is unavailable, Sprint 2.1 reports relative strength versus the `UNIVERSE_EQUAL_WEIGHT_PROXY` and flags that source explicitly.
