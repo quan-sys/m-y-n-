@@ -2,6 +2,9 @@
 
 ## 2026-07-05
 
+- Added Sprint 2.4 AI analyst report template, prompt, web research checklist, and validation checklist.
+- Added AI package validator for required files, schemas, sector counts, driver map counts, and metadata consistency.
+- Added tests for AI package validation and AI report documentation safety.
 - Added Sprint 2.3 AI-ready weekly package outputs: `AI_INPUT_SUMMARY.md`, `README_FOR_AI.md`, `sector_cycle_signals.csv`, and `sector_driver_map.csv`.
 - Added deterministic candidate sector-cycle labels with confidence and warning flags.
 - Added sector-level driver map for later public web research without fetching or inventing live driver values.

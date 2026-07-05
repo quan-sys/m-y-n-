@@ -65,6 +65,30 @@ Sprint 2.3 adds an AI-ready sector package in the same report folder:
 
 These files prepare structured sector-level inputs for later AI analysis. They do not add stock ranking, valuation, BCTC analysis, external driver values, or transaction advice.
 
+## Sprint 2.4 — AI Analyst Template & Validation
+
+Sprint 2.4 adds safe templates and validation for later ChatGPT sector-level reasoning:
+
+- `docs/AI_ANALYST_REPORT_TEMPLATE.md`
+- `docs/AI_ANALYST_PROMPT.md`
+- `docs/SECTOR_DRIVER_WEB_RESEARCH_CHECKLIST.md`
+- `docs/AI_REPORT_VALIDATION_CHECKLIST.md`
+- `scripts/validate_ai_package.py`
+
+Run validation:
+
+```bash
+python scripts/validate_ai_package.py reports/<YYYY-MM-DD>
+```
+
+Run tests:
+
+```bash
+pytest
+```
+
+This sprint does not create an end-to-end weekly workflow, a final AI market report, stock ranking, target prices, or buy/sell recommendations.
+
 Sprint 2.1 hardens this run by:
 
 - skipping fresh per-ticker OHLCV cache hits and logging fetched/cached/stale/API_ERROR counts;
