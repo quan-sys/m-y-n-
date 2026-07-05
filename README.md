@@ -89,6 +89,30 @@ pytest
 
 This sprint does not create an end-to-end weekly workflow, a final AI market report, stock ranking, target prices, or buy/sell recommendations.
 
+## Sprint 2.5 — End-to-End Weekly Analyst Workflow
+
+Sprint 2.5 adds a weekly workflow for validating an AI-ready package and building a ChatGPT handoff:
+
+- `docs/WEEKLY_ANALYST_WORKFLOW.md`
+- `docs/HANDOFF_TO_CHATGPT_TEMPLATE.md`
+- `scripts/build_chatgpt_handoff.py`
+- `scripts/run_weekly_workflow.py`
+- `docs/SAMPLE_FINAL_AI_SECTOR_REPORT_STRUCTURE.md`
+
+Validate existing report and build ChatGPT handoff:
+
+```bash
+python scripts/run_weekly_workflow.py --existing-report reports/<YYYY-MM-DD>
+```
+
+Or build handoff directly:
+
+```bash
+python scripts/build_chatgpt_handoff.py reports/<YYYY-MM-DD>
+```
+
+This sprint does not run ChatGPT, does not web search, does not generate final market analysis automatically, and does not provide buy/sell recommendations.
+
 Sprint 2.1 hardens this run by:
 
 - skipping fresh per-ticker OHLCV cache hits and logging fetched/cached/stale/API_ERROR counts;

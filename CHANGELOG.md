@@ -2,6 +2,11 @@
 
 ## 2026-07-05
 
+- Added Sprint 2.5 weekly analyst workflow documentation.
+- Added ChatGPT handoff template and handoff builder.
+- Added weekly workflow script for existing-report validation and handoff generation.
+- Added sample final AI sector report structure without market conclusions.
+- Added tests for handoff and weekly workflow safety.
 - Added Sprint 2.4 AI analyst report template, prompt, web research checklist, and validation checklist.
 - Added AI package validator for required files, schemas, sector counts, driver map counts, and metadata consistency.
 - Added tests for AI package validation and AI report documentation safety.
