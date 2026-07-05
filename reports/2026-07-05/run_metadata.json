@@ -1,8 +1,8 @@
 {
-  "run_id": "weekly-mvp-2026-07-05T04:06:57.175115+00:00",
-  "generated_at": "2026-07-05T04:06:57.175115+00:00",
+  "run_id": "weekly-mvp-2026-07-05T04:59:31.544880+00:00",
+  "generated_at": "2026-07-05T04:59:31.544880+00:00",
   "as_of": "2026-07-03",
-  "git_commit_if_available": "59aa6b9",
+  "git_commit_if_available": "1be8179",
   "python_version": "3.13.5",
   "package_versions": {
     "pandas": "2.3.3",
@@ -18,11 +18,17 @@
   "output_dir": "C:\\Users\\Admin\\Documents\\Codex\\2026-07-04\\files-mentioned-by-the-user-codex\\work\\sprint2-m-y-n-\\reports\\2026-07-05",
   "valid_price_total": 378,
   "api_error_total": 0,
-  "cached_price_total": 372,
+  "cached_price_total": 378,
   "stale_price_total": 0,
   "index_source": "VNINDEX",
-  "cap_weight_available_sectors": 0,
-  "market_cap_available_total": 131,
-  "market_cap_coverage_min": 0.125,
-  "cap_weight_status": "SKIPPED_MISSING_MARKET_CAP"
+  "cap_weight_available_sectors": 1,
+  "market_cap_available_total": 211,
+  "market_cap_coverage_min": 0.25,
+  "cap_weight_status": "OK;SKIPPED_MISSING_MARKET_CAP",
+  "ai_ready_package_created": true,
+  "cycle_signals_created": true,
+  "driver_map_created": true,
+  "cycle_signal_sector_count": 19,
+  "driver_map_sector_count": 19,
+  "driver_map_row_count": 57
 }

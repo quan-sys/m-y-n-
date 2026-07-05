@@ -11,9 +11,12 @@ from src.weekly import (
     MARKET_CAP_SOURCE_PROXY,
     MARKET_CAP_SOURCE_REPORTED,
     MISSING,
+    ai_package_metadata,
     breadth_ma_pct,
     build_run_metadata,
     build_sector_daily_returns,
+    build_sector_cycle_signals,
+    build_sector_driver_map,
     build_sector_index,
     build_weekly_outputs,
     calc_distance_from_52w_low,
@@ -25,6 +28,8 @@ from src.weekly import (
     compute_confidence_lite,
     coverage_status_for,
     enrich_universe_market_caps,
+    render_ai_input_summary,
+    render_readme_for_ai,
     render_weekly_report,
 )
 
@@ -293,6 +298,79 @@ def test_data_quality_marks_cap_weight_ok_when_market_cap_complete():
     assert row["market_cap_coverage_pct"] == 1
     assert row["cap_weight_available"] == "yes"
     assert row["cap_weight_status"] == "OK"
+
+
+def test_cycle_signals_are_created_for_each_sector():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(260, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(260, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(260, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, _index_result())
+    signals = build_sector_cycle_signals(result.indicators, result.summary, result.data_quality)
+
+    assert len(signals) == 1
+    assert {
+        "sector",
+        "price_trend_signal",
+        "candidate_cycle_stage",
+        "cycle_signal_confidence",
+        "warning_flags",
+    }.issubset(signals.columns)
+    assert signals.iloc[0]["candidate_cycle_stage"] in {
+        "LEADERSHIP",
+        "IMPROVING",
+        "NEUTRAL",
+        "WEAKENING",
+        "LAGGING",
+        "UNCLEAR_DATA",
+    }
+
+
+def test_driver_map_covers_requested_sectors():
+    indicators = pd.DataFrame({"icb2": ["NGÂN HÀNG", "BẤT ĐỘNG SẢN", "DẦU KHÍ"]})
+
+    driver_map = build_sector_driver_map(indicators)
+
+    assert driver_map["sector"].nunique() == 3
+    assert set(driver_map["source_strategy"]) == {"CHATGPT_WEB_SEARCH_PUBLIC"}
+    assert set(driver_map["public_web_search_available"]) == {"yes"}
+    assert set(driver_map["codex_pipeline_required"]) == {"no"}
+    assert len(driver_map) >= 9
+
+
+def test_ai_summary_and_readme_are_safe_and_actionable():
+    universe = _universe([("AAA", "BANKS", 100), ("BBB", "BANKS", 200), ("CCC", "BANKS", 300)])
+    prices = {
+        "AAA": FetchResult(True, _price_frame(260, start=100, step=1), source="fixture"),
+        "BBB": FetchResult(True, _price_frame(260, start=100, step=0.5), source="fixture"),
+        "CCC": FetchResult(True, _price_frame(260, start=100, step=-0.1), source="fixture"),
+    }
+    result = build_weekly_outputs(universe, prices, _index_result())
+    signals = build_sector_cycle_signals(result.indicators, result.summary, result.data_quality)
+    ai_summary = render_ai_input_summary(result.indicators, result.data_quality, signals, _metadata(len(universe)))
+    readme = render_readme_for_ai()
+    combined = f"{ai_summary}\n{readme}".lower()
+
+    assert "input package for ai analysis" in combined
+    assert "do not recommend buying or selling" in combined
+    assert "target price" not in combined
+    assert all(phrase not in combined for phrase in BANNED_REPORT_PHRASES)
+
+
+def test_ai_package_metadata_flags_outputs():
+    cycle_signals = pd.DataFrame({"sector": ["BANKS"]})
+    driver_map = pd.DataFrame({"sector": ["BANKS", "BANKS"], "driver_name": ["credit growth", "NIM"]})
+
+    metadata = ai_package_metadata(cycle_signals, driver_map)
+
+    assert metadata["ai_ready_package_created"] is True
+    assert metadata["cycle_signals_created"] is True
+    assert metadata["driver_map_created"] is True
+    assert metadata["cycle_signal_sector_count"] == 1
+    assert metadata["driver_map_sector_count"] == 1
+    assert metadata["driver_map_row_count"] == 2
 
 
 def _universe(rows: list[tuple[str, str, object]]) -> pd.DataFrame:

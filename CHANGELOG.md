@@ -2,6 +2,10 @@
 
 ## 2026-07-05
 
+- Added Sprint 2.3 AI-ready weekly package outputs: `AI_INPUT_SUMMARY.md`, `README_FOR_AI.md`, `sector_cycle_signals.csv`, and `sector_driver_map.csv`.
+- Added deterministic candidate sector-cycle labels with confidence and warning flags.
+- Added sector-level driver map for later public web research without fetching or inventing live driver values.
+- Updated weekly metadata and report text to expose AI-package status while keeping cap-weight skipped when market-cap coverage is incomplete.
 - Added Sprint 2.2 market-cap investigation support in weekly reporting.
 - Added weekly market-cap enrichment from company overview with `SOURCE_REPORTED_MARKET_CAP` and `SHARES_X_LAST_CLOSE_PROXY` markers.
 - Added controlled cap-weight skip fields: market-cap coverage, `cap_weight_status`, and `cap_weight_reason`.

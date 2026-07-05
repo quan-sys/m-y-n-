@@ -1,6 +1,6 @@
 # sector-cycle-monitor
 
-Python data pipeline for monitoring Vietnam equity sector cycles. M0 builds the stock universe and reject log. Sprint 2 adds an indicator-only weekly sector report; it does not compute formal scores, dashboards, valuation, BCTC, target prices, or transaction advice.
+Python data pipeline for monitoring Vietnam equity sector cycles. M0 builds the stock universe and reject log. Sprint 2 adds an indicator-only weekly sector report; it does not compute formal scores, dashboards, valuation, BCTC, price targets, or transaction advice.
 
 ## Setup
 
@@ -56,6 +56,15 @@ The script reads `data/universe.csv`, fetches/resumes OHLCV cache for accepted t
 - `reports/<YYYY-MM-DD>/data_quality.csv`
 - `reports/<YYYY-MM-DD>/run_metadata.json`
 
+Sprint 2.3 adds an AI-ready sector package in the same report folder:
+
+- `reports/<YYYY-MM-DD>/AI_INPUT_SUMMARY.md`
+- `reports/<YYYY-MM-DD>/README_FOR_AI.md`
+- `reports/<YYYY-MM-DD>/sector_cycle_signals.csv`
+- `reports/<YYYY-MM-DD>/sector_driver_map.csv`
+
+These files prepare structured sector-level inputs for later AI analysis. They do not add stock ranking, valuation, BCTC analysis, external driver values, or transaction advice.
+
 Sprint 2.1 hardens this run by:
 
 - skipping fresh per-ticker OHLCV cache hits and logging fetched/cached/stale/API_ERROR counts;
@@ -101,3 +110,4 @@ See `data_contract.md` for output schemas, valid `reject_reason` values, valid `
 - If `market_cap` is blank, Sprint 2 cap-weight indicators are reported as `N/A (MISSING_DATA)` rather than silently falling back to equal-weight.
 - If VNINDEX/VN30 history is unavailable, Sprint 2.1 reports relative strength versus the `UNIVERSE_EQUAL_WEIGHT_PROXY` and flags that source explicitly.
 - Sprint 2.2 does not fabricate share counts or use zero-filled market caps; cap-weight is skipped when reliable coverage is incomplete.
+- Sprint 2.3 adds deterministic candidate cycle labels and a sector driver checklist for later public web research; these are inputs, not final analytical conclusions.

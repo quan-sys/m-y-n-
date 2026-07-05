@@ -97,6 +97,40 @@ QUALITY_COLUMNS = [
     "source",
 ]
 
+CYCLE_SIGNAL_COLUMNS = [
+    "sector",
+    "ticker_count",
+    "valid_price_count",
+    "data_quality_status",
+    "coverage_status",
+    "relative_strength_1m_vs_vnindex",
+    "sector_return_1w_equal_weight",
+    "sector_return_1m_equal_weight",
+    "price_trend_signal",
+    "relative_strength_signal",
+    "momentum_signal",
+    "breadth_signal",
+    "liquidity_signal",
+    "data_confidence_signal",
+    "candidate_cycle_stage",
+    "cycle_signal_confidence",
+    "evidence_summary",
+    "warning_flags",
+]
+
+DRIVER_MAP_COLUMNS = [
+    "sector",
+    "driver_name",
+    "why_it_matters",
+    "driver_type",
+    "source_strategy",
+    "public_web_search_available",
+    "codex_pipeline_required",
+    "priority",
+    "interpretation_note",
+    "data_status",
+]
+
 CORE_INDICATORS = [
     "sector_return_1w_equal_weight",
     "sector_return_1m_equal_weight",
@@ -182,19 +216,31 @@ def run_weekly_mvp(
     indicators = outputs.indicators
     summary = outputs.summary
     data_quality = outputs.data_quality
+    cycle_signals = build_sector_cycle_signals(indicators, summary, data_quality)
+    driver_map = build_sector_driver_map(indicators)
     as_of = _latest_as_of(indicators, fallback=report_date)
+    metadata_extra = run_quality_metadata(data_quality)
+    metadata_extra.update(ai_package_metadata(cycle_signals, driver_map))
     metadata = build_run_metadata(
         universe_path=universe_path,
         universe=universe,
         as_of=as_of,
         source=SOURCE,
         output_dir=output_dir,
-        extra=run_quality_metadata(data_quality),
+        extra=metadata_extra,
     )
 
     indicators.to_csv(output_dir / "sector_indicators_tier1.csv", index=False)
     summary.to_csv(output_dir / "sector_summary.csv", index=False)
     data_quality.to_csv(output_dir / "data_quality.csv", index=False)
+    cycle_signals.to_csv(output_dir / "sector_cycle_signals.csv", index=False)
+    driver_map.to_csv(output_dir / "sector_driver_map.csv", index=False)
+    ai_summary_text = render_ai_input_summary(indicators, data_quality, cycle_signals, metadata)
+    readme_text = render_readme_for_ai()
+    _assert_report_is_safe(ai_summary_text)
+    _assert_report_is_safe(readme_text)
+    (output_dir / "AI_INPUT_SUMMARY.md").write_text(ai_summary_text, encoding="utf-8")
+    (output_dir / "README_FOR_AI.md").write_text(readme_text, encoding="utf-8")
     (output_dir / "run_metadata.json").write_text(
         json.dumps(metadata, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -281,6 +327,555 @@ def build_weekly_outputs(
         data_quality=pd.DataFrame(quality_rows, columns=QUALITY_COLUMNS),
         metadata={},
     )
+
+
+def build_sector_cycle_signals(
+    indicators: pd.DataFrame,
+    summary: pd.DataFrame,
+    data_quality: pd.DataFrame,
+) -> pd.DataFrame:
+    if indicators.empty:
+        return pd.DataFrame(columns=CYCLE_SIGNAL_COLUMNS)
+
+    rows: list[dict[str, Any]] = []
+    for _, indicator_row in indicators.sort_values("icb2").iterrows():
+        sector = str(indicator_row.get("icb2", "")).strip()
+        quality_row = find_row(data_quality, "icb2", indicator_row.get("icb2"))
+        summary_row = find_row(summary, "icb2", indicator_row.get("icb2"))
+        ticker_count = int_or_zero(indicator_row.get("ticker_count"))
+        valid_price_count = int_or_zero(indicator_row.get("valid_price_count"))
+        coverage_status = str(quality_row.get("coverage_status", indicator_row.get("data_quality_status", MISSING)))
+        data_quality_status = str(indicator_row.get("data_quality_status", coverage_status))
+        one_week = signal_number(indicator_row.get("sector_return_1w_equal_weight"))
+        one_month = signal_number(indicator_row.get("sector_return_1m_equal_weight"))
+        relative = signal_number(indicator_row.get("relative_strength_1m_vs_vnindex"))
+        breadth = signal_number(indicator_row.get("breadth_ma50_pct"))
+        liquidity = signal_number(indicator_row.get("liquidity_trend_4w"))
+        stage = candidate_cycle_stage_for(
+            coverage_status=coverage_status,
+            one_week=one_week,
+            one_month=one_month,
+            relative=relative,
+            breadth=breadth,
+        )
+        confidence = cycle_signal_confidence_for(
+            coverage_status=coverage_status,
+            ticker_count=ticker_count,
+            valid_price_count=valid_price_count,
+            one_week=one_week,
+            one_month=one_month,
+            relative=relative,
+            breadth=breadth,
+            liquidity=liquidity,
+            candidate_cycle_stage=stage,
+        )
+        warnings = warning_flags_for(indicator_row, quality_row, relative=relative, breadth=breadth)
+
+        rows.append(
+            {
+                "sector": sector,
+                "ticker_count": ticker_count,
+                "valid_price_count": valid_price_count,
+                "data_quality_status": data_quality_status,
+                "coverage_status": coverage_status,
+                "relative_strength_1m_vs_vnindex": indicator_row.get("relative_strength_1m_vs_vnindex", MISSING),
+                "sector_return_1w_equal_weight": indicator_row.get("sector_return_1w_equal_weight", MISSING),
+                "sector_return_1m_equal_weight": indicator_row.get("sector_return_1m_equal_weight", MISSING),
+                "price_trend_signal": price_trend_signal(one_month),
+                "relative_strength_signal": relative_strength_signal(relative),
+                "momentum_signal": momentum_signal(one_week, one_month),
+                "breadth_signal": breadth_signal(breadth),
+                "liquidity_signal": liquidity_signal(liquidity),
+                "data_confidence_signal": data_confidence_signal(
+                    coverage_status=coverage_status,
+                    ticker_count=ticker_count,
+                    valid_price_count=valid_price_count,
+                ),
+                "candidate_cycle_stage": stage,
+                "cycle_signal_confidence": confidence,
+                "evidence_summary": cycle_evidence_summary(
+                    one_week=one_week,
+                    one_month=one_month,
+                    relative=relative,
+                    breadth=breadth,
+                    liquidity=liquidity,
+                    main_signal=summary_row.get("main_signal", MISSING),
+                ),
+                "warning_flags": warnings,
+            }
+        )
+    return pd.DataFrame(rows, columns=CYCLE_SIGNAL_COLUMNS)
+
+
+def build_sector_driver_map(indicators: pd.DataFrame) -> pd.DataFrame:
+    if indicators.empty or "icb2" not in indicators:
+        return pd.DataFrame(columns=DRIVER_MAP_COLUMNS)
+
+    templates = sector_driver_templates()
+    rows: list[dict[str, Any]] = []
+    sectors = sorted(str(value).strip() for value in indicators["icb2"].dropna().astype(str).unique() if str(value).strip())
+    for sector in sectors:
+        drivers = templates.get(sector, generic_sector_drivers())
+        for driver in drivers:
+            row = {"sector": sector}
+            row.update(driver)
+            rows.append(row)
+    return pd.DataFrame(rows, columns=DRIVER_MAP_COLUMNS)
+
+
+def ai_package_metadata(cycle_signals: pd.DataFrame, driver_map: pd.DataFrame) -> dict[str, Any]:
+    return {
+        "ai_ready_package_created": bool(not cycle_signals.empty and not driver_map.empty),
+        "cycle_signals_created": bool(not cycle_signals.empty),
+        "driver_map_created": bool(not driver_map.empty),
+        "cycle_signal_sector_count": int(cycle_signals["sector"].nunique()) if "sector" in cycle_signals else 0,
+        "driver_map_sector_count": int(driver_map["sector"].nunique()) if "sector" in driver_map else 0,
+        "driver_map_row_count": int(len(driver_map)),
+    }
+
+
+def render_ai_input_summary(
+    indicators: pd.DataFrame,
+    data_quality: pd.DataFrame,
+    cycle_signals: pd.DataFrame,
+    metadata: dict[str, Any],
+) -> str:
+    generated_at = metadata.get("generated_at", MISSING)
+    as_of = metadata.get("as_of", MISSING)
+    universe_count = metadata.get("universe_row_count", 0)
+    sector_count = int(cycle_signals["sector"].nunique()) if "sector" in cycle_signals else 0
+    quality_counts = quality_status_counts(data_quality)
+    valid_price_total = quality_total(data_quality, "valid_price_count")
+    api_error_total = quality_total(data_quality, "api_error_count")
+    index_source = quality_unique_values(data_quality, "index_source")
+    relative_strength_available = "yes" if indicator_has_any_value(indicators, "relative_strength_1m_vs_vnindex") else "no"
+    cap_weight_status = quality_unique_values(data_quality, "cap_weight_status")
+    cap_weight_reason = unique_quality_text(data_quality, "cap_weight_reason")
+
+    lines = [
+        "# AI Input Summary",
+        "",
+        "This is an input package for AI analysis, not a buy/sell recommendation report.",
+        "",
+        "## Run Context",
+        "",
+        f"- report date: {as_of}",
+        f"- generated_at: {generated_at}",
+        f"- universe ticker count: {universe_count}",
+        f"- sector count: {sector_count}",
+        f"- valid_price total: {valid_price_total}",
+        f"- API_ERROR total: {api_error_total}",
+        f"- index_source: {index_source}",
+        f"- relative_strength availability: {relative_strength_available}",
+        f"- cap_weight_status: {cap_weight_status}",
+        f"- cap_weight_reason: {cap_weight_reason}",
+        f"- OK sectors: {quality_counts.get('OK', 0)}",
+        f"- WATCH sectors: {quality_counts.get('WATCH', 0)}",
+        f"- LOW_COVERAGE sectors: {quality_counts.get('LOW_COVERAGE', 0)}",
+        f"- DATA_WEAK sectors: {quality_counts.get('DATA_WEAK', 0)}",
+        "",
+        "## Sector Snapshot",
+        "",
+        "| sector | ticker_count | valid_price_count | coverage/data_quality | relative_strength_1m_vs_vnindex | return_1w_equal_weight | return_1m_equal_weight | warning_flags |",
+        "| --- | ---: | ---: | --- | ---: | ---: | ---: | --- |",
+    ]
+    for _, row in cycle_signals.sort_values("sector").iterrows():
+        quality_text = f"{row['coverage_status']}/{row['data_quality_status']}"
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    str(row["sector"]),
+                    str(row["ticker_count"]),
+                    str(row["valid_price_count"]),
+                    quality_text,
+                    format_value(row["relative_strength_1m_vs_vnindex"]),
+                    format_value(row["sector_return_1w_equal_weight"]),
+                    format_value(row["sector_return_1m_equal_weight"]),
+                    str(row["warning_flags"]),
+                ]
+            )
+            + " |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Reading Notes",
+            "",
+            "- Candidate cycle labels are deterministic input labels, not final interpretation.",
+            "- Missing values must stay missing and must not be treated as zero.",
+            "- Cap-weight fields remain unavailable unless cap_weight_status is OK.",
+            "- Public web research is still required for current sector drivers and news context.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def render_readme_for_ai() -> str:
+    lines = [
+        "# README For AI",
+        "",
+        "Use this package as structured input for sector-level cycle analysis only.",
+        "",
+        "## Rules",
+        "",
+        "- Analyze only at sector level.",
+        "- Do not recommend buying or selling.",
+        "- Do not rank individual stocks.",
+        "- Do not provide price targets.",
+        "- Do not treat missing data as zero.",
+        "- Cap-weight indicators are unavailable unless cap_weight_status says OK.",
+        "- If a sector has LOW_COVERAGE or DATA_WEAK, conclusions must be cautious.",
+        "- Relative strength is compared against index_source.",
+        "- Web search should be used later for public sector drivers, news, commodity prices, macro policy, and recent context.",
+        "- Non-public or unavailable data must be marked as N/A, not invented.",
+        "",
+        "## Files",
+        "",
+        "- AI_INPUT_SUMMARY.md: compact run summary for AI consumption.",
+        "- sector_cycle_signals.csv: deterministic candidate sector-cycle labels and warnings.",
+        "- sector_driver_map.csv: sector-level driver checklist for later public web research.",
+        "- sector_indicators_tier1.csv: raw tier-1 sector indicators.",
+        "- data_quality.csv: data coverage, source, and missing-data warnings.",
+        "- WEEKLY_REPORT.md: automated data summary, not a final analytical report.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def signal_number(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+    except (TypeError, ValueError):
+        pass
+    text = str(value).strip()
+    if text == "" or text == MISSING:
+        return None
+    try:
+        number = float(text.replace(",", ""))
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def int_or_zero(value: Any) -> int:
+    number = signal_number(value)
+    return int(number) if number is not None else 0
+
+
+def price_trend_signal(one_month: float | None) -> str:
+    if one_month is None:
+        return "MISSING"
+    if one_month > 0.03:
+        return "STRONG_UP"
+    if one_month > 0:
+        return "UP"
+    if one_month < -0.03:
+        return "STRONG_DOWN"
+    if one_month < 0:
+        return "DOWN"
+    return "FLAT"
+
+
+def relative_strength_signal(relative: float | None) -> str:
+    if relative is None:
+        return "MISSING"
+    if relative > 0.02:
+        return "OUTPERFORMING"
+    if relative > 0:
+        return "SLIGHTLY_OUTPERFORMING"
+    if relative < -0.02:
+        return "UNDERPERFORMING"
+    if relative < 0:
+        return "SLIGHTLY_UNDERPERFORMING"
+    return "INLINE"
+
+
+def momentum_signal(one_week: float | None, one_month: float | None) -> str:
+    if one_week is None or one_month is None:
+        return "MISSING"
+    if one_week > 0 and one_month > 0:
+        return "POSITIVE"
+    if one_week < 0 and one_month < 0:
+        return "NEGATIVE"
+    if one_week > 0 and one_month < 0:
+        return "RECOVERING"
+    if one_week < 0 and one_month > 0:
+        return "COOLING"
+    return "MIXED"
+
+
+def breadth_signal(breadth: float | None) -> str:
+    if breadth is None:
+        return "MISSING"
+    if breadth >= 0.65:
+        return "BROAD_POSITIVE"
+    if breadth >= 0.5:
+        return "POSITIVE"
+    if breadth >= 0.35:
+        return "MIXED"
+    return "WEAK"
+
+
+def liquidity_signal(liquidity: float | None) -> str:
+    if liquidity is None:
+        return "MISSING"
+    if liquidity > 0.1:
+        return "EXPANDING"
+    if liquidity >= 0:
+        return "STABLE_TO_UP"
+    if liquidity > -0.1:
+        return "STABLE_TO_DOWN"
+    return "CONTRACTING"
+
+
+def data_confidence_signal(coverage_status: str, ticker_count: int, valid_price_count: int) -> str:
+    if coverage_status in {"LOW_COVERAGE", "DATA_WEAK"}:
+        return "LOW"
+    if coverage_status == "WATCH" or valid_price_count < ticker_count:
+        return "MEDIUM"
+    return "HIGH"
+
+
+def candidate_cycle_stage_for(
+    coverage_status: str,
+    one_week: float | None,
+    one_month: float | None,
+    relative: float | None,
+    breadth: float | None,
+) -> str:
+    if coverage_status in {"LOW_COVERAGE", "DATA_WEAK"} or one_month is None or relative is None:
+        return "UNCLEAR_DATA"
+    if one_month > 0 and relative > 0 and breadth is not None and breadth >= 0.5:
+        return "LEADERSHIP" if one_week is not None and one_week > 0 else "IMPROVING"
+    if (one_month > 0 and relative >= 0) or (relative > 0 and breadth is not None and breadth >= 0.4):
+        return "IMPROVING"
+    if one_month < 0 and relative < 0 and breadth is not None and breadth <= 0.4:
+        return "LAGGING"
+    if one_month < 0 or relative < 0:
+        return "WEAKENING"
+    return "NEUTRAL"
+
+
+def cycle_signal_confidence_for(
+    coverage_status: str,
+    ticker_count: int,
+    valid_price_count: int,
+    one_week: float | None,
+    one_month: float | None,
+    relative: float | None,
+    breadth: float | None,
+    liquidity: float | None,
+    candidate_cycle_stage: str,
+) -> str:
+    required_missing = any(value is None for value in (one_month, relative))
+    if candidate_cycle_stage == "UNCLEAR_DATA" or coverage_status in {"LOW_COVERAGE", "DATA_WEAK"} or required_missing:
+        return "LOW"
+    optional_missing = any(value is None for value in (one_week, breadth, liquidity))
+    if coverage_status == "OK" and valid_price_count == ticker_count and not optional_missing:
+        return "HIGH"
+    return "MEDIUM"
+
+
+def cycle_evidence_summary(
+    one_week: float | None,
+    one_month: float | None,
+    relative: float | None,
+    breadth: float | None,
+    liquidity: float | None,
+    main_signal: Any,
+) -> str:
+    parts = [
+        f"1w={format_value(one_week)}",
+        f"1m={format_value(one_month)}",
+        f"relative_1m={format_value(relative)}",
+        f"breadth_ma50={format_value(breadth)}",
+        f"liquidity_4w={format_value(liquidity)}",
+        f"summary={main_signal}",
+    ]
+    return "; ".join(parts)
+
+
+def warning_flags_for(
+    indicator_row: pd.Series,
+    quality_row: dict[str, Any],
+    relative: float | None,
+    breadth: float | None,
+) -> str:
+    flags: list[str] = []
+    coverage = str(quality_row.get("coverage_status", indicator_row.get("data_quality_status", "")))
+    if coverage and coverage != "OK":
+        flags.append(coverage)
+    cap_weight_status = str(quality_row.get("cap_weight_status", ""))
+    if cap_weight_status and cap_weight_status != CAP_WEIGHT_STATUS_OK:
+        flags.append("CAP_WEIGHT_SKIPPED")
+    missing_fields = str(indicator_row.get("missing_fields", "NONE"))
+    if missing_fields and missing_fields != "NONE":
+        flags.append(f"MISSING_FIELDS={missing_fields}")
+    api_error_count = int_or_zero(quality_row.get("api_error_count"))
+    if api_error_count:
+        flags.append(f"API_ERROR={api_error_count}")
+    if relative is None:
+        flags.append("MISSING_RELATIVE_STRENGTH")
+    elif relative < 0:
+        flags.append("NEGATIVE_RELATIVE_STRENGTH")
+    if breadth is None:
+        flags.append("MISSING_BREADTH")
+    elif breadth < 0.4:
+        flags.append("LOW_BREADTH")
+    return "|".join(dict.fromkeys(flags)) if flags else "NONE"
+
+
+def indicator_has_any_value(indicators: pd.DataFrame, column: str) -> bool:
+    if indicators.empty or column not in indicators:
+        return False
+    return any(signal_number(value) is not None for value in indicators[column])
+
+
+def unique_quality_text(data_quality: pd.DataFrame, column: str) -> str:
+    if data_quality.empty or column not in data_quality:
+        return MISSING
+    values = []
+    for value in data_quality[column].dropna().astype(str):
+        text = value.strip()
+        if text and text not in values:
+            values.append(text)
+    return "; ".join(values) if values else MISSING
+
+
+def sector_driver_templates() -> dict[str, list[dict[str, str]]]:
+    return {
+        "BÁN LẺ": [
+            driver("consumer spending", "Tracks household demand and discretionary purchase cycles.", "demand", "high"),
+            driver("same-store sales", "Shows whether retail growth is broad or store-opening driven.", "operating", "high"),
+            driver("inventory cycle", "High inventory can pressure margins and cash conversion.", "operating", "medium"),
+        ],
+        "BẢO HIỂM": [
+            driver("bond yields", "Investment income and reserve discount rates are sensitive to yields.", "macro", "high"),
+            driver("premium growth", "Shows insurance demand and distribution momentum.", "demand", "high"),
+            driver("claim ratio", "Rising claims can pressure underwriting profitability.", "operating", "medium"),
+        ],
+        "BẤT ĐỘNG SẢN": [
+            driver("interest rate and credit policy", "Affects buyer affordability, financing access, and project progress.", "macro", "high"),
+            driver("legal approvals", "Approval pace affects launch timing, presales, and revenue recognition.", "policy", "high"),
+            driver("housing presales", "Shows demand strength before accounting revenue appears.", "demand", "high"),
+        ],
+        "CÔNG NGHỆ THÔNG TIN": [
+            driver("global IT spending", "Affects outsourcing demand and project budgets.", "demand", "high"),
+            driver("USD/VND exchange rate", "Revenue and margin can be sensitive to export billing currency.", "macro", "medium"),
+            driver("digital transformation budgets", "Domestic enterprise and public-sector budgets support demand.", "demand", "medium"),
+        ],
+        "DU LỊCH VÀ GIẢI TRÍ": [
+            driver("tourist arrivals", "Visitor flow drives hotel, airport service, and leisure demand.", "demand", "high"),
+            driver("hotel occupancy", "Occupancy shows pricing power and service utilization.", "operating", "high"),
+            driver("airline capacity", "Seat supply and routes affect travel volume and costs.", "supply", "medium"),
+        ],
+        "DẦU KHÍ": [
+            driver("Brent crude price", "Oil price affects upstream revenue, sentiment, and project economics.", "commodity", "high"),
+            driver("gas demand", "Industrial and power-sector demand affects gas volume cycles.", "demand", "medium"),
+            driver("refining margin", "Crack spreads influence refinery earnings sensitivity.", "commodity", "high"),
+        ],
+        "DỊCH VỤ TÀI CHÍNH": [
+            driver("market turnover", "Brokerage revenue and sentiment follow market liquidity.", "market", "high"),
+            driver("margin lending", "Affects securities-company interest income and risk appetite.", "credit", "high"),
+            driver("IPO and issuance pipeline", "Capital-market activity supports fee income cycles.", "market", "medium"),
+        ],
+        "HÀNG & DỊCH VỤ CÔNG NGHIỆP": [
+            driver("manufacturing PMI", "Shows industrial demand and order momentum.", "macro", "high"),
+            driver("export orders", "Industrial service demand often follows external orders.", "demand", "high"),
+            driver("logistics cost", "Freight and fuel costs can pressure margins.", "cost", "medium"),
+        ],
+        "HÀNG CÁ NHÂN & GIA DỤNG": [
+            driver("consumer discretionary demand", "Demand cycle affects volume and pricing power.", "demand", "high"),
+            driver("export orders", "Many manufacturers depend on external consumer demand.", "demand", "medium"),
+            driver("input costs", "Materials and labor shifts affect gross margin.", "cost", "medium"),
+        ],
+        "HÓA CHẤT": [
+            driver("rubber price", "Affects revenue and margin for rubber producers and cost pressure for downstream users.", "commodity", "high"),
+            driver("fertilizer and chemical input cost", "Feedstock costs influence spread and profitability.", "commodity", "high"),
+            driver("export demand", "External demand affects volume and pricing cycle.", "demand", "medium"),
+        ],
+        "NGÂN HÀNG": [
+            driver("credit growth", "Affects loan growth and banking revenue cycle.", "credit", "high"),
+            driver("net interest margin", "Interest-rate cycle affects spread income.", "macro", "high"),
+            driver("asset quality and NPLs", "Credit costs can lag the loan cycle and affect earnings quality.", "risk", "high"),
+        ],
+        "THỰC PHẨM VÀ ĐỒ UỐNG": [
+            driver("input commodity prices", "Sugar, grain, milk, and packaging costs affect margins.", "commodity", "high"),
+            driver("consumer demand", "Volume growth follows staples and discretionary spending trends.", "demand", "high"),
+            driver("export markets", "Seafood and food exporters depend on overseas demand and trade rules.", "demand", "medium"),
+        ],
+        "TRUYỀN THÔNG": [
+            driver("advertising spend", "Ad budgets drive revenue sensitivity for media businesses.", "demand", "high"),
+            driver("platform regulation", "Policy changes can affect distribution and monetization.", "policy", "medium"),
+            driver("event and content cycle", "Major events and content releases can shift traffic and ad demand.", "operating", "medium"),
+        ],
+        "TÀI NGUYÊN CƠ BẢN": [
+            driver("steel price", "Price cycle affects revenue and inventory gains or losses.", "commodity", "high"),
+            driver("iron ore and coking coal", "Input costs affect steel producer margins.", "commodity", "high"),
+            driver("China demand", "Regional commodity demand often follows China construction and manufacturing.", "macro", "medium"),
+        ],
+        "VIỄN THÔNG": [
+            driver("subscriber and ARPU trend", "User growth and revenue per user drive telecom revenue cycle.", "operating", "high"),
+            driver("5G capex", "Network investment affects cost cycle and future service capacity.", "capex", "medium"),
+            driver("data usage", "Traffic growth supports monetization if pricing holds.", "demand", "medium"),
+        ],
+        "XÂY DỰNG VÀ VẬT LIỆU": [
+            driver("public investment", "Infrastructure spending drives construction and materials demand.", "policy", "high"),
+            driver("cement and steel prices", "Material price cycles affect margins and demand timing.", "commodity", "high"),
+            driver("construction permits", "Permit activity signals private construction demand.", "demand", "medium"),
+        ],
+        "Y TẾ": [
+            driver("hospital and pharma demand", "Patient volume and medicine demand drive revenue cycles.", "demand", "high"),
+            driver("drug tender policy", "Tender rules affect pricing, volume, and timing.", "policy", "high"),
+            driver("insurance reimbursement", "Payment policy can change affordability and provider cash flow.", "policy", "medium"),
+        ],
+        "Ô TÔ VÀ PHỤ TÙNG": [
+            driver("vehicle sales", "Unit sales show demand cycle for assemblers and parts suppliers.", "demand", "high"),
+            driver("registration fee and tax policy", "Policy incentives can pull demand forward.", "policy", "high"),
+            driver("auto loan rates", "Financing cost affects consumer purchase affordability.", "macro", "medium"),
+        ],
+        "ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT": [
+            driver("power demand", "Electricity load tracks industrial and household consumption.", "demand", "high"),
+            driver("hydrology and water inflow", "Water availability affects hydropower output mix and margins.", "weather", "high"),
+            driver("regulated tariff policy", "Tariff changes affect revenue and cost pass-through.", "policy", "high"),
+        ],
+    }
+
+
+def generic_sector_drivers() -> list[dict[str, str]]:
+    return [
+        driver("sector demand", "Checks whether end-market demand is expanding or contracting.", "demand", "high"),
+        driver("input cost cycle", "Tracks whether cost pressure is rising or easing.", "cost", "medium"),
+        driver("policy and macro context", "Sector cycles can be affected by interest rates, regulation, and fiscal policy.", "macro", "medium"),
+    ]
+
+
+def driver(
+    driver_name: str,
+    why_it_matters: str,
+    driver_type: str,
+    priority: str,
+    source_strategy: str = "CHATGPT_WEB_SEARCH_PUBLIC",
+    public_web_search_available: str = "yes",
+    codex_pipeline_required: str = "no",
+    data_status: str = "NEEDS_WEB_RESEARCH",
+) -> dict[str, str]:
+    return {
+        "driver_name": driver_name,
+        "why_it_matters": why_it_matters,
+        "driver_type": driver_type,
+        "source_strategy": source_strategy,
+        "public_web_search_available": public_web_search_available,
+        "codex_pipeline_required": codex_pipeline_required,
+        "priority": priority,
+        "interpretation_note": "Use public current context later; do not invent live values in this package.",
+        "data_status": data_status,
+    }
 
 
 def build_index_context(
@@ -840,7 +1435,10 @@ def render_weekly_report(
         "Cap-weight indicators are unavailable because reliable market_cap/share-count data is missing. "
         "The report does not substitute equal-weight data as cap-weight."
         if cap_weight_available_count == 0
-        else "Cap-weight indicators are shown only for sectors with complete market_cap coverage for the return window."
+        else (
+            "Cap-weight indicators are shown only for sectors with complete market_cap coverage for the return window; "
+            "sectors without complete coverage remain SKIPPED_MISSING_MARKET_CAP and equal-weight data is not substituted."
+        )
     )
 
     lines = [
@@ -860,6 +1458,8 @@ def render_weekly_report(
         f"- Market-cap source: {market_cap_sources}",
         f"- Market-cap available/missing: {market_cap_available_total}/{market_cap_missing_total}",
         f"- Market-cap min sector coverage: {format_value(market_cap_min_coverage)}",
+        "- AI-ready outputs: AI_INPUT_SUMMARY.md exists; README_FOR_AI.md exists; sector_cycle_signals.csv exists; sector_driver_map.csv exists.",
+        "This report is not a buy/sell recommendation.",
         "",
         "Báo cáo này chỉ tổng hợp chỉ báo cấp ngành. Đây không phải chỉ dẫn giao dịch.",
         "",
@@ -948,6 +1548,7 @@ def render_weekly_report(
             f"- `{MISSING}` nghĩa là nguồn dữ liệu chưa đủ để tính chỉ báo.",
             "- Cap-weight return cần market_cap từ universe; nếu market_cap trống thì chỉ báo cap-weight được để thiếu dữ liệu.",
             f"- {cap_weight_note}",
+            "- AI-ready package files: `AI_INPUT_SUMMARY.md`, `README_FOR_AI.md`, `sector_cycle_signals.csv`, and `sector_driver_map.csv`.",
             "- Relative strength dùng `index_source` trong `data_quality.csv`: VNINDEX, VN30, hoặc UNIVERSE_EQUAL_WEIGHT_PROXY khi index thật không lấy được.",
             "- M0 mặc định không bật `--fetch-market-cap`, vì vậy cap-weight không dùng equal-weight thay thế khi market_cap trống.",
             "- Volatility 20d là độ lệch chuẩn 20 phiên của daily sector returns, không annualize.",
