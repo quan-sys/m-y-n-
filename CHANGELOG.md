@@ -2,6 +2,11 @@
 
 ## 2026-07-05
 
+- Added Sprint 2.7 web driver research archive and cross-check workflow.
+- Added driver research schema, ChatGPT web research prompt, and cross-check guide.
+- Added scripts to build driver research placeholders, validate saved research, and summarize research status.
+- Updated weekly workflow to create `driver_research_todo.md` and pending driver research placeholders.
+- Added tests for driver research template generation, validation, summary, and workflow integration.
 - Added Sprint 2.5 weekly analyst workflow documentation.
 - Added ChatGPT handoff template and handoff builder.
 - Added weekly workflow script for existing-report validation and handoff generation.

@@ -21,6 +21,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.build_chatgpt_handoff import FILES_FOR_CHATGPT, build_handoff  # noqa: E402
+from scripts.build_driver_research_template import build_driver_research_template  # noqa: E402
 from scripts.validate_ai_package import format_result, validate_ai_package  # noqa: E402
 from src.weekly import run_weekly_mvp  # noqa: E402
 
@@ -33,10 +34,13 @@ def _run_existing_report(report_folder: Path) -> int:
         return 1
 
     handoff_path = build_handoff(report_folder)
+    driver_paths = build_driver_research_template(report_folder)
     print("Weekly analyst workflow: PASS")
     print(f"- report folder: {report_folder}")
     print("- validation: PASS")
     print(f"- handoff: {handoff_path}")
+    print(f"- driver research todo: {driver_paths['todo']}")
+    print("- driver research: pending")
     print("")
     print("Files user should provide to ChatGPT:")
     for file_name in FILES_FOR_CHATGPT:

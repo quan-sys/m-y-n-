@@ -65,6 +65,7 @@ Dùng các file sau:
 - `README_FOR_AI.md`
 - `sector_cycle_signals.csv`
 - `sector_driver_map.csv`
+- `driver_research_todo.md`
 - `data_quality.csv`
 - `run_metadata.json`
 

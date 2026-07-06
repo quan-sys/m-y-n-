@@ -26,7 +26,9 @@ def test_weekly_workflow_existing_report_passes_with_valid_fixture(tmp_path):
     assert "Weekly analyst workflow: PASS" in result.stdout
     assert "validation: PASS" in result.stdout
     assert "HANDOFF_TO_CHATGPT.md" in result.stdout
+    assert "driver research todo" in result.stdout
     assert (package / "HANDOFF_TO_CHATGPT.md").exists()
+    assert (package / "driver_research_todo.md").exists()
 
 
 def test_weekly_workflow_existing_report_fails_when_package_invalid(tmp_path):
@@ -70,3 +72,4 @@ def test_weekly_workflow_existing_report_does_not_require_live_pipeline(tmp_path
     assert "Files user should provide to ChatGPT" in result.stdout
     assert "AI_INPUT_SUMMARY.md" in result.stdout
     assert "run_metadata.json" in result.stdout
+    assert "driver_research_todo.md" in result.stdout

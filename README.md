@@ -113,6 +113,38 @@ python scripts/build_chatgpt_handoff.py reports/<YYYY-MM-DD>
 
 This sprint does not run ChatGPT, does not web search, does not generate final market analysis automatically, and does not provide buy/sell recommendations.
 
+## Sprint 2.7 — Web Driver Research Archive & Cross-check
+
+Sprint 2.7 adds structured storage for driver web research after ChatGPT/user research is done:
+
+- `docs/WEB_DRIVER_RESEARCH_WORKFLOW.md`
+- `docs/DRIVER_RESEARCH_SCHEMA.md`
+- `docs/CHATGPT_WEB_RESEARCH_PROMPT.md`
+- `docs/DRIVER_CROSSCHECK_GUIDE.md`
+- `scripts/build_driver_research_template.py`
+- `scripts/validate_driver_research.py`
+- `scripts/summarize_driver_research.py`
+
+Build driver research placeholders:
+
+```bash
+python scripts/build_driver_research_template.py reports/<YYYY-MM-DD>
+```
+
+Validate saved research:
+
+```bash
+python scripts/validate_driver_research.py reports/<YYYY-MM-DD>
+```
+
+Summarize saved research:
+
+```bash
+python scripts/summarize_driver_research.py reports/<YYYY-MM-DD>
+```
+
+This sprint does not web search, does not call an AI API, does not invent driver data, and does not provide transaction advice.
+
 Sprint 2.1 hardens this run by:
 
 - skipping fresh per-ticker OHLCV cache hits and logging fetched/cached/stale/API_ERROR counts;

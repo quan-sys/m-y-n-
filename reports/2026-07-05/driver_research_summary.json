@@ -1,0 +1,20 @@
+{
+  "report_folder": "reports\\2026-07-05",
+  "generated_at": "2026-07-06T09:27:19.360798+00:00",
+  "research_status": "PENDING",
+  "sectors_researched": 0,
+  "source_count_total": 0,
+  "high_confidence_count": 0,
+  "medium_confidence_count": 0,
+  "low_confidence_count": 0,
+  "unconfirmed_driver_count": 19,
+  "crosscheck_counts": {
+    "DATA_INSUFFICIENT": 1,
+    "DRIVER_CONFIRMS_STRENGTH": 0,
+    "DRIVER_CONFIRMS_WEAKNESS": 0,
+    "DRIVER_CONTRADICTS_PRICE_SIGNAL": 0,
+    "DRIVER_MIXED": 0,
+    "PRICE_STRONG_BUT_DRIVER_UNCONFIRMED": 6,
+    "PRICE_WEAK_BUT_DRIVER_UNCONFIRMED": 12
+  }
+}

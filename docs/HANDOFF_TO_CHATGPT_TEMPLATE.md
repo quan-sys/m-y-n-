@@ -29,6 +29,7 @@ Sector Cycle Monitor theo dõi chu kỳ ngành ICB2 của thị trường chứn
 - `README_FOR_AI.md`
 - `sector_cycle_signals.csv`
 - `sector_driver_map.csv`
+- `driver_research_todo.md`
 - `data_quality.csv`
 - `run_metadata.json`
 - `HANDOFF_TO_CHATGPT.md`
@@ -71,6 +72,9 @@ Sector Cycle Monitor theo dõi chu kỳ ngành ICB2 của thị trường chứn
 - `docs/AI_ANALYST_REPORT_TEMPLATE.md`
 - `docs/SECTOR_DRIVER_WEB_RESEARCH_CHECKLIST.md`
 - `docs/AI_REPORT_VALIDATION_CHECKLIST.md`
+- `docs/WEB_DRIVER_RESEARCH_WORKFLOW.md`
+- `docs/CHATGPT_WEB_RESEARCH_PROMPT.md`
+- `docs/DRIVER_CROSSCHECK_GUIDE.md`
 
 ## 9. Nhắc lại
 
