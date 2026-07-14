@@ -223,6 +223,10 @@ non-financial balance sheet, income statement, and cash flow; VCB returned
 `86 x 7`, `26 x 7`, and `52 x 7`. The 7 columns are `item`, `item_en`,
 `item_id`, and 4 period columns.
 
+A separate public `KBS` probe for VNM quarterly balance sheet returned an
+empty response with shape `[0, 0]`, 0 periods, and `MISSING_DATA`. It did not
+provide an alternative unique identifier or a longer-history path.
+
 OPEN QUESTION: A supported public method for retrieving more than 4 periods
 has not been confirmed. Account-entitlement behavior also remains unverified.
 

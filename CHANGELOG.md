@@ -22,6 +22,8 @@
 - Ran the public VCI smoke path for VNM, FPT, and VCB: 12/18 requests normalized;
   six balance-sheet responses failed honestly because provider `item_id` values
   were duplicated. All raw responses returned exactly 4 periods.
+- Probed the public KBS finance source for VNM quarterly balance sheet; it
+  returned an empty `[0, 0]` response with 0 periods and `MISSING_DATA`.
 - Verified VNM Q1 2026 net sales against CafeF at `16,148,657,871,623` raw VND.
 - Documented a VNM 2020 corporate-action comparison showing that historical VCI
   OHLC is retroactively adjusted rather than raw.
