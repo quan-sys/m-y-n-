@@ -1,6 +1,10 @@
 # sector-cycle-monitor
 
-Python data pipeline for monitoring Vietnam equity sector cycles. M0 builds the stock universe and reject log. Sprint 2 adds an indicator-only weekly sector report; it does not compute formal scores, dashboards, valuation, BCTC, price targets, or transaction advice.
+Python data pipeline for monitoring Vietnam equity sector cycles. M0 builds the
+stock universe and reject log. Sprint 2 adds an indicator-only weekly sector
+report. Sprint 3 adds the financial-statement data foundation and forward-only
+point-in-time snapshots; it still does not compute screener formulas,
+portfolios, backtests, price targets, or transaction advice.
 
 ## Setup
 
@@ -20,6 +24,7 @@ The script writes:
 
 - `data/universe.csv`
 - `data/universe_rejects.csv`
+- `data/snapshots/<YYYY-MM-DD>/` for a complete, non-limited run
 
 For a smaller runtime check:
 
@@ -28,11 +33,15 @@ python scripts/run_universe.py --limit 20
 python scripts/run_universe.py --limit 100
 ```
 
-Market cap fetching is disabled by default to reduce M0 API rate-limit pressure. Enable it only when needed:
+Market cap fetching is disabled by default to reduce M0 API rate-limit pressure.
+It requires an explicit controlled batch limit:
 
 ```bash
-python scripts/run_universe.py --fetch-market-cap
+python scripts/run_universe.py --fetch-market-cap --market-cap-limit 20
 ```
+
+Runs using `--limit` are diagnostic slices and do not create canonical
+point-in-time snapshots.
 
 ## Smoke Test Vnstock
 
@@ -46,6 +55,12 @@ The smoke test checks the real VCI symbol and ICB shapes without building the fu
 
 ```bash
 python scripts/run_weekly_mvp.py
+```
+
+Weekly live market-cap requests default to zero. To allow a controlled batch:
+
+```bash
+python scripts/run_weekly_mvp.py --market-cap-limit 20
 ```
 
 The script reads `data/universe.csv`, fetches/resumes OHLCV cache for accepted tickers, aggregates indicators by ICB2 sector, and writes:
@@ -156,7 +171,7 @@ Sprint 2.1 hardens this run by:
 Sprint 2.2 checks market-cap availability in the weekly run:
 
 - direct company overview market cap is marked `SOURCE_REPORTED_MARKET_CAP`;
-- share-count times close fallback is marked `SHARES_X_LAST_CLOSE_PROXY`;
+- share-count times close times `1000` fallback is marked `SHARES_X_LAST_CLOSE_X1000_PROXY`;
 - cap-weight returns stay `N/A (MISSING_DATA)` unless market-cap coverage is complete for the sector return window;
 - controlled skips are marked with `cap_weight_status=SKIPPED_MISSING_MARKET_CAP` and a reason in `data_quality.csv`.
 
@@ -165,6 +180,58 @@ For a quick local check only:
 ```bash
 python scripts/run_weekly_mvp.py --limit-sectors 3
 ```
+
+## Sprint 3 — Financial Statements and Point-in-Time Data
+
+Sprint 3 adds:
+
+- `src/data/finance_client.py`, built on the public `vnstock.api.Finance`
+  interface;
+- balance sheet, income statement, and cash-flow retrieval for quarterly and
+  yearly periods;
+- LONG-to-tidy normalization keyed on `item_id`;
+- content-addressed raw and normalized caches under `data/fundamentals/`;
+- `report_period`, `period_end`, and conservative `available_from` dates;
+- full-universe snapshots under `data/snapshots/YYYY-MM-DD/`;
+- controlled market-cap request limits and the required price `×1000` unit
+  conversion;
+- fixture-only unit tests and a separate live finance smoke command.
+
+Run the explicit live finance smoke test on at least three tickers:
+
+```bash
+python scripts/smoke_vnstock_finance.py --tickers VNM FPT VCB
+```
+
+Tests never execute this live command. The smoke output is local and ignored by
+Git.
+
+The current pinned public API returns only the 4 most recent statement periods
+by default. A supported public longer-history path has not yet been confirmed.
+The `ratio` endpoint is forbidden because its verified headers are corrupted.
+
+Financial statements are raw VND, while VCI prices are thousands of VND. Any
+price-times-shares or price-times-fundamentals calculation multiplies price by
+`1000` exactly once.
+
+The API has no publication-date field, so availability uses conservative legal
+lags: quarter 30 days, semiannual 60 days, and annual 90 days. Historical
+statements may be restated; downloading them today does not recreate what an
+investor knew at the original date.
+
+The documented VNM 2020 corporate-action comparison shows that historical VCI
+OHLC is retroactively adjusted, not a raw historical price series. It must not
+be combined with historical share counts to create raw historical market cap.
+
+The 2026-07-14 live finance run completed all 18 requests for VNM, FPT, and VCB.
+Twelve income-statement and cash-flow requests normalized successfully. Six
+balance-sheet responses were preserved but rejected because the provider
+reused `item_id` values, which violates the approved unique-key contract. The
+pipeline does not sum those rows or substitute names as keys.
+
+The VNM Q1 2026 `net_sales` value matched CafeF exactly at
+`16,148,657,871,623` raw VND. Full-universe ≥90% coverage remains open, so
+Sprint 3 is not yet declared complete.
 
 ## Run Tests
 
@@ -191,3 +258,9 @@ See `data_contract.md` for output schemas, valid `reject_reason` values, valid `
 - If VNINDEX/VN30 history is unavailable, Sprint 2.1 reports relative strength versus the `UNIVERSE_EQUAL_WEIGHT_PROXY` and flags that source explicitly.
 - Sprint 2.2 does not fabricate share counts or use zero-filled market caps; cap-weight is skipped when reliable coverage is incomplete.
 - Sprint 2.3 adds deterministic candidate cycle labels and a sector driver checklist for later public web research; these are inputs, not final analytical conclusions.
+- Historical financial statements from vnstock may be restated and are not
+  clean historical point-in-time evidence.
+- Financial-sector statement schemas remain separate; Sprint 3 does not
+  force-normalize or exclude them.
+- Sprint 3 does not implement accruals, M-Score, F-Score, valuation, portfolio
+  construction, backtesting, dashboards, machine learning, or GitHub Actions.

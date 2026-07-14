@@ -28,10 +28,24 @@ from src.weekly import (
     compute_confidence_lite,
     coverage_status_for,
     enrich_universe_market_caps,
+    _fetch_market_caps,
     render_ai_input_summary,
     render_readme_for_ai,
     render_weekly_report,
 )
+
+
+class CountingMarketCapClient:
+    def __init__(self) -> None:
+        self.calls: list[str] = []
+
+    def get_market_cap(self, ticker: str) -> FetchResult:
+        self.calls.append(ticker)
+        return FetchResult(
+            True,
+            pd.DataFrame([{"issue_share": 100_000_000, "current_price": 12.5}]),
+            source="fixture",
+        )
 
 
 def test_return_1w_1m_3m_windows():
@@ -253,7 +267,7 @@ def test_enrich_universe_uses_reported_market_cap_before_proxy():
         ),
         "BBB": FetchResult(
             True,
-            pd.DataFrame([{"issue_share": 100_000_000, "current_price": 12_500}]),
+            pd.DataFrame([{"issue_share": 100_000_000, "current_price": 12.5}]),
             source="fixture",
         ),
     }
@@ -264,6 +278,24 @@ def test_enrich_universe_uses_reported_market_cap_before_proxy():
     assert enriched.loc[enriched["ticker"] == "AAA", "market_cap_source"].iloc[0] == MARKET_CAP_SOURCE_REPORTED
     assert enriched.loc[enriched["ticker"] == "BBB", "market_cap"].iloc[0] == 1_250_000_000_000
     assert enriched.loc[enriched["ticker"] == "BBB", "market_cap_source"].iloc[0] == MARKET_CAP_SOURCE_PROXY
+
+
+def test_weekly_market_cap_fetch_respects_controlled_limit():
+    universe = _universe([("AAA", "BANKS", ""), ("BBB", "BANKS", ""), ("CCC", "BANKS", "")])
+    client = CountingMarketCapClient()
+
+    results = _fetch_market_caps(
+        universe,
+        client=client,
+        progress=False,
+        market_cap_limit=1,
+    )
+
+    assert client.calls == ["AAA"]
+    assert results["AAA"].ok
+    assert results["BBB"].status == "MISSING_DATA"
+    assert results["BBB"].metadata["cache_state"] == "CONTROLLED_SKIP"
+    assert results["CCC"].status == "MISSING_DATA"
 
 
 def test_data_quality_records_cap_weight_controlled_skip_when_market_cap_missing():

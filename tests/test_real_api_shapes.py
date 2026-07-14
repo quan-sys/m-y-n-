@@ -56,7 +56,7 @@ class VciShapeClient:
     def get_market_cap(self, ticker: str) -> FetchResult:
         return FetchResult(
             True,
-            pd.DataFrame([{"symbol": ticker, "issue_share": 100_000_000, "last_close": 10_000}]),
+            pd.DataFrame([{"symbol": ticker, "issue_share": 100_000_000, "last_close": 10}]),
             source=self.source,
         )
 
@@ -103,13 +103,13 @@ def test_unknown_stock_board_is_rejected_as_unsupported_exchange():
 
 
 def test_market_cap_proxy_uses_issue_share_times_last_close_with_source_marker():
-    overview = pd.DataFrame([{"symbol": "AAA", "issue_share": 100_000_000, "last_close": 12_500}])
+    overview = pd.DataFrame([{"symbol": "AAA", "issue_share": 100_000_000, "last_close": 12.5}])
 
     value, source = _extract_market_cap_with_source(overview)
 
     assert _extract_market_cap(overview) == 1_250_000_000_000
     assert value == 1_250_000_000_000
-    assert source == "SHARES_X_LAST_CLOSE_PROXY"
+    assert source == "SHARES_X_LAST_CLOSE_X1000_PROXY"
 
 
 def test_valid_long_icb_shape_does_not_mass_reject_missing_icb():
@@ -118,12 +118,13 @@ def test_valid_long_icb_shape_does_not_mass_reject_missing_icb():
         write_outputs=False,
         min_adtv_20d=0,
         fetch_market_cap=True,
+        market_cap_limit=2,
     )
 
     assert len(result.accepted) == 2
     assert "MISSING_ICB_CLASSIFICATION" not in set(result.rejects["reject_reason"])
     assert set(result.accepted["icb2"]) == {"MATERIALS", "BANKS"}
-    assert result.accepted["source"].str.contains("SHARES_X_LAST_CLOSE_PROXY").all()
+    assert result.accepted["source"].str.contains("SHARES_X_LAST_CLOSE_X1000_PROXY").all()
 
 
 def test_shape_tests_do_not_import_real_vnstock(monkeypatch):

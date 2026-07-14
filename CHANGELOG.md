@@ -2,6 +2,34 @@
 
 ## 2026-07-14
 
+- Added `src/data/finance_client.py` on the public `vnstock.api.Finance`
+  interface with fixture-tested quarterly/yearly balance sheet, income
+  statement, and cash-flow retrieval.
+- Added LONG-to-tidy normalization keyed on `item_id`, conservative
+  `available_from` lags, raw-VND magnitude checks, explicit error statuses,
+  secret redaction, and content-addressed immutable observations.
+- Added full-universe point-in-time snapshots under
+  `data/snapshots/YYYY-MM-DD/`; limited diagnostic runs are excluded and
+  conflicting same-date observations fail explicitly.
+- Corrected market-cap proxy units to shares × price × 1000 and renamed the
+  source marker to `SHARES_X_LAST_CLOSE_X1000_PROXY`.
+- Added explicit market-cap request limits to M0 and weekly runtime paths;
+  weekly live market-cap requests now default to zero.
+- Added `scripts/smoke_vnstock_finance.py` for the separate ≥3 ticker live API
+  check, including raw response shape and returned-period evidence.
+- Preserved raw financial responses before normalization and added redacted
+  `failure.json` evidence when validation rejects a response.
+- Ran the public VCI smoke path for VNM, FPT, and VCB: 12/18 requests normalized;
+  six balance-sheet responses failed honestly because provider `item_id` values
+  were duplicated. All raw responses returned exactly 4 periods.
+- Verified VNM Q1 2026 net sales against CafeF at `16,148,657,871,623` raw VND.
+- Documented a VNM 2020 corporate-action comparison showing that historical VCI
+  OHLC is retroactively adjusted rather than raw.
+- Added fixture-only finance tests covering all statement types, 30/60/90-day
+  lags, missing values, duplicate keys, unit traps, cache immutability,
+  `API_ERROR`, `STALE_DATA`, secret redaction, and public API routing.
+- Upgraded `data_contract.md` to v2 for fundamentals, snapshots, price units,
+  provider findings, restatement bias, and unresolved price-adjustment status.
 - Added `docs/SPEC_SPRINT_3.md` for the financial-statement data layer,
   point-in-time availability rules, universe snapshots, controlled market-cap
   retrieval, price-unit verification, and explicit Sprint 3 exclusions.

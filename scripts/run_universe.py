@@ -19,7 +19,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.data.vnstock_client import VnstockClient  # noqa: E402
-from src.universe import build_universe, print_summary  # noqa: E402
+from src.universe import build_universe, print_summary, write_universe_snapshot  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -38,7 +38,18 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Fetch per-ticker overview data for market cap. Disabled by default to reduce M0 API rate-limit pressure.",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--market-cap-limit",
+        type=int,
+        default=None,
+        help="Maximum controlled market-cap requests. Required with --fetch-market-cap.",
+    )
+    args = parser.parse_args()
+    if args.fetch_market_cap and args.market_cap_limit is None:
+        parser.error("--market-cap-limit is required with --fetch-market-cap")
+    if args.market_cap_limit is not None and args.market_cap_limit < 0:
+        parser.error("--market-cap-limit must be zero or greater")
+    return args
 
 
 def main() -> int:
@@ -54,7 +65,18 @@ def main() -> int:
         limit=args.limit,
         max_consecutive_api_errors=args.max_consecutive_api_errors,
         fetch_market_cap=args.fetch_market_cap,
+        market_cap_limit=args.market_cap_limit,
     )
+    if args.limit is None:
+        snapshot_path = write_universe_snapshot(
+            result.accepted,
+            result.rejects,
+            ROOT / "data" / "snapshots",
+        )
+        result.summary["snapshot_path"] = str(snapshot_path.resolve())
+        result.summary["snapshot_status"] = "WRITTEN"
+    else:
+        result.summary["snapshot_status"] = "SKIPPED_LIMITED_RUN"
     print_summary(result.summary)
     return 0
 

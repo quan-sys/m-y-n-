@@ -28,7 +28,7 @@ INDEX_SOURCE_PROXY = "UNIVERSE_EQUAL_WEIGHT_PROXY"
 CACHE_STATE_CACHED = "CACHED"
 CACHE_STATE_FETCHED = "FETCHED"
 MARKET_CAP_SOURCE_REPORTED = "SOURCE_REPORTED_MARKET_CAP"
-MARKET_CAP_SOURCE_PROXY = "SHARES_X_LAST_CLOSE_PROXY"
+MARKET_CAP_SOURCE_PROXY = "SHARES_X_LAST_CLOSE_X1000_PROXY"
 MARKET_CAP_SOURCE_MISSING = "N/A"
 MARKET_CAP_STATUS_OK = "OK"
 MARKET_CAP_STATUS_MISSING = "MISSING_DATA"
@@ -183,8 +183,11 @@ def run_weekly_mvp(
     reports_root: str | Path = "reports",
     client: Any | None = None,
     limit_sectors: int | None = None,
+    market_cap_limit: int = 0,
     progress: bool = True,
 ) -> WeeklyMvpResult:
+    if market_cap_limit < 0:
+        raise ValueError("market_cap_limit must be zero or greater")
     universe_path = Path(universe_path)
     reports_root = Path(reports_root)
     universe = _accepted_universe(_read_universe(universe_path))
@@ -204,7 +207,12 @@ def run_weekly_mvp(
     )
 
     price_results = _fetch_ticker_prices(universe, client=client, progress=progress)
-    market_cap_results = _fetch_market_caps(universe, client=client, progress=progress)
+    market_cap_results = _fetch_market_caps(
+        universe,
+        client=client,
+        progress=progress,
+        market_cap_limit=market_cap_limit,
+    )
     universe = enrich_universe_market_caps(universe, market_cap_results)
     index_result = _fetch_index_prices(client)
     outputs = build_weekly_outputs(universe, price_results, index_result=index_result, source=SOURCE)
@@ -1634,10 +1642,16 @@ def _fetch_ticker_prices(universe: pd.DataFrame, client: Any, progress: bool) ->
     return results
 
 
-def _fetch_market_caps(universe: pd.DataFrame, client: Any, progress: bool) -> dict[str, FetchResult]:
+def _fetch_market_caps(
+    universe: pd.DataFrame,
+    client: Any,
+    progress: bool,
+    market_cap_limit: int,
+) -> dict[str, FetchResult]:
     tickers = universe["ticker"].dropna().astype(str).str.upper().drop_duplicates().tolist()
     results: dict[str, FetchResult] = {}
     total = len(tickers)
+    live_fetch_count = 0
     for index, ticker in enumerate(tickers, start=1):
         existing_rows = universe[universe["ticker"].astype(str).str.upper() == ticker]
         existing_cap = None
@@ -1650,8 +1664,17 @@ def _fetch_market_caps(universe: pd.DataFrame, client: Any, progress: bool) -> d
                 source=MARKET_CAP_SOURCE,
                 metadata={"cache_state": "EXISTING_UNIVERSE"},
             )
-        else:
+        elif live_fetch_count < market_cap_limit:
+            live_fetch_count += 1
             results[ticker] = _as_fetch_result(client.get_market_cap(ticker), source=MARKET_CAP_SOURCE)
+        else:
+            results[ticker] = FetchResult(
+                True,
+                pd.DataFrame(),
+                status=MARKET_CAP_STATUS_MISSING,
+                source=MARKET_CAP_SOURCE,
+                metadata={"cache_state": "CONTROLLED_SKIP", "reason": "market_cap_batch_limit"},
+            )
         if results[ticker].status == API_ERROR:
             _clear_terminal_api_error(client)
         if progress and (index % 25 == 0 or index == total):
