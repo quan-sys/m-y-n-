@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-07-14
+
+- Added `docs/SPEC_SPRINT_3.md` for the financial-statement data layer,
+  point-in-time availability rules, universe snapshots, controlled market-cap
+  retrieval, price-unit verification, and explicit Sprint 3 exclusions.
+- Expanded `AGENTS.md` with the master-plan constraints, non-coder spec review
+  requirement, and GitHub secret-safety publishing rules.
+- Hardened `.gitignore` against local Python environments, `.env` secrets, and
+  private key files while allowing a non-secret `.env.example` template.
+
 ## 2026-07-05
 
 - Added Sprint 2.7 web driver research archive and cross-check workflow.
