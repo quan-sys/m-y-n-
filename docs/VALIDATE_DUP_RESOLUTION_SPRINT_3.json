@@ -1,0 +1,1488 @@
+{
+  "seed": 20260715,
+  "sample": [
+    "CSM",
+    "DVP",
+    "C32",
+    "VOS",
+    "PHR",
+    "DP3",
+    "DHC",
+    "DRC",
+    "VCS",
+    "TLH",
+    "HID",
+    "DXP",
+    "LBE",
+    "ASM",
+    "PVP",
+    "CTF",
+    "HDG",
+    "PVC",
+    "NCT",
+    "VC7"
+  ],
+  "clean": false,
+  "records": [
+    {
+      "ticker": "VNM",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.007339601256866954,
+            "2025-Q4": 0.001616008005079024,
+            "2025-Q3": 0.001025668300562646,
+            "2025-Q2": 0.001111152784091594
+          },
+          "mean_error": 0.0027731075866500544
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.016562098149754616,
+            "2025-Q4": 0.005125048369035066,
+            "2025-Q3": 0.005149937679339381,
+            "2025-Q2": 0.007051507800091748
+          },
+          "mean_error": 0.008472147999555202
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.6008098099151296,
+            "2025-Q4": 0.5872664935678498,
+            "2025-Q3": 0.5443775018361622,
+            "2025-Q2": 0.5804619803966838
+          },
+          "mean_error": 0.5782289464289563
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.6100323068080172,
+            "2025-Q4": 0.5940075499419639,
+            "2025-Q3": 0.5505531078160641,
+            "2025-Q2": 0.5886246409808672
+          },
+          "mean_error": 0.5858044013867281
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "HPG",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0036789181616118916,
+            "2025-Q4": 0.0006178493483264067,
+            "2025-Q3": 0.0005454990940617783,
+            "2025-Q2": 0.00048000480819308984
+          },
+          "mean_error": 0.0013305678530482917
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.08027476805024608,
+            "2025-Q4": 0.07659221571961274,
+            "2025-Q3": 0.08411304439307504,
+            "2025-Q2": 0.08304825344632571
+          },
+          "mean_error": 0.08100707040231489
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.2362033351477774,
+            "2025-Q4": 0.18734785605486454,
+            "2025-Q3": 0.1975551381426743,
+            "2025-Q2": 0.17965854663583752
+          },
+          "mean_error": 0.20019121899528844
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.3127991850364116,
+            "2025-Q4": 0.2645579211228037,
+            "2025-Q3": 0.28221368162981114,
+            "2025-Q2": 0.26318680489035634
+          },
+          "mean_error": 0.28068939816984567
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "FPT",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.001668113324362002,
+            "2025-Q4": 0.001438381365744825,
+            "2025-Q3": 0.0015667786664124589,
+            "2025-Q2": 0.0015879534242740716
+          },
+          "mean_error": 0.0015653066951983392
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.03060413408676335,
+            "2025-Q4": 0.022445686744441935,
+            "2025-Q3": 0.026896086954655247,
+            "2025-Q2": 0.02635155455349863
+          },
+          "mean_error": 0.02657436558483979
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.44987285178262426,
+            "2025-Q4": 0.5082329702944487,
+            "2025-Q3": 0.5041964130513323,
+            "2025-Q2": 0.5034168617523892
+          },
+          "mean_error": 0.4914297742201986
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.4821450991937496,
+            "2025-Q4": 0.5321170384046354,
+            "2025-Q3": 0.5326592786724,
+            "2025-Q2": 0.5313563697301619
+          },
+          "mean_error": 0.5195694465002367
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "VCB",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED"
+      ],
+      "preferred_values": null,
+      "identity_candidates": [],
+      "error": ""
+    },
+    {
+      "ticker": "CSM",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.06990044413158895,
+            "2025-Q4": 0.060218613980924346,
+            "2025-Q3": 0.16221766159932247,
+            "2025-Q2": 0.1789122003378347
+          },
+          "mean_error": 0.11781223001241761
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.11810826672949795,
+            "2025-Q4": 0.07414494441075328,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.04806330278506281
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.18800871086108692,
+            "2025-Q4": 0.13436355839167763,
+            "2025-Q3": 0.16221766159932247,
+            "2025-Q2": 0.1789122003378347
+          },
+          "mean_error": 0.16587553279748043
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "DVP",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0026727877665106456,
+            "2025-Q4": 0.002816528998876131,
+            "2025-Q3": 0.0010596031498178358,
+            "2025-Q2": 0.0016500573338901368
+          },
+          "mean_error": 0.0020497443122736874
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.9229606344907619,
+            "2025-Q4": 0.8985291837799207,
+            "2025-Q3": 0.9184796840192628,
+            "2025-Q2": 0.9310312437015803
+          },
+          "mean_error": 0.9177501864978814
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.9256334222572725,
+            "2025-Q4": 0.9013457127787968,
+            "2025-Q3": 0.9195392871690807,
+            "2025-Q2": 0.9326813010354704
+          },
+          "mean_error": 0.9197999308101551
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "C32",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.026461613087821807,
+            "2025-Q4": 0.023630165561084125,
+            "2025-Q3": 0.028159437675352835,
+            "2025-Q2": 0.03474609897534455
+          },
+          "mean_error": 0.02824932882490083
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0048832164923173094,
+            "2025-Q4": 0.01819881913727369,
+            "2025-Q3": 0.015623554169272141,
+            "2025-Q2": 0.01726220202017891
+          },
+          "mean_error": 0.013991947954760513
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.07952234248934503,
+            "2025-Q4": 0.07374056776045496,
+            "2025-Q3": 0.04391235254260006,
+            "2025-Q2": 0.04861285314401124
+          },
+          "mean_error": 0.06144702898410282
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.10110073908484954,
+            "2025-Q4": 0.07917191418426539,
+            "2025-Q3": 0.03137646903651936,
+            "2025-Q2": 0.031128956188845595
+          },
+          "mean_error": 0.06069451962361997
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "VOS",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0415850187029608,
+            "2025-Q4": 0.028549479732648514,
+            "2025-Q3": 0.03434218978291404,
+            "2025-Q2": 0.029086013954859102
+          },
+          "mean_error": 0.03339067554334561
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.09446062085917305,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.28872358825795447
+          },
+          "mean_error": 0.09579605227928188
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.13604563956213384,
+            "2025-Q4": 0.028549479732648514,
+            "2025-Q3": 0.03434218978291404,
+            "2025-Q2": 0.31780960221281357
+          },
+          "mean_error": 0.1291867278226275
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "PHR",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.00013235780071231602,
+            "2025-Q4": 0.00015248554866030127,
+            "2025-Q3": 8.448310091650565e-05,
+            "2025-Q2": 8.07693363699829e-05
+          },
+          "mean_error": 0.00011252394666477647
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.03533270865748215,
+            "2025-Q4": 0.04060307761857258,
+            "2025-Q3": 0.03210064730662552,
+            "2025-Q2": 0.04319178090222511
+          },
+          "mean_error": 0.03780705362122634
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.6463824477546206,
+            "2025-Q4": 0.6102228381883552,
+            "2025-Q3": 0.5468907157175829,
+            "2025-Q2": 0.6130451496045736
+          },
+          "mean_error": 0.6041352878162831
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.6818475142128151,
+            "2025-Q4": 0.6509784013555882,
+            "2025-Q3": 0.5790758461251249,
+            "2025-Q2": 0.6563176998431687
+          },
+          "mean_error": 0.6420548653841742
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "DP3",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0013523736471526273,
+            "2025-Q4": 0.0009906415029757687,
+            "2025-Q3": 0.0013449881611989844,
+            "2025-Q2": 0.0014463373034727378
+          },
+          "mean_error": 0.0012835851537000295
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.7878734546209826,
+            "2025-Q4": 0.8016158186599774,
+            "2025-Q3": 0.782751682252885,
+            "2025-Q2": 0.6585546325956234
+          },
+          "mean_error": 0.7576988970323671
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.7892258282681353,
+            "2025-Q4": 0.8026064601629532,
+            "2025-Q3": 0.784096670414084,
+            "2025-Q2": 0.6600009698990961
+          },
+          "mean_error": 0.7589824821860671
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "DHC",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.007630936753770301,
+            "2025-Q4": 0.007016832413793664,
+            "2025-Q3": 0.005413737674568971,
+            "2025-Q2": 0.0031229970365951533
+          },
+          "mean_error": 0.005796125969682022
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.3344677675551961,
+            "2025-Q4": 0.29908826461830307,
+            "2025-Q3": 0.29184715908469483,
+            "2025-Q2": 0.3433347008196751
+          },
+          "mean_error": 0.3171844730194673
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.3420987043089664,
+            "2025-Q4": 0.3061050970320967,
+            "2025-Q3": 0.2972608967592638,
+            "2025-Q2": 0.3464576978562703
+          },
+          "mean_error": 0.3229805989891493
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "DRC",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0011489672283233458,
+            "2025-Q4": 0.0010674453173103115,
+            "2025-Q3": 0.0052803913658719375,
+            "2025-Q2": 0.0049260448488346684
+          },
+          "mean_error": 0.003105712190085066
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0836224753358847,
+            "2025-Q4": 0.0816212697437301,
+            "2025-Q3": 0.0985477058885352,
+            "2025-Q2": 0.10269776065476957
+          },
+          "mean_error": 0.0916223029057299
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.017905703493781348,
+            "2025-Q4": 0.0010674453173103115,
+            "2025-Q3": 0.0052803913658719375,
+            "2025-Q2": 0.0049260448488346684
+          },
+          "mean_error": 0.007294896256449566
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.10267714605798939,
+            "2025-Q4": 0.0816212697437301,
+            "2025-Q3": 0.0985477058885352,
+            "2025-Q2": 0.10269776065476957
+          },
+          "mean_error": 0.09638597058625606
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "VCS",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.013738305460542838,
+            "2025-Q4": 0.014799862973987367,
+            "2025-Q3": 0.010160470250292257,
+            "2025-Q2": 0.010852367412876615
+          },
+          "mean_error": 0.01238775152442477
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.02360251311511015,
+            "2025-Q4": 0.02039657426251755,
+            "2025-Q3": 0.014679803631025987,
+            "2025-Q2": 0.006598962046984974
+          },
+          "mean_error": 0.016319463263909664
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.2535974161358101,
+            "2025-Q4": 0.1075996478376915,
+            "2025-Q3": 0.1347623023725964,
+            "2025-Q2": 0.1261060752778281
+          },
+          "mean_error": 0.15551636040598152
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.2909382347114631,
+            "2025-Q4": 0.14279608507419642,
+            "2025-Q3": 0.15960257625391466,
+            "2025-Q2": 0.14355740473768971
+          },
+          "mean_error": 0.18422357519431598
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "TLH",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.009235903910715772,
+            "2025-Q4": 0.00930462353416697,
+            "2025-Q3": 0.017329731378102408,
+            "2025-Q2": 0.017702486960705522
+          },
+          "mean_error": 0.013393186445922668
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.018756333226514016,
+            "2025-Q4": 0.019038311639651573,
+            "2025-Q3": 0.005771334703410981,
+            "2025-Q2": 0.010525565882004996
+          },
+          "mean_error": 0.013522886362895392
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.002342893934453973,
+            "2025-Q4": 0.0063791855301877365,
+            "2025-Q3": 0.004682553689953876,
+            "2025-Q2": 0.005945161605170037
+          },
+          "mean_error": 0.0048374486899414055
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.025649343202775815,
+            "2025-Q4": 0.02196374964363081,
+            "2025-Q3": 0.018418512391559515,
+            "2025-Q2": 0.022282891237540483
+          },
+          "mean_error": 0.022078624118876657
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "HID",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.008188225438424424,
+            "2025-Q4": 0.006791868725704272,
+            "2025-Q3": 0.0012560761627479322,
+            "2025-Q2": 0.01750405002451538
+          },
+          "mean_error": 0.008435055087848002
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.008188225438424424,
+            "2025-Q4": 0.006791868725704272,
+            "2025-Q3": 0.0012560761627479322,
+            "2025-Q2": 0.01750405002451538
+          },
+          "mean_error": 0.008435055087848002
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "DXP",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0049238199231256335,
+            "2025-Q4": 0.0059162022252315614,
+            "2025-Q3": 0.0035570357040257627,
+            "2025-Q2": 0.001433511105976294
+          },
+          "mean_error": 0.003957642239589813
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.7018137821496301,
+            "2025-Q4": 0.8697722756795279,
+            "2025-Q3": 0.8227106730232209,
+            "2025-Q2": 0.6296981418425119
+          },
+          "mean_error": 0.7559987181737227
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.7067376020727557,
+            "2025-Q4": 0.8756884779047595,
+            "2025-Q3": 0.8262677087272466,
+            "2025-Q2": 0.6311316529484882
+          },
+          "mean_error": 0.7599563604133125
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "LBE",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.012380069450540791
+          },
+          "mean_error": 0.0030950173626351977
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.12463121345482295,
+            "2025-Q4": 0.16889833384153735,
+            "2025-Q3": 0.007609591405839552,
+            "2025-Q2": 0.004794188020767415
+          },
+          "mean_error": 0.07648333168074181
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.04688113233596015,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.016351949712686265
+          },
+          "mean_error": 0.015808270512161604
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.1715123457907831,
+            "2025-Q4": 0.16889833384153735,
+            "2025-Q3": 0.007609591405839552,
+            "2025-Q2": 0.00876606828291289
+          },
+          "mean_error": 0.08919658483026822
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "ASM",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.004902914595926099,
+            "2025-Q4": 0.004038720869264666,
+            "2025-Q3": 0.00431416076596484,
+            "2025-Q2": 0.003959451909069016
+          },
+          "mean_error": 0.004303812035056156
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.19229824688945615,
+            "2025-Q4": 0.17280976120890754,
+            "2025-Q3": 0.18863904462807513,
+            "2025-Q2": 0.1872410447225327
+          },
+          "mean_error": 0.18524702436224288
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.19720116148538225,
+            "2025-Q4": 0.1768484820781722,
+            "2025-Q3": 0.19295320539403998,
+            "2025-Q2": 0.1912004966316017
+          },
+          "mean_error": 0.18955083639729903
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "PVP",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0014624016093697334,
+            "2025-Q4": 0.0019250410829415665,
+            "2025-Q3": 0.0014950525183313236,
+            "2025-Q2": 0.0017838431987636843
+          },
+          "mean_error": 0.001666584602351577
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.505056970806008,
+            "2025-Q4": 0.4993322081439191,
+            "2025-Q3": 0.5490148055534007,
+            "2025-Q2": 0.6177145392866483
+          },
+          "mean_error": 0.542779630947494
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.5065193724153777,
+            "2025-Q4": 0.5012572492268607,
+            "2025-Q3": 0.5505098580717319,
+            "2025-Q2": 0.619498382485412
+          },
+          "mean_error": 0.5444462155498455
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "CTF",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0014976265859511448,
+            "2025-Q4": 0.0014420211059676855,
+            "2025-Q3": 0.001630734675303263,
+            "2025-Q2": 0.0016303600122448442
+          },
+          "mean_error": 0.0015501855948667344
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.012025395538147934,
+            "2025-Q4": 0.009810880175216074,
+            "2025-Q3": 0.013696923835301526,
+            "2025-Q2": 0.011296383904827574
+          },
+          "mean_error": 0.011707395863373276
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0021164557636044285,
+            "2025-Q4": 0.0020378737327410804,
+            "2025-Q3": 0.001630734675303263,
+            "2025-Q2": 0.0016303600122448442
+          },
+          "mean_error": 0.001853856045973404
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.015639477887703507,
+            "2025-Q4": 0.01329077501392484,
+            "2025-Q3": 0.013696923835301526,
+            "2025-Q2": 0.011296383904827574
+          },
+          "mean_error": 0.013480890160439362
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "HDG",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.002933308076780081,
+            "2025-Q4": 0.0028233761520006727,
+            "2025-Q3": 0.003158281434868575,
+            "2025-Q2": 0.003441883306123801
+          },
+          "mean_error": 0.0030892122424432825
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.012239079494785487,
+            "2025-Q4": 0.009094565587274797,
+            "2025-Q3": 0.009767113755317518,
+            "2025-Q2": 0.010660729553228767
+          },
+          "mean_error": 0.010440372097651642
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.11519578534845305,
+            "2025-Q4": 0.14014631438770245,
+            "2025-Q3": 0.11516374184460886,
+            "2025-Q2": 0.06152979452133769
+          },
+          "mean_error": 0.10800890902552551
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.13036817292001862,
+            "2025-Q4": 0.1520642561269779,
+            "2025-Q3": 0.12808913703479494,
+            "2025-Q2": 0.07563240738069026
+          },
+          "mean_error": 0.12153849336562043
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "PVC",
+      "status": "AMBIGUOUS",
+      "data_status": "REQUIRED_ITEM_AMBIGUOUS",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "REQUIRED_ITEM_AMBIGUOUS"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.024550889315064557,
+            "2025-Q4": 0.022118825993398525,
+            "2025-Q3": 0.023056590833662363,
+            "2025-Q2": 0.026218761558201506
+          },
+          "mean_error": 0.02398626692508174
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.016782471798588453,
+            "2025-Q4": 0.01686579629221571,
+            "2025-Q3": 0.01712022442831069,
+            "2025-Q2": 0.019217643207566568
+          },
+          "mean_error": 0.017496533931670354
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.060158260579917994,
+            "2025-Q4": 0.06454803103382503,
+            "2025-Q3": 0.07973011011896812,
+            "2025-Q2": 0.07726620793091495
+          },
+          "mean_error": 0.07042565241590652
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.0679266780963941,
+            "2025-Q4": 0.06980106073500786,
+            "2025-Q3": 0.08566647652431979,
+            "2025-Q2": 0.08426732628154988
+          },
+          "mean_error": 0.07691538540931792
+        }
+      ],
+      "error": "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+    },
+    {
+      "ticker": "NCT",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.008818642565438576,
+            "2025-Q4": 0.0005224815368546743,
+            "2025-Q3": 0.0037056149895744826,
+            "2025-Q2": 0.004690950869825862
+          },
+          "mean_error": 0.0044344224904233984
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.6661020508365888,
+            "2025-Q4": 0.7092978208300259,
+            "2025-Q3": 0.7214839731909234,
+            "2025-Q2": 0.6548105841598807
+          },
+          "mean_error": 0.6879236072543546
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.6749206934020273,
+            "2025-Q4": 0.7098203023668807,
+            "2025-Q3": 0.7251895881804978,
+            "2025-Q2": 0.6595015350297065
+          },
+          "mean_error": 0.6923580297447781
+        }
+      ],
+      "error": ""
+    },
+    {
+      "ticker": "VC7",
+      "status": "RESOLVED",
+      "data_status": "OK",
+      "flags": [
+        "DUPLICATE_ITEM_ID_QUARANTINED",
+        "DUPLICATE_RESOLVED_NON_NAN",
+        "DUPLICATE_RESOLVED_BY_IDENTITY"
+      ],
+      "preferred_values": {
+        "2026-Q1": 0.0,
+        "2025-Q4": 0.0,
+        "2025-Q3": 0.0,
+        "2025-Q2": 0.0
+      },
+      "identity_candidates": [
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.0
+        },
+        {
+          "short_term_investments_index": 4,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.017498540021893976,
+            "2025-Q4": 0.004274749111807584,
+            "2025-Q3": 0.006244058911296185,
+            "2025-Q2": 0.004946458712192143
+          },
+          "mean_error": 0.008240951689297471
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 17,
+          "period_errors": {
+            "2026-Q1": 0.020270860764180332,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          },
+          "mean_error": 0.005067715191045083
+        },
+        {
+          "short_term_investments_index": 5,
+          "other_current_assets_index": 21,
+          "period_errors": {
+            "2026-Q1": 0.03776940078607431,
+            "2025-Q4": 0.004274749111807584,
+            "2025-Q3": 0.006244058911296185,
+            "2025-Q2": 0.004946458712192143
+          },
+          "mean_error": 0.013308666880342556
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

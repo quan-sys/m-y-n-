@@ -183,6 +183,13 @@ identity_error = abs(current_assets - rhs) / abs(current_assets)
 - A period is available for this rule only when `current_assets` is non-zero and
   every aggregate input and both candidate values are numeric source values.
   Missing values remain missing; the rule must not convert `NaN` to zero.
+- Before evaluating candidate combinations, inspect the identity inputs
+  `cash_and_cash_equivalents`, `accounts_receivable`, `inventories`, and
+  `current_assets`. If an input is duplicated and its rows differ in any
+  returned period, do not extend the candidate search and do not select a row;
+  record `REQUIRED_ITEM_AMBIGUOUS` for the statement. If all duplicated rows of
+  an input are identical in every returned period (including matching missing
+  values), using their common value is allowed and the collapse must be logged.
 - Score each candidate combination by its mean `identity_error` across all
   periods available for that combination. The candidate with the smallest mean
   error is the provisional winner.

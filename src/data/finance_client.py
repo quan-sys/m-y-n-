@@ -7,6 +7,7 @@ import calendar
 import contextlib
 import hashlib
 import importlib
+import itertools
 import io
 import json
 import random
@@ -21,6 +22,7 @@ from src.data.vnstock_client import FetchResult
 
 
 FUNDAMENTALS_DIR = Path(__file__).resolve().parents[2] / "data" / "fundamentals"
+SCREENER_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "screener.yaml"
 
 LAG_QUARTER = 30
 LAG_SEMIANNUAL = 60
@@ -80,6 +82,23 @@ _SECRET_PATTERNS = [
         r"[^\s,;]+"
     ),
 ]
+
+IDENTITY_INPUTS = (
+    "cash_and_cash_equivalents",
+    "accounts_receivable",
+    "inventories",
+    "current_assets",
+)
+IDENTITY_CANDIDATES = ("short_term_investments", "other_current_assets")
+PREFERRED_SHARES = "preferred_shares"
+RESOLUTION_ITEMS = frozenset((*IDENTITY_INPUTS, *IDENTITY_CANDIDATES, PREFERRED_SHARES))
+
+
+@dataclass(frozen=True)
+class IdentityConfig:
+    tolerance: float
+    minimum_periods: int
+    margin: float
 
 
 @dataclass(frozen=True)
@@ -269,12 +288,21 @@ class FinanceClient:
                     source=self.source,
                     as_of=as_of,
                 )
+                resolution = dict(tidy.attrs.get("duplicate_resolution", {}))
                 if expect_large_company_scale:
                     validate_large_company_magnitude(tidy)
+                result_status = (
+                    "REQUIRED_ITEM_AMBIGUOUS" if resolution.get("ambiguous") else "OK"
+                )
                 result = FetchResult(
                     True,
                     tidy,
-                    status="OK",
+                    status=result_status,
+                    error=(
+                        "REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved"
+                        if resolution.get("ambiguous")
+                        else None
+                    ),
                     source=self.source,
                     as_of=as_of,
                     metadata={
@@ -282,6 +310,7 @@ class FinanceClient:
                         "cache_hit": False,
                         "returned_period_count": raw_period_count,
                         "raw_shape": raw_shape,
+                        "duplicate_resolution": resolution,
                     },
                 )
 
@@ -453,6 +482,7 @@ class FinanceClient:
                 "data_status": result.status,
                 "returned_period_count": int(tidy["report_period"].nunique()) if not tidy.empty else 0,
                 "content_hash": observation_dir.name,
+                "duplicate_resolution": (result.metadata or {}).get("duplicate_resolution", {}),
             }
             metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
         return observation_dir
@@ -570,6 +600,13 @@ def normalize_financial_statement(
     if not period_columns:
         raise ValueError("financial statement has no recognized period columns")
 
+    identity_config = load_identity_config()
+    work, resolution = resolve_duplicate_items(work, period_columns, identity_config)
+    if resolution["ambiguous"]:
+        result = empty_financial_frame()
+        result.attrs["duplicate_resolution"] = resolution
+        return result
+
     period_info = {str(column): parse_report_period(column) for column in period_columns}
     melted = work[["item", "item_en", "item_id", *period_columns]].melt(
         id_vars=["item", "item_en", "item_id"],
@@ -621,7 +658,193 @@ def normalize_financial_statement(
         raise ValueError(f"financial statement has {int(duplicated.sum())} rows with duplicate tidy keys")
     if bool(result["available_from"].isna().any()):
         raise ValueError("financial statement has missing available_from")
-    return result.reset_index(drop=True)
+    result = result.reset_index(drop=True)
+    result.attrs["duplicate_resolution"] = resolution
+    return result
+
+
+def load_identity_config(path: str | Path = SCREENER_CONFIG_PATH) -> IdentityConfig:
+    values: dict[str, str] = {}
+    for raw_line in Path(path).read_text(encoding="utf-8").splitlines():
+        line = raw_line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        key, separator, value = line.partition(":")
+        if not separator:
+            raise ValueError(f"invalid screener config line: {raw_line}")
+        values[key.strip()] = value.strip()
+    required = {"IDENTITY_TOL", "IDENTITY_MIN_PERIODS", "IDENTITY_MARGIN"}
+    missing = required - values.keys()
+    if missing:
+        raise ValueError(f"screener config missing: {sorted(missing)}")
+    config = IdentityConfig(
+        tolerance=float(values["IDENTITY_TOL"]),
+        minimum_periods=int(values["IDENTITY_MIN_PERIODS"]),
+        margin=float(values["IDENTITY_MARGIN"]),
+    )
+    if config.tolerance < 0 or config.minimum_periods < 1 or config.margin <= 1:
+        raise ValueError("invalid identity resolution thresholds")
+    return config
+
+
+def resolve_duplicate_items(
+    frame: pd.DataFrame,
+    period_columns: list[Any],
+    config: IdentityConfig,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Resolve only owner-approved duplicate item_ids using reported values."""
+    work = frame.copy()
+    audit: dict[str, Any] = {"ambiguous": False, "flags": [], "events": []}
+
+    duplicate_ids = set(
+        work.loc[work["item_id"].astype(str).duplicated(keep=False), "item_id"].astype(str)
+    )
+    outside = sorted(duplicate_ids - RESOLUTION_ITEMS)
+    if outside:
+        work = work[~work["item_id"].astype(str).isin(outside)].copy()
+        audit["flags"].append("DUPLICATE_ITEM_ID_QUARANTINED")
+        audit["events"].append({"flag": "DUPLICATE_ITEM_ID_QUARANTINED", "item_ids": outside})
+
+    for item_id in IDENTITY_INPUTS:
+        indices = list(work.index[work["item_id"].astype(str) == item_id])
+        if len(indices) <= 1:
+            continue
+        if not _rows_identical(work.loc[indices], period_columns):
+            return _ambiguous(work, audit, f"non-identical duplicate identity input: {item_id}")
+        keep = indices[0]
+        work = work.drop(index=indices[1:])
+        audit["events"].append(
+            {"flag": "DUPLICATE_IDENTITY_INPUT_IDENTICAL", "item_id": item_id, "kept_index": int(keep)}
+        )
+
+    preferred_indices = list(work.index[work["item_id"].astype(str) == PREFERRED_SHARES])
+    if len(preferred_indices) > 1:
+        informative = [
+            index for index in preferred_indices if not work.loc[index, period_columns].isna().all()
+        ]
+        if len(informative) != 1:
+            return _ambiguous(work, audit, "preferred_shares has zero or multiple informative rows")
+        selected = informative[0]
+        work = work.drop(index=[index for index in preferred_indices if index != selected])
+        audit["flags"].append("DUPLICATE_RESOLVED_NON_NAN")
+        event: dict[str, Any] = {
+            "flag": "DUPLICATE_RESOLVED_NON_NAN",
+            "item_id": PREFERRED_SHARES,
+            "selected_index": int(selected),
+        }
+        numeric = pd.to_numeric(work.loc[selected, period_columns], errors="coerce")
+        event["resolved_values"] = _period_values(period_columns, numeric)
+        if bool((numeric > 0).any()):
+            audit["flags"].append("PREFERRED_POSITIVE_REVIEW")
+            event["review_flag"] = "PREFERRED_POSITIVE_REVIEW"
+        audit["events"].append(event)
+
+    candidate_indices = {
+        item_id: list(work.index[work["item_id"].astype(str) == item_id])
+        for item_id in IDENTITY_CANDIDATES
+    }
+    if any(len(indices) > 1 for indices in candidate_indices.values()):
+        if any(len(candidate_indices[item_id]) == 0 for item_id in IDENTITY_CANDIDATES):
+            return _ambiguous(work, audit, "identity candidate input is missing")
+        base_indices: dict[str, int] = {}
+        for item_id in IDENTITY_INPUTS:
+            matches = list(work.index[work["item_id"].astype(str) == item_id])
+            if len(matches) != 1:
+                return _ambiguous(work, audit, f"identity input unavailable: {item_id}")
+            base_indices[item_id] = matches[0]
+
+        scores: list[dict[str, Any]] = []
+        for sti_index, other_index in itertools.product(
+            candidate_indices["short_term_investments"],
+            candidate_indices["other_current_assets"],
+        ):
+            errors: dict[str, float] = {}
+            for period in period_columns:
+                values = pd.to_numeric(
+                    pd.Series(
+                        [
+                            work.at[base_indices["current_assets"], period],
+                            work.at[base_indices["cash_and_cash_equivalents"], period],
+                            work.at[sti_index, period],
+                            work.at[base_indices["accounts_receivable"], period],
+                            work.at[base_indices["inventories"], period],
+                            work.at[other_index, period],
+                        ]
+                    ),
+                    errors="coerce",
+                )
+                if values.isna().any() or values.iloc[0] == 0:
+                    continue
+                rhs = float(values.iloc[1:].sum())
+                errors[str(period)] = abs(float(values.iloc[0]) - rhs) / abs(float(values.iloc[0]))
+            scores.append(
+                {
+                    "short_term_investments_index": int(sti_index),
+                    "other_current_assets_index": int(other_index),
+                    "period_errors": errors,
+                    "mean_error": (sum(errors.values()) / len(errors)) if errors else None,
+                }
+            )
+        scored = [score for score in scores if score["mean_error"] is not None]
+        scored.sort(key=lambda score: float(score["mean_error"]))
+        if not scored:
+            audit["events"].append({"flag": "IDENTITY_CANDIDATE_ERRORS", "candidates": scores})
+            return _ambiguous(work, audit, "no available periods for identity")
+        winner = scored[0]
+        passing_periods = sum(
+            error <= config.tolerance for error in winner["period_errors"].values()
+        )
+        winner_error = float(winner["mean_error"])
+        rejected = scored[1:]
+        margin_passes = all(
+            float(candidate["mean_error"]) > 0
+            if winner_error == 0
+            else float(candidate["mean_error"]) >= config.margin * winner_error
+            for candidate in rejected
+        )
+        audit["events"].append({"flag": "IDENTITY_CANDIDATE_ERRORS", "candidates": scores})
+        if passing_periods < config.minimum_periods or not margin_passes:
+            return _ambiguous(work, audit, "identity tolerance or margin not met")
+        selected = {
+            "short_term_investments": int(winner["short_term_investments_index"]),
+            "other_current_assets": int(winner["other_current_assets_index"]),
+        }
+        for item_id, indices in candidate_indices.items():
+            work = work.drop(index=[index for index in indices if index != selected[item_id]])
+        audit["flags"].append("DUPLICATE_RESOLVED_BY_IDENTITY")
+        audit["events"].append(
+            {"flag": "DUPLICATE_RESOLVED_BY_IDENTITY", "selected": selected, "passing_periods": passing_periods}
+        )
+
+    remaining = work["item_id"].astype(str).duplicated(keep=False)
+    if bool(remaining.any()):
+        return _ambiguous(work, audit, "unresolved duplicate required item")
+    return work, audit
+
+
+def _rows_identical(rows: pd.DataFrame, periods: list[Any]) -> bool:
+    first = rows.iloc[0][periods]
+    return all(
+        bool(((row[periods] == first) | (row[periods].isna() & first.isna())).all())
+        for _, row in rows.iloc[1:].iterrows()
+    )
+
+
+def _ambiguous(
+    work: pd.DataFrame, audit: dict[str, Any], reason: str
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    audit["ambiguous"] = True
+    if "REQUIRED_ITEM_AMBIGUOUS" not in audit["flags"]:
+        audit["flags"].append("REQUIRED_ITEM_AMBIGUOUS")
+    audit["events"].append({"flag": "REQUIRED_ITEM_AMBIGUOUS", "reason": reason})
+    return work, audit
+
+
+def _period_values(periods: list[Any], values: pd.Series) -> dict[str, float | None]:
+    return {
+        str(period): (None if pd.isna(value) else float(value))
+        for period, value in zip(periods, values, strict=True)
+    }
 
 
 def parse_report_period(value: Any) -> PeriodInfo:

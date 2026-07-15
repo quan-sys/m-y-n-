@@ -2,6 +2,13 @@
 
 ## 2026-07-15
 
+- Implemented the owner-approved value-based duplicate resolution for required
+  balance-sheet items. Identity winners require at least three periods within
+  1% and a 5x mean-error margin; these named values live in
+  `config/screener.yaml` so later changes cannot be hidden in source code.
+- Added the safety rule that duplicated identity inputs may be collapsed only
+  when their reported values are identical in every period; conflicting inputs
+  produce `REQUIRED_ITEM_AMBIGUOUS` rather than extending the search or guessing.
 - Recorded the real VCI duplicate-`item_id` investigation for VNM, HPG, FPT,
   and VCB in `docs/SPRINT_3_DUPLICATE_ITEM_ID_INVESTIGATION.md`.
 - Documented the root cause in pinned `vnstock==4.0.3`: distinct provider fields

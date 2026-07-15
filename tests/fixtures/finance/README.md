@@ -13,3 +13,7 @@ company's reported financial data and must never be presented as real data.
 
 The separate `scripts/smoke_vnstock_finance.py` command is the required live
 API shape check. Unit tests never call the live API.
+`verified_dup_items_vci_2026_07_15.csv` contains the verbatim VNM/HPG/FPT
+quarterly values recorded in `docs/VERIFY_DUP_ITEMS_SPRINT_3.md`, plus the
+identity-input rows from the same public VCI responses re-read on 2026-07-15.
+It is saved evidence only; pytest never calls the API.

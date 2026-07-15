@@ -18,6 +18,8 @@ from src.data.finance_client import (
     STATEMENT_CASH_FLOW,
     STATEMENT_INCOME_STATEMENT,
     FinanceClient,
+    IdentityConfig,
+    load_identity_config,
     normalize_financial_statement,
     parse_report_period,
     validate_large_company_magnitude,
@@ -72,6 +74,15 @@ def annual_shape(long_shape: pd.DataFrame) -> pd.DataFrame:
             "2025-Q2": "2022",
         }
     )
+
+
+@pytest.fixture()
+def verified_duplicate_shapes() -> dict[str, pd.DataFrame]:
+    raw = pd.read_csv(FIXTURES / "verified_dup_items_vci_2026_07_15.csv")
+    return {
+        ticker: group.drop(columns="ticker").reset_index(drop=True)
+        for ticker, group in raw.groupby("ticker", sort=False)
+    }
 
 
 def test_long_shape_normalizes_to_required_tidy_schema(long_shape):
@@ -156,18 +167,19 @@ def test_missing_item_id_fails_honestly(long_shape):
         )
 
 
-def test_duplicate_tidy_key_fails_instead_of_summing(long_shape):
+def test_duplicate_outside_required_items_is_quarantined_without_summing(long_shape):
     duplicated = pd.concat([long_shape, long_shape.iloc[[0]]], ignore_index=True)
+    result = normalize_financial_statement(
+        duplicated,
+        ticker="VNM",
+        statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL",
+        source="fixture_vci_shape",
+        as_of="2026-07-14",
+    )
 
-    with pytest.raises(ValueError, match="duplicate tidy keys"):
-        normalize_financial_statement(
-            duplicated,
-            ticker="VNM",
-            statement_type=STATEMENT_BALANCE_SHEET,
-            company_type="NON_FINANCIAL",
-            source="fixture_vci_shape",
-            as_of="2026-07-14",
-        )
+    assert "SYN_BS_001" not in set(result["item_id"])
+    assert "DUPLICATE_ITEM_ID_QUARANTINED" in result.attrs["duplicate_resolution"]["flags"]
 
 
 def test_non_numeric_source_value_fails_honestly(long_shape):
@@ -256,20 +268,182 @@ def test_company_types_and_different_schema_sizes_remain_separate(long_shape, tm
     assert bank.data["company_type"].eq("BANK").all()
 
 
-def test_raw_response_is_preserved_when_normalization_fails(long_shape, tmp_path):
+def test_raw_response_is_preserved_when_outside_duplicate_is_quarantined(long_shape, tmp_path):
     duplicated = pd.concat([long_shape, long_shape.iloc[[0]]], ignore_index=True)
     client = FixtureFinanceClient(duplicated, tmp_path, use_cache=False)
 
     result = client.get_balance_sheet("VNM", "quarter", company_type="NON_FINANCIAL")
 
-    assert not result.ok
-    assert result.status == "API_ERROR"
-    assert "duplicate tidy keys" in result.error
+    assert result.ok
+    assert result.status == "OK"
+    assert "DUPLICATE_ITEM_ID_QUARANTINED" in result.metadata["duplicate_resolution"]["flags"]
     assert result.metadata["returned_period_count"] == 4
     assert result.metadata["raw_shape"] == [3, 7]
     assert len(list(tmp_path.rglob("raw.parquet"))) == 1
-    assert len(list(tmp_path.rglob("normalized.parquet"))) == 0
-    assert len(list(tmp_path.rglob("failure.json"))) == 1
+    assert len(list(tmp_path.rglob("normalized.parquet"))) == 1
+    assert len(list(tmp_path.rglob("failure.json"))) == 0
+
+
+@pytest.mark.parametrize("ticker", ["HPG", "FPT"])
+def test_verbatim_required_duplicates_resolve_by_reported_values(
+    ticker, verified_duplicate_shapes
+):
+    result = normalize_financial_statement(
+        verified_duplicate_shapes[ticker],
+        ticker=ticker,
+        statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL",
+        source="verbatim_vci_2026_07_15",
+        as_of="2026-07-15",
+    )
+    audit = result.attrs["duplicate_resolution"]
+
+    assert not audit["ambiguous"]
+    assert "DUPLICATE_RESOLVED_BY_IDENTITY" in audit["flags"]
+    assert "DUPLICATE_RESOLVED_NON_NAN" in audit["flags"]
+    assert result[result["item_id"] == "short_term_investments"]["value"].max() > 1e12
+    assert result[result["item_id"] == "preferred_shares"]["value"].fillna(0).eq(0).all()
+
+
+def test_verbatim_vnm_is_ambiguous_when_five_x_margin_is_not_met(
+    verified_duplicate_shapes,
+):
+    result = normalize_financial_statement(
+        verified_duplicate_shapes["VNM"],
+        ticker="VNM",
+        statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL",
+        source="verbatim_vci_2026_07_15",
+        as_of="2026-07-15",
+    )
+    audit = result.attrs["duplicate_resolution"]
+
+    assert result.empty
+    assert audit["ambiguous"]
+    candidate_event = next(
+        event for event in audit["events"] if event.get("flag") == "IDENTITY_CANDIDATE_ERRORS"
+    )
+    means = sorted(
+        float(candidate["mean_error"])
+        for candidate in candidate_event["candidates"]
+        if candidate["mean_error"] is not None
+    )
+    assert means[1] / means[0] < 5.0
+    assert "REQUIRED_ITEM_AMBIGUOUS" in audit["flags"]
+
+
+def test_preferred_multiple_informative_candidates_are_ambiguous(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["VNM"].copy()
+    preferred = raw.index[raw["item_id"] == "preferred_shares"]
+    raw.loc[preferred[0], ["2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]] = 1
+
+    result = normalize_financial_statement(
+        raw, ticker="VNM", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="failure_fixture", as_of="2026-07-15"
+    )
+
+    assert result.empty
+    assert result.attrs["duplicate_resolution"]["ambiguous"]
+    assert "REQUIRED_ITEM_AMBIGUOUS" in result.attrs["duplicate_resolution"]["flags"]
+
+
+def test_preferred_zero_informative_candidates_are_ambiguous(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["VNM"].copy()
+    periods = ["2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
+    raw.loc[raw["item_id"] == "preferred_shares", periods] = float("nan")
+
+    result = normalize_financial_statement(
+        raw, ticker="VNM", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="failure_fixture", as_of="2026-07-15"
+    )
+
+    assert result.empty
+    assert "REQUIRED_ITEM_AMBIGUOUS" in result.attrs["duplicate_resolution"]["flags"]
+
+
+def test_positive_resolved_preferred_value_requires_owner_review(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["HPG"].copy()
+    periods = ["2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
+    informative = raw.index[
+        raw["item_id"].eq("preferred_shares") & raw[periods].notna().any(axis=1)
+    ][0]
+    raw.loc[informative, "2026-Q1"] = 1
+
+    result = normalize_financial_statement(
+        raw, ticker="HPG", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="positive_fixture", as_of="2026-07-15"
+    )
+
+    assert "PREFERRED_POSITIVE_REVIEW" in result.attrs["duplicate_resolution"]["flags"]
+
+
+def test_client_reports_ambiguous_statement_without_api_error(
+    verified_duplicate_shapes, tmp_path
+):
+    client = FixtureFinanceClient(verified_duplicate_shapes["VNM"], tmp_path, use_cache=False)
+
+    result = client.get_balance_sheet("VNM", "quarter", company_type="NON_FINANCIAL")
+
+    assert result.ok
+    assert result.status == "REQUIRED_ITEM_AMBIGUOUS"
+    assert result.data.empty
+    assert result.metadata["duplicate_resolution"]["ambiguous"]
+    assert len(list(tmp_path.rglob("raw.parquet"))) == 1
+
+
+def test_identity_margin_failure_never_selects(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["VNM"].copy()
+    sti = list(raw.index[raw["item_id"] == "short_term_investments"])
+    periods = ["2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
+    raw.loc[sti[1], periods] = raw.loc[sti[0], periods].astype(float) * 1.001
+
+    result = normalize_financial_statement(
+        raw, ticker="VNM", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="margin_fixture", as_of="2026-07-15"
+    )
+
+    assert result.empty
+    assert result.attrs["duplicate_resolution"]["ambiguous"]
+    assert any(
+        event.get("reason") == "identity tolerance or margin not met"
+        for event in result.attrs["duplicate_resolution"]["events"]
+    )
+
+
+def test_non_identical_duplicate_identity_input_is_ambiguous(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["HPG"].copy()
+    cash = raw[raw["item_id"] == "cash_and_cash_equivalents"].iloc[[0]].copy()
+    cash.loc[:, "2026-Q1"] = float(cash.iloc[0]["2026-Q1"]) + 1
+    raw = pd.concat([raw, cash], ignore_index=True)
+
+    result = normalize_financial_statement(
+        raw, ticker="HPG", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="conflict_fixture", as_of="2026-07-15"
+    )
+
+    assert result.empty
+    assert result.attrs["duplicate_resolution"]["ambiguous"]
+
+
+def test_identical_duplicate_identity_input_is_allowed_and_logged(verified_duplicate_shapes):
+    raw = verified_duplicate_shapes["FPT"].copy()
+    cash = raw[raw["item_id"] == "cash_and_cash_equivalents"].iloc[[0]].copy()
+    raw = pd.concat([raw, cash], ignore_index=True)
+
+    result = normalize_financial_statement(
+        raw, ticker="FPT", statement_type=STATEMENT_BALANCE_SHEET,
+        company_type="NON_FINANCIAL", source="identical_fixture", as_of="2026-07-15"
+    )
+
+    assert not result.empty
+    assert any(
+        event.get("flag") == "DUPLICATE_IDENTITY_INPUT_IDENTICAL"
+        for event in result.attrs["duplicate_resolution"]["events"]
+    )
+
+
+def test_named_identity_thresholds_are_loaded_from_config():
+    assert load_identity_config() == IdentityConfig(0.01, 3, 5.0)
 
 
 def test_content_addressed_cache_is_reused_without_api_call(long_shape, tmp_path):
