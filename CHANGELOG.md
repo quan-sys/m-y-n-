@@ -2,6 +2,14 @@
 
 ## 2026-07-15
 
+- Implemented the approved R1 per-item margin so a candidate is compared only
+  with combinations that change that same source row; this removes false
+  ambiguity such as VNM without changing the 1% identity tolerance or 5x margin.
+- Implemented R2 with `DUPLICATE_VERIFIED_IDENTICAL` and complete source-value
+  logging because numerically identical duplicate rows contain no disagreement.
+- Added `DUP_MATERIALITY_EPS=0.01` to configuration and implemented R3 only
+  after the unchanged identity tolerance passes; this permits auditable small
+  candidate differences while leaving material or poor-fitting cases ambiguous.
 - Approved a spec-only refinement from combination-level to per-item identity
   margins. Reason: VNM's correct short-term-investment row beat every rival
   short-term-investment row by about 208x, but the former comparison incorrectly

@@ -2,7 +2,9 @@
 
 Date: 2026-07-15
 Fixed seed: `20260715`
-Seeded random tickers: `CSM, DVP, C32, VOS, PHR, DP3, DHC, DRC, VCS, TLH, HID, DXP, LBE, ASM, PVP, CTF, HDG, PVC, NCT, VC7`
+Original seeded tickers: `CSM, DVP, C32, VOS, PHR, DP3, DHC, DRC, VCS, TLH, HID, DXP, LBE, ASM, PVP, CTF, HDG, PVC, NCT, VC7`
+Additional seeded tickers: `CTI, FMC, CAP, RAL, DVM, DPG, EVG, VVS, VHC, IDC, GAS, MST, ASP, SHN, D2D, HT1`
+All 40 validation tickers: `VNM, HPG, FPT, VCB, CSM, DVP, C32, VOS, PHR, DP3, DHC, DRC, VCS, TLH, HID, DXP, LBE, ASM, PVP, CTF, HDG, PVC, NCT, VC7, CTI, FMC, CAP, RAL, DVM, DPG, EVG, VVS, VHC, IDC, GAS, MST, ASP, SHN, D2D, HT1`
 All sample statements resolved cleanly: `NO`
 
 This one-off probe used the supported public `vnstock.api.Finance` VCI
@@ -10,18 +12,19 @@ quarterly balance-sheet interface. It did not run under pytest.
 
 ## Tóm tắt đơn giản cho chủ project
 
-- Đã chạy kiểm chứng thật cho 24 mã; nguồn dữ liệu trả lời đủ cả 24 mã.
-- Có 15 mã phân biệt được rõ ràng và 9 mã còn mơ hồ.
-- Các mã mơ hồ: `VNM, C32, DRC, VCS, TLH, HID, CTF, HDG, PVC`.
+- Đã chạy kiểm chứng thật cho 40 mã; nguồn dữ liệu trả lời đủ cả 40 mã.
+- Có 33 mã phân biệt được rõ ràng và 7 mã còn mơ hồ.
+- Coverage xử lý trùng trong nhóm kiểm chứng: 33/40 = 82.50%; thấp hơn mốc 90%.
+- Các mã mơ hồ: `C32, DRC, VCS, TLH, PVC, VHC, HT1`.
 - Mơ hồ nghĩa là các con số chưa tạo khoảng cách đủ lớn để hệ thống chọn an toàn; hệ thống đã dừng ở các mã đó thay vì đoán.
-- Vì mẫu chưa sạch, chưa được phép tính coverage toàn thị trường và không thay đổi ngưỡng 1% / 3 kỳ / 5 lần.
-- Việc còn lại: chủ project xem kết quả và quyết định hướng xử lý cho các mã mơ hồ. Sprint 3 chưa đạt điểm hoàn thành 90% trong lần chạy này.
+- Ngưỡng 1% / 3 kỳ / 5 lần được giữ nguyên; không có điều chỉnh để làm đẹp kết quả.
+- Sau bước này, coverage toàn thị trường được tính riêng theo danh sách REQUIRED_ITEMS đầy đủ.
 
 ## Summary
 
 | ticker | result | data_status | preferred values | flags |
 | --- | --- | --- | --- | --- |
-| VNM | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
+| VNM | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | HPG | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | FPT | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | VCB | RESOLVED | OK | `null` | `["DUPLICATE_ITEM_ID_QUARANTINED"]` |
@@ -35,28 +38,47 @@ quarterly balance-sheet interface. It did not run under pytest.
 | DRC | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
 | VCS | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
 | TLH | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
-| HID | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
+| HID | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_VERIFIED_IDENTICAL", "DUPLICATE_RESOLVED_NON_NAN"]` |
 | DXP | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | LBE | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | ASM | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | PVP | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
-| CTF | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
-| HDG | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
+| CTF | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_IMMATERIAL"]` |
+| HDG | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | PVC | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
 | NCT | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
 | VC7 | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| CTI | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| FMC | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| CAP | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| RAL | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_VERIFIED_IDENTICAL", "DUPLICATE_RESOLVED_NON_NAN"]` |
+| DVM | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| DPG | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| EVG | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| VVS | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| VHC | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
+| IDC | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| GAS | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| MST | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| ASP | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| SHN | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| D2D | RESOLVED | OK | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]` |
+| HT1 | AMBIGUOUS | REQUIRED_ITEM_AMBIGUOUS | `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}` | `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]` |
 
 ## Coverage gate
 
-STOP: the sample did not resolve cleanly, so full whitelist coverage was not recomputed and no threshold was changed.
+Duplicate-resolution validation coverage: 33/40 = 82.50% (below 90%).
+The complete Sprint 4-6 REQUIRED_ITEMS list is not yet present in the repository,
+so a full-universe complete-whitelist percentage cannot be computed without
+inventing an unapproved mapping. See `docs/COVERAGE_SPRINT_3.md`.
 
 ## VNM
 
-- Result: `AMBIGUOUS`
-- data_status: `REQUIRED_ITEM_AMBIGUOUS`
-- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
 - Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
-- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+- Error: ``
 
 ### Verbatim relevant raw rows
 
@@ -122,6 +144,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.5858044013867281
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0027731075866500544,
+    "rival_index": 5,
+    "rival_mean_error": 0.5782289464289563,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## HPG
@@ -198,6 +246,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0013305678530482917,
+    "rival_index": 5,
+    "rival_mean_error": 0.20019121899528844,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## FPT
 
 - Result: `RESOLVED`
@@ -272,6 +346,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0015653066951983392,
+    "rival_index": 5,
+    "rival_mean_error": 0.4914297742201986,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## VCB
 
 - Result: `RESOLVED`
@@ -290,6 +390,21 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 
 ```json
 []
+```
+
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## CSM
@@ -366,6 +481,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.04806330278506281,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## DVP
 
 - Result: `RESOLVED`
@@ -438,6 +579,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.9197999308101551
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.9177501864978814,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## C32
@@ -514,6 +681,21 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## VOS
 
 - Result: `RESOLVED`
@@ -586,6 +768,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.1291867278226275
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.09579605227928188,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## PHR
@@ -662,6 +870,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.00011252394666477647,
+    "rival_index": 5,
+    "rival_mean_error": 0.6041352878162831,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## DP3
 
 - Result: `RESOLVED`
@@ -734,6 +968,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.7589824821860671
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.7576988970323671,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## DHC
@@ -810,6 +1070,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.3171844730194673,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## DRC
 
 - Result: `AMBIGUOUS`
@@ -882,6 +1168,98 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.09638597058625606
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.003105712190085066,
+    "rival_index": 5,
+    "rival_mean_error": 0.007294896256449566,
+    "required_margin": 5.0,
+    "passed": false
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [
+    {
+      "flag": "DUPLICATE_MATERIALITY_CHECK",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "epsilon": 0.01,
+      "maximum_relative_difference": 0.019054670722104695,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 50000000000.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ],
+      "period_comparisons": [
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2026-Q1",
+          "current_assets": 2624028550753.0,
+          "left_value": 50000000000.0,
+          "right_value": 0.0,
+          "relative_difference": 0.019054670722104695
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q4",
+          "current_assets": 2824428345048.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q3",
+          "current_assets": 2737472574746.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q2",
+          "current_assets": 2934387930191.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        }
+      ]
+    }
+  ],
+  "identical": []
+}
 ```
 
 ## VCS
@@ -958,6 +1336,21 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## TLH
 
 - Result: `AMBIGUOUS`
@@ -1032,13 +1425,105 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 5,
+    "winner_mean_error": 0.0048374486899414055,
+    "rival_index": 4,
+    "rival_mean_error": 0.013393186445922668,
+    "required_margin": 5.0,
+    "passed": false
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [
+    {
+      "flag": "DUPLICATE_MATERIALITY_CHECK",
+      "item_id": "short_term_investments",
+      "selected_index": 5,
+      "epsilon": 0.01,
+      "maximum_relative_difference": 0.012647177688148534,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 43260405651.0,
+            "2025-Q4": 52214691131.0,
+            "2025-Q3": 73160283775.0,
+            "2025-Q2": 70385687200.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 28244899730.0,
+            "2025-Q4": 45260996457.0,
+            "2025-Q3": 44189096716.0,
+            "2025-Q2": 38476517373.0
+          }
+        }
+      ],
+      "period_comparisons": [
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2026-Q1",
+          "current_assets": 2178367066450.0,
+          "left_value": 43260405651.0,
+          "right_value": 28244899730.0,
+          "relative_difference": 0.006893009976261799
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q4",
+          "current_assets": 2376975572390.0,
+          "left_value": 52214691131.0,
+          "right_value": 45260996457.0,
+          "relative_difference": 0.0029254380039792343
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q3",
+          "current_assets": 2290723493681.0,
+          "left_value": 73160283775.0,
+          "right_value": 44189096716.0,
+          "relative_difference": 0.012647177688148534
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q2",
+          "current_assets": 2713982037758.0,
+          "left_value": 70385687200.0,
+          "right_value": 38476517373.0,
+          "relative_difference": 0.011757325355535485
+        }
+      ]
+    }
+  ],
+  "identical": []
+}
+```
+
 ## HID
 
-- Result: `AMBIGUOUS`
-- data_status: `REQUIRED_ITEM_AMBIGUOUS`
-- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_VERIFIED_IDENTICAL", "DUPLICATE_RESOLVED_NON_NAN"]`
 - Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
-- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+- Error: ``
 
 ### Verbatim relevant raw rows
 
@@ -1058,52 +1543,48 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ### Identity candidate errors
 
 ```json
-[
-  {
-    "short_term_investments_index": 4,
-    "other_current_assets_index": 17,
-    "period_errors": {
-      "2026-Q1": 0.0,
-      "2025-Q4": 0.0,
-      "2025-Q3": 0.0,
-      "2025-Q2": 0.0
-    },
-    "mean_error": 0.0
-  },
-  {
-    "short_term_investments_index": 4,
-    "other_current_assets_index": 21,
-    "period_errors": {
-      "2026-Q1": 0.008188225438424424,
-      "2025-Q4": 0.006791868725704272,
-      "2025-Q3": 0.0012560761627479322,
-      "2025-Q2": 0.01750405002451538
-    },
-    "mean_error": 0.008435055087848002
-  },
-  {
-    "short_term_investments_index": 5,
-    "other_current_assets_index": 17,
-    "period_errors": {
-      "2026-Q1": 0.0,
-      "2025-Q4": 0.0,
-      "2025-Q3": 0.0,
-      "2025-Q2": 0.0
-    },
-    "mean_error": 0.0
-  },
-  {
-    "short_term_investments_index": 5,
-    "other_current_assets_index": 21,
-    "period_errors": {
-      "2026-Q1": 0.008188225438424424,
-      "2025-Q4": 0.006791868725704272,
-      "2025-Q3": 0.0012560761627479322,
-      "2025-Q2": 0.01750405002451538
-    },
-    "mean_error": 0.008435055087848002
-  }
-]
+[]
+```
+
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": [
+    {
+      "flag": "DUPLICATE_VERIFIED_IDENTICAL",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ## DXP
@@ -1180,6 +1661,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.7559987181737227,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## LBE
 
 - Result: `RESOLVED`
@@ -1252,6 +1759,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.08919658483026822
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0030950173626351977,
+    "rival_index": 5,
+    "rival_mean_error": 0.015808270512161604,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## ASM
@@ -1328,6 +1861,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.18524702436224288,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## PVP
 
 - Result: `RESOLVED`
@@ -1402,13 +1961,39 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.542779630947494,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## CTF
 
-- Result: `AMBIGUOUS`
-- data_status: `REQUIRED_ITEM_AMBIGUOUS`
-- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_IMMATERIAL"]`
 - Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
-- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+- Error: ``
 
 ### Verbatim relevant raw rows
 
@@ -1476,13 +2061,169 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0015501855948667344,
+    "rival_index": 5,
+    "rival_mean_error": 0.001853856045973404,
+    "required_margin": 5.0,
+    "passed": false
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [
+    {
+      "flag": "DUPLICATE_MATERIALITY_CHECK",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "epsilon": 0.01,
+      "maximum_relative_difference": 0.003614082349555573,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 10400000000.0,
+            "2025-Q4": 10400000000.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ],
+      "period_comparisons": [
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2026-Q1",
+          "current_assets": 2877632271240.0,
+          "left_value": 10400000000.0,
+          "right_value": 0.0,
+          "relative_difference": 0.003614082349555573
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q4",
+          "current_assets": 2988596058799.0,
+          "left_value": 10400000000.0,
+          "right_value": 0.0,
+          "relative_difference": 0.003479894838708766
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q3",
+          "current_assets": 3031323629689.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q2",
+          "current_assets": 3032020239624.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        }
+      ]
+    },
+    {
+      "flag": "DUPLICATE_RESOLVED_IMMATERIAL",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "maximum_relative_difference": 0.003614082349555573,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 10400000000.0,
+            "2025-Q4": 10400000000.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ],
+      "period_comparisons": [
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2026-Q1",
+          "current_assets": 2877632271240.0,
+          "left_value": 10400000000.0,
+          "right_value": 0.0,
+          "relative_difference": 0.003614082349555573
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q4",
+          "current_assets": 2988596058799.0,
+          "left_value": 10400000000.0,
+          "right_value": 0.0,
+          "relative_difference": 0.003479894838708766
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q3",
+          "current_assets": 3031323629689.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q2",
+          "current_assets": 3032020239624.0,
+          "left_value": 0.0,
+          "right_value": 0.0,
+          "relative_difference": 0.0
+        }
+      ]
+    }
+  ],
+  "identical": []
+}
+```
+
 ## HDG
 
-- Result: `AMBIGUOUS`
-- data_status: `REQUIRED_ITEM_AMBIGUOUS`
-- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
 - Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
-- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+- Error: ``
 
 ### Verbatim relevant raw rows
 
@@ -1548,6 +2289,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.12153849336562043
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0030892122424432825,
+    "rival_index": 5,
+    "rival_mean_error": 0.10800890902552551,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
 ```
 
 ## PVC
@@ -1624,6 +2391,21 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## NCT
 
 - Result: `RESOLVED`
@@ -1698,6 +2480,32 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
 ]
 ```
 
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.6879236072543546,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
 ## VC7
 
 - Result: `RESOLVED`
@@ -1770,4 +2578,1655 @@ STOP: the sample did not resolve cleanly, so full whitelist coverage was not rec
     "mean_error": 0.013308666880342556
   }
 ]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.005067715191045083,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## CTI
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 479807762849.0 | 423087832142.0 | 500931741277.0 | 499296406948.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 68880997386.0 | 56057949303.0 | 63601119554.0 | 92047648935.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 7676427234.0 | 7581990387.0 | 0.0 | 7483401512.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 196818517758.0 | 135515006927.0 | 133497673689.0 | 91155896618.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 191800794335.0 | 206375015324.0 | 301268262892.0 | 305206915630.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 14631026136.0 | 17557870201.0 | 2564685142.0 | 3402544253.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.030493516922535747,
+      "2025-Q4": 0.041499350411729856,
+      "2025-Q3": 0.005119829570915146,
+      "2025-Q2": 0.006814678026221733
+    },
+    "mean_error": 0.02098184373285062
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.01599896422771268,
+      "2025-Q4": 0.0179206061034988,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.01498789377985524
+    },
+    "mean_error": 0.012226866027766679
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.04649248115024843,
+      "2025-Q4": 0.059419956515228654,
+      "2025-Q3": 0.005119829570915146,
+      "2025-Q2": 0.021802571806076972
+    },
+    "mean_error": 0.0332087097606173
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.012226866027766679,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## FMC
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 3505277383904.0 | 3806037069517.0 | 3797956058500.0 | 3552618797813.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 563867786969.0 | 1159214053467.0 | 1454682599575.0 | 1472056133195.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 1375575255000.0 | 1055925255000.0 | 316613256925.0 | 176470656925.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 494033373503.0 | 559290090917.0 | 1249009399444.0 | 562431586916.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 976852145074.0 | 884713190560.0 | 652593831590.0 | 1277381989453.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 94948823358.0 | 146894479573.0 | 125056970966.0 | 64278431324.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.027087392225790364,
+      "2025-Q4": 0.03859512581984428,
+      "2025-Q3": 0.03292744019144633,
+      "2025-Q2": 0.018093253169625165
+    },
+    "mean_error": 0.029175802851676536
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.39242978638910286,
+      "2025-Q4": 0.27743430652765577,
+      "2025-Q3": 0.08336411797508952,
+      "2025-Q2": 0.049673400656900124
+    },
+    "mean_error": 0.20072540288718707
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.41951717861489324,
+      "2025-Q4": 0.31602943234750003,
+      "2025-Q3": 0.11629155816653586,
+      "2025-Q2": 0.06776665382652529
+    },
+    "mean_error": 0.2299012057388636
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.20072540288718707,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## CAP
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 248806065476.0 | 231230248941.0 | 222464913866.0 | 219853008299.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 28535824074.0 | 70912166999.0 | 59611326275.0 | 7867847284.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 20000000000.0 | 80000000000.0 | 70000000000.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 34139769744.0 | 35061307049.0 | 66806117483.0 | 49066764361.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 184559013724.0 | 103272406385.0 | 15876312593.0 | 91883744875.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 1571457934.0 | 1984368508.0 | 171157515.0 | 1034651779.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.006315995275250169,
+      "2025-Q4": 0.008581785977778042,
+      "2025-Q3": 0.0007693685805353351,
+      "2025-Q2": 0.0047061069894157375
+    },
+    "mean_error": 0.005093314205744821
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.08649387392694949,
+      "2025-Q3": 0.3596072684440809,
+      "2025-Q2": 0.318394551621509
+    },
+    "mean_error": 0.19112392349813484
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.006315995275250169,
+      "2025-Q4": 0.09507565990472754,
+      "2025-Q3": 0.36037663702461625,
+      "2025-Q2": 0.32310065861092474
+    },
+    "mean_error": 0.19621723770387967
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.19112392349813484,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## RAL
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_VERIFIED_IDENTICAL", "DUPLICATE_RESOLVED_NON_NAN"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 7632908430047.0 | 7432677418184.0 | 7314238684935.0 | 7463077806751.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 2130663108908.0 | 1851247945631.0 | 1665430378151.0 | 1596223462018.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 3257928766908.0 | 3146079559848.0 | 3253804653780.0 | 3430475141362.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 2053878336692.0 | 2231886163512.0 | 2202855113099.0 | 2243263856681.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 190438217539.0 | 203463749193.0 | 192148539905.0 | 193115346690.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[]
+```
+
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": [
+    {
+      "flag": "DUPLICATE_VERIFIED_IDENTICAL",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+## DVM
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 789248919868.0 | 852482472013.0 | 925958621628.0 | 948423504811.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 3672396426.0 | 113581162697.0 | 42207250021.0 | 124167487717.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 5110000000.0 | 40687060655.0 | 52668113926.0 | 98553330078.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 683756850051.0 | 586763204058.0 | 585300439389.0 | 484392727941.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 96157126609.0 | 110667649760.0 | 245571086762.0 | 241022161798.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 552546782.0 | 783394843.0 | 211731530.0 | 287797277.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.000700091907749981,
+      "2025-Q4": 0.0009189571266493483,
+      "2025-Q3": 0.00022866197803497775,
+      "2025-Q2": 0.0003034480646463435
+    },
+    "mean_error": 0.0005377897692701627
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.006474509969370165,
+      "2025-Q4": 0.04772773868173977,
+      "2025-Q3": 0.0568795545457529,
+      "2025-Q2": 0.1039127874605338
+    },
+    "mean_error": 0.053748647664349156
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.007174601877120146,
+      "2025-Q4": 0.048646695808389116,
+      "2025-Q3": 0.057108216523787884,
+      "2025-Q2": 0.10421623552518014
+    },
+    "mean_error": 0.05428643743361932
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.053748647664349156,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## DPG
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 5494332554949.0 | 4687777557118.0 | 4176052799236.0 | 4426973867048.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 834166280417.0 | 796256459555.0 | 605411308308.0 | 897034831285.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 447562442500.0 | 63902042500.0 | 63902042500.0 | 71452042500.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 205442500.0 | 205442500.0 | 205442500.0 | 205442500.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 1665653698205.0 | 1418700291640.0 | 1261240253052.0 | 1236268435656.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 2341813591201.0 | 2242549801276.0 | 2127583877771.0 | 2114869935680.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 205136542626.0 | 166368962147.0 | 117915317605.0 | 107348621927.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.03733602590932069,
+      "2025-Q4": 0.03548994382090135,
+      "2025-Q3": 0.028236069626938712,
+      "2025-Q2": 0.024248758892851188
+    },
+    "mean_error": 0.03132769956250298
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.08142153674281052,
+      "2025-Q4": 0.013587803436466822,
+      "2025-Q3": 0.015252824392367156,
+      "2025-Q2": 0.016093747589142365
+    },
+    "mean_error": 0.03158897804019672
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.11875756265213121,
+      "2025-Q4": 0.04907774725736817,
+      "2025-Q3": 0.04348889401930586,
+      "2025-Q2": 0.04034250648199355
+    },
+    "mean_error": 0.0629166776026997
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.03158897804019672,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## EVG
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 5795437661824.0 | 5723357799204.0 | 5295163699942.0 | 4881388712273.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 251963057477.0 | 517641549501.0 | 430213151750.0 | 563442502548.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 696140000000.0 | 46540000000.0 | 30540000000.0 | 224540000000.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 1477772352840.0 | 1848666494706.0 | 2326733402124.0 | 2007424780104.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 3309477782183.0 | 3256903965013.0 | 2453836118524.0 | 2049370184459.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 60084469324.0 | 53605789984.0 | 53841027544.0 | 36611245162.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.010367546478808918,
+      "2025-Q4": 0.00936614341872099,
+      "2025-Q3": 0.010167962804358577,
+      "2025-Q2": 0.007500169996695902
+    },
+    "mean_error": 0.009350455674646097
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.12011862444585482,
+      "2025-Q4": 0.008131590166610367,
+      "2025-Q3": 0.005767527073872053,
+      "2025-Q2": 0.04599920498759948
+    },
+    "mean_error": 0.04500423666848418
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.13048617092466375,
+      "2025-Q4": 0.017497733585331358,
+      "2025-Q3": 0.01593548987823063,
+      "2025-Q2": 0.053499374984295384
+    },
+    "mean_error": 0.05435469234313028
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.04500423666848418,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## VVS
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 6783265035912.0 | 5078554693526.0 | 5162253169792.0 | 3889777026530.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 53292017321.0 | 87361926758.0 | 131576286804.0 | 171070004748.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 16000000000.0 | 0.0 | 0.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 4833795830993.0 | 4191700150644.0 | 3760249212195.0 | 2510068258172.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 1788182207060.0 | 775511777881.0 | 1213852431985.0 | 1174578065038.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 107994980538.0 | 7980838243.0 | 56575238808.0 | 34060698572.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.015920796248746344,
+      "2025-Q4": 0.001571478250135565,
+      "2025-Q3": 0.010959408023430891,
+      "2025-Q2": 0.00875646556079975
+    },
+    "mean_error": 0.009302037020778137
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0031505026460375337,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0007876256615093834
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.015920796248746344,
+      "2025-Q4": 0.004721980896173099,
+      "2025-Q3": 0.010959408023430891,
+      "2025-Q2": 0.00875646556079975
+    },
+    "mean_error": 0.01008966268228752
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.0007876256615093834,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## VHC
+
+- Result: `AMBIGUOUS`
+- data_status: `REQUIRED_ITEM_AMBIGUOUS`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 9682981516659.0 | 9321970265394.0 | 9495012256535.0 | 8733341549605.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 2093771897470.0 | 2008261260343.0 | 1678417812091.0 | 1147531700332.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 1943169708793.0 | 2377483974663.0 | 2699749641625.0 | 2071899866718.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 44471156119.0 | 44471156119.0 | 24029181119.0 | 158814866782.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 2624054771738.0 | 1984670923966.0 | 2213317710161.0 | 2229482839541.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 3124494409073.0 | 2995070909025.0 | 2835181617925.0 | 3192477778951.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 138594007291.0 | 166559647356.0 | 175392386290.0 | 198683775460.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 5000000.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.02489969409640987,
+      "2025-Q4": 0.022535627552779044,
+      "2025-Q3": 0.01127401510022531,
+      "2025-Q2": 0.012221485990299725
+    },
+    "mean_error": 0.017732705684928487
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.010587056294451273,
+      "2025-Q4": 0.0046681979628864145,
+      "2025-Q3": 0.007198039653499216,
+      "2025-Q2": 0.01052854323178953
+    },
+    "mean_error": 0.008245459285656608
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.1711864545146766,
+      "2025-Q4": 0.2277347286191191,
+      "2025-Q3": 0.2705287238761693,
+      "2025-Q2": 0.2068338422674766
+    },
+    "mean_error": 0.2190709373193604
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.1854990923166352,
+      "2025-Q4": 0.2456021582090117,
+      "2025-Q3": 0.2890007786298938,
+      "2025-Q2": 0.22958387148956583
+    },
+    "mean_error": 0.23742147516127665
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## IDC
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 10087525251101.0 | 9856822003191.0 | 9562532464360.0 | 7811294674643.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 800729495703.0 | 553052678239.0 | 791686559919.0 | 863253933107.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 6841660868866.0 | 6807014517859.0 | 5645952622247.0 | 4019330803621.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 1039082103804.0 | 1157155456553.0 | 1774478928980.0 | 1559600303738.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 1340105628935.0 | 1302184245205.0 | 1315905180121.0 | 1328960693425.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 69507830195.0 | 40975781737.0 | 38572059215.0 | 42475786830.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.00035297818973106126,
+      "2025-Q4": 0.0003612397992829011,
+      "2025-Q3": 0.00042487553764053237,
+      "2025-Q2": 0.00029788225574864055
+    },
+    "mean_error": 0.00035924394560078385
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.006537495783299498,
+      "2025-Q4": 0.0037958588805689516,
+      "2025-Q3": 0.0036087901632352393,
+      "2025-Q2": 0.00513985740191461
+    },
+    "mean_error": 0.0047705005572545745
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.677876884790713,
+      "2025-Q4": 0.6902279293726196,
+      "2025-Q3": 0.5899995380044547,
+      "2025-Q2": 0.5142558468038577
+    },
+    "mean_error": 0.6180900497429113
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.6847673587637435,
+      "2025-Q4": 0.6943850280524714,
+      "2025-Q3": 0.5940332037053305,
+      "2025-Q2": 0.519693586461521
+    },
+    "mean_error": 0.6232197942457666
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.00035924394560078385,
+    "rival_index": 5,
+    "rival_mean_error": 0.6180900497429113,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## GAS
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 69205780703236.0 | 69902465635326.0 | 70160798119085.0 | 64857286428940.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 7321907295672.0 | 6876468282085.0 | 11641062000554.0 | 10377145910363.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 32854568498585.0 | 32890551400598.0 | 32506102707604.0 | 30730802707604.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 25127892974691.0 | 24881281586057.0 | 22912149381591.0 | 19777698700821.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 3237941119932.0 | 4587524289258.0 | 2514731760135.0 | 3357742646765.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 853589249711.0 | 855393085401.0 | 718936403279.0 | 746080597465.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0027471467473252596,
+      "2025-Q4": 0.002700233909597769,
+      "2025-Q3": 0.0018840169670482061,
+      "2025-Q2": 0.002038076850822702
+    },
+    "mean_error": 0.002342368618698484
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.009586927675898275,
+      "2025-Q4": 0.00953671764320579,
+      "2025-Q3": 0.008362964574677391,
+      "2025-Q2": 0.009465343019856486
+    },
+    "mean_error": 0.009237988228409485
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.4719901969360002,
+      "2025-Q4": 0.4678203850938096,
+      "2025-Q3": 0.4614246052129745,
+      "2025-Q2": 0.47178382350379333
+    },
+    "mean_error": 0.4682547526866444
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.4843242713592237,
+      "2025-Q4": 0.48005733664661315,
+      "2025-Q3": 0.4716715867547001,
+      "2025-Q2": 0.48328724337447254
+    },
+    "mean_error": 0.47983510953375236
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.002342368618698484,
+    "rival_index": 5,
+    "rival_mean_error": 0.4682547526866444,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## MST
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 2188844194630.0 | 1934922041533.0 | 2314224570900.0 | 1954992808492.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 8051946094.0 | 147026456960.0 | 8422245741.0 | 5160327013.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 603538393363.0 | 493184913239.0 | 753734370956.0 | 387860259927.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 1400343994810.0 | 1186724543745.0 | 1490819711209.0 | 1532996636648.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 166739691610.0 | 102753268839.0 | 59470313301.0 | 27623058958.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 10170168753.0 | 5232858750.0 | 1777929693.0 | 1352525946.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.004646364861396247,
+      "2025-Q4": 0.002704428725125334,
+      "2025-Q3": 0.0007682615228255764,
+      "2025-Q2": 0.0006918316733058891
+    },
+    "mean_error": 0.0022027216956632617
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.27573383013907093,
+      "2025-Q4": 0.2548861931658288,
+      "2025-Q3": 0.32569629604393724,
+      "2025-Q2": 0.1983947246466749
+    },
+    "mean_error": 0.26367776099887796
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.28038019500046724,
+      "2025-Q4": 0.2575906218909541,
+      "2025-Q3": 0.3264645575667628,
+      "2025-Q2": 0.1990865563199808
+    },
+    "mean_error": 0.26588048269454123
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.26367776099887796,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## ASP
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 748356184565.0 | 673070424459.0 | 803161786983.0 | 782364854591.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 115741442736.0 | 76813855652.0 | 103627985982.0 | 82815530738.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 33175010400.0 | 22925010400.0 | 82200000000.0 | 82200000000.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 479392191216.0 | 525306587250.0 | 546629938072.0 | 529908555363.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 98651745688.0 | 42357830772.0 | 57197766063.0 | 69381220624.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 25519848843.0 | 9791194703.0 | 18998977898.0 | 23552428898.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.005510817446370415,
+      "2025-Q4": 0.006127225574225504,
+      "2025-Q3": 0.006839071680232048,
+      "2025-Q2": 0.007020868843695101
+    },
+    "mean_error": 0.006374495886130767
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.028590389130594036,
+      "2025-Q4": 0.008419832723381256,
+      "2025-Q3": 0.01681615968898913,
+      "2025-Q2": 0.02308328110602701
+    },
+    "mean_error": 0.01922741566224786
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.038819691319697675,
+      "2025-Q4": 0.027933118732875267,
+      "2025-Q3": 0.09550643495645245,
+      "2025-Q2": 0.09804520041752193
+    },
+    "mean_error": 0.06507611135663682
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.07292089789666212,
+      "2025-Q4": 0.04248017703048203,
+      "2025-Q3": 0.11916166632567363,
+      "2025-Q2": 0.12814935036724404
+    },
+    "mean_error": 0.09067802290501545
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.006374495886130767,
+    "rival_index": 5,
+    "rival_mean_error": 0.06507611135663682,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## SHN
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 3913586521035.0 | 3507083876807.0 | 3522468457932.0 | 3759925764323.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 45749775504.0 | 35994913916.0 | 38194449242.0 | 21009258085.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 221147202795.0 | 399435000.0 | 399435000.0 | 399435000.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 3309886877108.0 | 3140212055988.0 | 3152638827520.0 | 3400183265790.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 335142536052.0 | 326467185551.0 | 327459934080.0 | 332140762965.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 1660129576.0 | 4010286352.0 | 3775812090.0 | 6193042483.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.00042419646712217227,
+      "2025-Q4": 0.0011434817337905067,
+      "2025-Q3": 0.0010719221861298753,
+      "2025-Q2": 0.0016471182866864657
+    },
+    "mean_error": 0.001071679668432255
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.05650755428718992,
+      "2025-Q4": 0.00011389376873519855,
+      "2025-Q3": 0.00011339633122918115,
+      "2025-Q2": 0.00010623481021623866
+    },
+    "mean_error": 0.014210269799342635
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.056931750754312095,
+      "2025-Q4": 0.001257375502525705,
+      "2025-Q3": 0.0011853185173590565,
+      "2025-Q2": 0.0017533530969027044
+    },
+    "mean_error": 0.01528194946777489
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.014210269799342635,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## D2D
+
+- Result: `RESOLVED`
+- data_status: `OK`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "DUPLICATE_RESOLVED_BY_IDENTITY"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: ``
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 268411171249.0 | 307200952428.0 | 338088995064.0 | 696446182136.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 17496423176.0 | 61494913764.0 | 37933794030.0 | 240601411563.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 30000000000.0 | 30000000000.0 | 62500000000.0 | 62500000000.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 80894979259.0 | 77503233246.0 | 98198638686.0 | 226186397760.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 136933766306.0 | 135477094217.0 | 138646066475.0 | 165455356611.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 3086002508.0 | 2725711201.0 | 810495873.0 | 1703016202.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.0,
+      "2025-Q4": 0.0,
+      "2025-Q3": 0.0,
+      "2025-Q2": 0.0
+    },
+    "mean_error": 0.0
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.011497295338490861,
+      "2025-Q4": 0.008872730307171936,
+      "2025-Q3": 0.002397285581113262,
+      "2025-Q2": 0.0024452947631600913
+    },
+    "mean_error": 0.006303151497484037
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.11176882042725995,
+      "2025-Q4": 0.09765594723223141,
+      "2025-Q3": 0.18486256847304006,
+      "2025-Q2": 0.08974132043959598
+    },
+    "mean_error": 0.12100716414303185
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.1232661157657508,
+      "2025-Q4": 0.10652867753940334,
+      "2025-Q3": 0.18725985405415332,
+      "2025-Q2": 0.09218661520275608
+    },
+    "mean_error": 0.1273103156405159
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.0,
+    "rival_index": 5,
+    "rival_mean_error": 0.12100716414303185,
+    "required_margin": 5.0,
+    "passed": true
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [],
+  "identical": []
+}
+```
+
+## HT1
+
+- Result: `AMBIGUOUS`
+- data_status: `REQUIRED_ITEM_AMBIGUOUS`
+- Flags: `["DUPLICATE_ITEM_ID_QUARANTINED", "DUPLICATE_RESOLVED_NON_NAN", "REQUIRED_ITEM_AMBIGUOUS"]`
+- Resolved preferred values: `{"2026-Q1": 0.0, "2025-Q4": 0.0, "2025-Q3": 0.0, "2025-Q2": 0.0}`
+- Error: `REQUIRED_ITEM_AMBIGUOUS: duplicate required item could not be resolved`
+
+### Verbatim relevant raw rows
+
+| raw_index | item | item_en | item_id | 2026-Q1 | 2025-Q4 | 2025-Q3 | 2025-Q2 |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+| 0 | TÀI SẢN NGẮN HẠN | CURRENT ASSETS | current_assets | 2098682875923.0 | 1657313551722.0 | 2132295894049.0 | 2035520064646.0 |
+| 1 | Tiền và tương đương tiền | Cash and cash equivalents | cash_and_cash_equivalents | 562315022832.0 | 518180034470.0 | 792365073448.0 | 901995675046.0 |
+| 4 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 117729476303.0 | 17729476303.0 | 17566483292.0 | 17014852499.0 |
+| 5 | Đầu tư ngắn hạn | Short-term investments | short_term_investments | 0.0 | 0.0 | 0.0 | 0.0 |
+| 7 | Các khoản phải thu | Accounts receivable | accounts_receivable | 675661327825.0 | 308389614241.0 | 557772372662.0 | 342249139712.0 |
+| 15 | Hàng tồn kho | Inventories | inventories | 650705850464.0 | 692973836025.0 | 680692445845.0 | 703948493444.0 |
+| 17 | Tài sản lưu động khác | Other current assets | other_current_assets | 102648012640.0 | 130417407224.0 | 94343916013.0 | 80920380267.0 |
+| 21 | Tài sản lưu động khác | Other current assets | other_current_assets | 0.0 | 0.0 | 0.0 | 0.0 |
+| 94 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | NaN | NaN | NaN | NaN |
+| 113 | Cổ phiếu ưu đãi | Preferred shares | preferred_shares | 0.0 | 0.0 | 0.0 | 0.0 |
+
+### Identity candidate errors
+
+```json
+[
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.004944441230281769,
+      "2025-Q4": 0.006261227110716718,
+      "2025-Q3": 0.00489819318235764,
+      "2025-Q2": 0.005211678580945324
+    },
+    "mean_error": 0.005328885026075363
+  },
+  {
+    "short_term_investments_index": 4,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.04396624166403376,
+      "2025-Q4": 0.07243082671850122,
+      "2025-Q3": 0.03934703388781745,
+      "2025-Q2": 0.03454247647380869
+    },
+    "mean_error": 0.047571644686040276
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 17,
+    "period_errors": {
+      "2026-Q1": 0.05115239819869705,
+      "2025-Q4": 0.004436492873880359,
+      "2025-Q3": 0.0033401021410194276,
+      "2025-Q2": 0.003147292079439237
+    },
+    "mean_error": 0.015519071323259017
+  },
+  {
+    "short_term_investments_index": 5,
+    "other_current_assets_index": 21,
+    "period_errors": {
+      "2026-Q1": 0.10006308109301258,
+      "2025-Q4": 0.0831285467030983,
+      "2025-Q3": 0.047585329211194516,
+      "2025-Q2": 0.04290144713419325
+    },
+    "mean_error": 0.06841960103537466
+  }
+]
+```
+
+### Per-item margins
+
+```json
+[
+  {
+    "flag": "IDENTITY_PER_ITEM_MARGIN",
+    "item_id": "short_term_investments",
+    "winner_index": 4,
+    "winner_mean_error": 0.005328885026075363,
+    "rival_index": 5,
+    "rival_mean_error": 0.015519071323259017,
+    "required_margin": 5.0,
+    "passed": false
+  }
+]
+```
+
+### Materiality comparisons and identical duplicates
+
+```json
+{
+  "materiality": [
+    {
+      "flag": "DUPLICATE_MATERIALITY_CHECK",
+      "item_id": "short_term_investments",
+      "selected_index": 4,
+      "epsilon": 0.01,
+      "maximum_relative_difference": 0.05609683942897881,
+      "source_rows": [
+        {
+          "index": 4,
+          "values": {
+            "2026-Q1": 117729476303.0,
+            "2025-Q4": 17729476303.0,
+            "2025-Q3": 17566483292.0,
+            "2025-Q2": 17014852499.0
+          }
+        },
+        {
+          "index": 5,
+          "values": {
+            "2026-Q1": 0.0,
+            "2025-Q4": 0.0,
+            "2025-Q3": 0.0,
+            "2025-Q2": 0.0
+          }
+        }
+      ],
+      "period_comparisons": [
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2026-Q1",
+          "current_assets": 2098682875923.0,
+          "left_value": 117729476303.0,
+          "right_value": 0.0,
+          "relative_difference": 0.05609683942897881
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q4",
+          "current_assets": 1657313551722.0,
+          "left_value": 17729476303.0,
+          "right_value": 0.0,
+          "relative_difference": 0.010697719984597077
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q3",
+          "current_assets": 2132295894049.0,
+          "left_value": 17566483292.0,
+          "right_value": 0.0,
+          "relative_difference": 0.008238295323377068
+        },
+        {
+          "left_index": 4,
+          "right_index": 5,
+          "period": "2025-Q2",
+          "current_assets": 2035520064646.0,
+          "left_value": 17014852499.0,
+          "right_value": 0.0,
+          "relative_difference": 0.008358970660384562
+        }
+      ]
+    }
+  ],
+  "identical": []
+}
 ```

@@ -27,6 +27,10 @@ from src.data.finance_client import FinanceClient  # noqa: E402
 
 SEED = 20260715
 CORE_TICKERS = ("VNM", "HPG", "FPT", "VCB")
+ORIGINAL_SEEDED_TICKERS = (
+    "CSM", "DVP", "C32", "VOS", "PHR", "DP3", "DHC", "DRC", "VCS", "TLH",
+    "HID", "DXP", "LBE", "ASM", "PVP", "CTF", "HDG", "PVC", "NCT", "VC7",
+)
 FINANCIAL_ICB2 = {"NGÂN HÀNG", "BẢO HIỂM", "DỊCH VỤ TÀI CHÍNH"}
 REPORT_ITEMS = {
     "current_assets",
@@ -42,7 +46,7 @@ REPORT_ITEMS = {
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Live Sprint 3 duplicate-resolution validation")
     parser.add_argument("--seed", type=int, default=SEED)
-    parser.add_argument("--sample-size", type=int, default=20)
+    parser.add_argument("--additional-size", type=int, default=16)
     parser.add_argument("--min-sleep", type=float, default=2.8)
     parser.add_argument("--max-sleep", type=float, default=3.6)
     parser.add_argument(
@@ -53,7 +57,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def choose_sample(seed: int, sample_size: int) -> list[str]:
+def choose_sample(seed: int, additional_size: int) -> tuple[list[str], list[str]]:
     universe = pd.read_csv(ROOT / "data" / "universe.csv")
     eligible = universe[
         universe["status"].eq("ACCEPTED")
@@ -62,9 +66,14 @@ def choose_sample(seed: int, sample_size: int) -> list[str]:
         & ~universe["ticker"].isin(CORE_TICKERS)
     ]
     tickers = sorted(eligible["ticker"].astype(str).unique())
-    if len(tickers) < sample_size:
-        raise ValueError(f"only {len(tickers)} eligible tickers for sample size {sample_size}")
-    return random.Random(seed).sample(tickers, sample_size)
+    missing_original = sorted(set(ORIGINAL_SEEDED_TICKERS) - set(tickers))
+    if missing_original:
+        raise ValueError(f"original seeded tickers are no longer eligible: {missing_original}")
+    remaining = [ticker for ticker in tickers if ticker not in ORIGINAL_SEEDED_TICKERS]
+    if len(remaining) < additional_size:
+        raise ValueError(f"only {len(remaining)} additional eligible tickers")
+    additional = random.Random(seed).sample(remaining, additional_size)
+    return list(ORIGINAL_SEEDED_TICKERS), additional
 
 
 def _number(value: object) -> str:
@@ -87,7 +96,8 @@ def _markdown_table(frame: pd.DataFrame, periods: list[str]) -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    sample = choose_sample(args.seed, args.sample_size)
+    original_sample, additional_sample = choose_sample(args.seed, args.additional_size)
+    sample = [*original_sample, *additional_sample]
     tickers = [*CORE_TICKERS, *sample]
     client = FinanceClient(
         cache_dir=ROOT / "data" / "fundamentals",
@@ -129,6 +139,18 @@ def main(argv: list[str] | None = None) -> int:
             ),
             {},
         )
+        margin_events = [
+            event for event in audit.get("events", [])
+            if event.get("flag") == "IDENTITY_PER_ITEM_MARGIN"
+        ]
+        materiality_events = [
+            event for event in audit.get("events", [])
+            if event.get("flag") in {"DUPLICATE_MATERIALITY_CHECK", "DUPLICATE_RESOLVED_IMMATERIAL"}
+        ]
+        identical_events = [
+            event for event in audit.get("events", [])
+            if event.get("flag") == "DUPLICATE_VERIFIED_IDENTICAL"
+        ]
         status = "AMBIGUOUS" if audit.get("ambiguous") else ("RESOLVED" if result.ok else "API_ERROR")
         record = {
             "ticker": ticker,
@@ -137,6 +159,9 @@ def main(argv: list[str] | None = None) -> int:
             "flags": audit.get("flags", []),
             "preferred_values": preferred_event.get("resolved_values"),
             "identity_candidates": identity_event.get("candidates", []),
+            "per_item_margins": margin_events,
+            "materiality_comparisons": materiality_events,
+            "identical_duplicates": identical_events,
             "error": result.error or "",
         }
         records.append(record)
@@ -165,11 +190,31 @@ def main(argv: list[str] | None = None) -> int:
                 json.dumps(record["identity_candidates"], ensure_ascii=False, indent=2),
                 "```",
                 "",
+                "### Per-item margins",
+                "",
+                "```json",
+                json.dumps(record["per_item_margins"], ensure_ascii=False, indent=2),
+                "```",
+                "",
+                "### Materiality comparisons and identical duplicates",
+                "",
+                "```json",
+                json.dumps(
+                    {
+                        "materiality": record["materiality_comparisons"],
+                        "identical": record["identical_duplicates"],
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                "```",
+                "",
             ]
         )
 
     clean = all(record["status"] == "RESOLVED" for record in records)
     resolved_count = sum(record["status"] == "RESOLVED" for record in records)
+    validation_resolution_coverage = resolved_count / len(records) if records else 0.0
     ambiguous_tickers = [
         str(record["ticker"]) for record in records if record["status"] == "AMBIGUOUS"
     ]
@@ -189,7 +234,9 @@ def main(argv: list[str] | None = None) -> int:
             "",
             f"Date: {date.today().isoformat()}",
             f"Fixed seed: `{args.seed}`",
-            f"Seeded random tickers: `{', '.join(sample)}`",
+            f"Original seeded tickers: `{', '.join(original_sample)}`",
+            f"Additional seeded tickers: `{', '.join(additional_sample)}`",
+            f"All 40 validation tickers: `{', '.join(tickers)}`",
             f"All sample statements resolved cleanly: `{'YES' if clean else 'NO'}`",
             "",
             "This one-off probe used the supported public `vnstock.api.Finance` VCI",
@@ -199,10 +246,11 @@ def main(argv: list[str] | None = None) -> int:
             "",
             f"- Đã chạy kiểm chứng thật cho {len(records)} mã; nguồn dữ liệu trả lời đủ cả {len(records)} mã.",
             f"- Có {resolved_count} mã phân biệt được rõ ràng và {len(ambiguous_tickers)} mã còn mơ hồ.",
+            f"- Coverage xử lý trùng trong nhóm kiểm chứng: {resolved_count}/{len(records)} = {validation_resolution_coverage:.2%}; thấp hơn mốc 90%.",
             f"- Các mã mơ hồ: `{', '.join(ambiguous_tickers) or 'NONE'}`.",
             "- Mơ hồ nghĩa là các con số chưa tạo khoảng cách đủ lớn để hệ thống chọn an toàn; hệ thống đã dừng ở các mã đó thay vì đoán.",
-            "- Vì mẫu chưa sạch, chưa được phép tính coverage toàn thị trường và không thay đổi ngưỡng 1% / 3 kỳ / 5 lần.",
-            "- Việc còn lại: chủ project xem kết quả và quyết định hướng xử lý cho các mã mơ hồ. Sprint 3 chưa đạt điểm hoàn thành 90% trong lần chạy này.",
+            "- Ngưỡng 1% / 3 kỳ / 5 lần được giữ nguyên; không có điều chỉnh để làm đẹp kết quả.",
+            "- Sau bước này, coverage toàn thị trường được tính riêng theo danh sách REQUIRED_ITEMS đầy đủ.",
             "",
             "## Summary",
             "",
@@ -210,11 +258,8 @@ def main(argv: list[str] | None = None) -> int:
             "",
             "## Coverage gate",
             "",
-            (
-                "The sample resolved cleanly; full whitelist coverage may now be recomputed."
-                if clean
-                else "STOP: the sample did not resolve cleanly, so full whitelist coverage was not recomputed and no threshold was changed."
-            ),
+            f"Duplicate-resolution validation coverage: {resolved_count}/{len(records)} = {validation_resolution_coverage:.2%} (below 90%).",
+            "The complete Sprint 4-6 REQUIRED_ITEMS list is not yet present in the repository, so a full-universe complete-whitelist percentage cannot be computed without inventing an unapproved mapping. See `docs/COVERAGE_SPRINT_3.md`.",
             "",
             *sections,
         ]
@@ -223,7 +268,16 @@ def main(argv: list[str] | None = None) -> int:
     args.output.write_text(document, encoding="utf-8")
     (args.output.with_suffix(".json")).write_text(
         json.dumps(
-            {"seed": args.seed, "sample": sample, "clean": clean, "records": records},
+            {
+                "seed": args.seed,
+                "original_sample": original_sample,
+                "additional_sample": additional_sample,
+                "sample": sample,
+                "tickers": tickers,
+                "clean": clean,
+                "validation_resolution_coverage": validation_resolution_coverage,
+                "records": records,
+            },
             ensure_ascii=False,
             indent=2,
         ),

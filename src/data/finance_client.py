@@ -90,6 +90,7 @@ IDENTITY_INPUTS = (
     "current_assets",
 )
 IDENTITY_CANDIDATES = ("short_term_investments", "other_current_assets")
+RULE_A_REQUIRED_ITEMS = frozenset({"short_term_investments"})
 PREFERRED_SHARES = "preferred_shares"
 RESOLUTION_ITEMS = frozenset((*IDENTITY_INPUTS, *IDENTITY_CANDIDATES, PREFERRED_SHARES))
 
@@ -99,6 +100,7 @@ class IdentityConfig:
     tolerance: float
     minimum_periods: int
     margin: float
+    materiality_epsilon: float
 
 
 @dataclass(frozen=True)
@@ -673,7 +675,12 @@ def load_identity_config(path: str | Path = SCREENER_CONFIG_PATH) -> IdentityCon
         if not separator:
             raise ValueError(f"invalid screener config line: {raw_line}")
         values[key.strip()] = value.strip()
-    required = {"IDENTITY_TOL", "IDENTITY_MIN_PERIODS", "IDENTITY_MARGIN"}
+    required = {
+        "IDENTITY_TOL",
+        "IDENTITY_MIN_PERIODS",
+        "IDENTITY_MARGIN",
+        "DUP_MATERIALITY_EPS",
+    }
     missing = required - values.keys()
     if missing:
         raise ValueError(f"screener config missing: {sorted(missing)}")
@@ -681,8 +688,14 @@ def load_identity_config(path: str | Path = SCREENER_CONFIG_PATH) -> IdentityCon
         tolerance=float(values["IDENTITY_TOL"]),
         minimum_periods=int(values["IDENTITY_MIN_PERIODS"]),
         margin=float(values["IDENTITY_MARGIN"]),
+        materiality_epsilon=float(values["DUP_MATERIALITY_EPS"]),
     )
-    if config.tolerance < 0 or config.minimum_periods < 1 or config.margin <= 1:
+    if (
+        config.tolerance < 0
+        or config.minimum_periods < 1
+        or config.margin <= 1
+        or config.materiality_epsilon < 0
+    ):
         raise ValueError("invalid identity resolution thresholds")
     return config
 
@@ -705,16 +718,25 @@ def resolve_duplicate_items(
         audit["flags"].append("DUPLICATE_ITEM_ID_QUARANTINED")
         audit["events"].append({"flag": "DUPLICATE_ITEM_ID_QUARANTINED", "item_ids": outside})
 
-    for item_id in IDENTITY_INPUTS:
+    for item_id in (*IDENTITY_INPUTS, *IDENTITY_CANDIDATES):
         indices = list(work.index[work["item_id"].astype(str) == item_id])
         if len(indices) <= 1:
             continue
         if not _rows_identical(work.loc[indices], period_columns):
+            if item_id in IDENTITY_CANDIDATES:
+                continue
             return _ambiguous(work, audit, f"non-identical duplicate identity input: {item_id}")
         keep = indices[0]
+        values = _source_rows(work, indices, period_columns)
         work = work.drop(index=indices[1:])
+        _add_flag(audit, "DUPLICATE_VERIFIED_IDENTICAL")
         audit["events"].append(
-            {"flag": "DUPLICATE_IDENTITY_INPUT_IDENTICAL", "item_id": item_id, "kept_index": int(keep)}
+            {
+                "flag": "DUPLICATE_VERIFIED_IDENTICAL",
+                "item_id": item_id,
+                "selected_index": int(keep),
+                "source_rows": values,
+            }
         )
 
     preferred_indices = list(work.index[work["item_id"].astype(str) == PREFERRED_SHARES])
@@ -726,7 +748,7 @@ def resolve_duplicate_items(
             return _ambiguous(work, audit, "preferred_shares has zero or multiple informative rows")
         selected = informative[0]
         work = work.drop(index=[index for index in preferred_indices if index != selected])
-        audit["flags"].append("DUPLICATE_RESOLVED_NON_NAN")
+        _add_flag(audit, "DUPLICATE_RESOLVED_NON_NAN")
         event: dict[str, Any] = {
             "flag": "DUPLICATE_RESOLVED_NON_NAN",
             "item_id": PREFERRED_SHARES,
@@ -735,7 +757,7 @@ def resolve_duplicate_items(
         numeric = pd.to_numeric(work.loc[selected, period_columns], errors="coerce")
         event["resolved_values"] = _period_values(period_columns, numeric)
         if bool((numeric > 0).any()):
-            audit["flags"].append("PREFERRED_POSITIVE_REVIEW")
+            _add_flag(audit, "PREFERRED_POSITIVE_REVIEW")
             event["review_flag"] = "PREFERRED_POSITIVE_REVIEW"
         audit["events"].append(event)
 
@@ -743,7 +765,21 @@ def resolve_duplicate_items(
         item_id: list(work.index[work["item_id"].astype(str) == item_id])
         for item_id in IDENTITY_CANDIDATES
     }
-    if any(len(indices) > 1 for indices in candidate_indices.values()):
+    duplicated_required_candidates = {
+        item_id: indices
+        for item_id, indices in candidate_indices.items()
+        if item_id in RULE_A_REQUIRED_ITEMS and len(indices) > 1
+    }
+    if not duplicated_required_candidates:
+        _quarantine_duplicate_auxiliary_candidates(work, candidate_indices, audit)
+        work = work[
+            ~(
+                work["item_id"].astype(str).eq("other_current_assets")
+                & work.index.isin(candidate_indices["other_current_assets"])
+                & (len(candidate_indices["other_current_assets"]) > 1)
+            )
+        ].copy()
+    elif any(len(indices) > 1 for indices in candidate_indices.values()):
         if any(len(candidate_indices[item_id]) == 0 for item_id in IDENTITY_CANDIDATES):
             return _ambiguous(work, audit, "identity candidate input is missing")
         base_indices: dict[str, int] = {}
@@ -794,27 +830,89 @@ def resolve_duplicate_items(
         passing_periods = sum(
             error <= config.tolerance for error in winner["period_errors"].values()
         )
-        winner_error = float(winner["mean_error"])
-        rejected = scored[1:]
-        margin_passes = all(
-            float(candidate["mean_error"]) > 0
-            if winner_error == 0
-            else float(candidate["mean_error"]) >= config.margin * winner_error
-            for candidate in rejected
-        )
         audit["events"].append({"flag": "IDENTITY_CANDIDATE_ERRORS", "candidates": scores})
-        if passing_periods < config.minimum_periods or not margin_passes:
-            return _ambiguous(work, audit, "identity tolerance or margin not met")
+        if passing_periods < config.minimum_periods:
+            return _ambiguous(work, audit, "identity tolerance not met")
         selected = {
             "short_term_investments": int(winner["short_term_investments_index"]),
             "other_current_assets": int(winner["other_current_assets_index"]),
         }
-        for item_id, indices in candidate_indices.items():
+        winner_error = float(winner["mean_error"])
+        for item_id, indices in duplicated_required_candidates.items():
+            index_key = f"{item_id}_index"
+            rivals = [
+                candidate
+                for candidate in scored
+                if int(candidate[index_key]) != selected[item_id]
+            ]
+            rival = min(rivals, key=lambda candidate: float(candidate["mean_error"])) if rivals else None
+            rival_error = float(rival["mean_error"]) if rival is not None else None
+            margin_passes = (
+                rival_error is not None
+                and (rival_error > 0 if winner_error == 0 else rival_error >= config.margin * winner_error)
+            )
+            margin_event = {
+                "flag": "IDENTITY_PER_ITEM_MARGIN",
+                "item_id": item_id,
+                "winner_index": selected[item_id],
+                "winner_mean_error": winner_error,
+                "rival_index": int(rival[index_key]) if rival is not None else None,
+                "rival_mean_error": rival_error,
+                "required_margin": config.margin,
+                "passed": margin_passes,
+            }
+            audit["events"].append(margin_event)
+            if margin_passes:
+                _add_flag(audit, "DUPLICATE_RESOLVED_BY_IDENTITY")
+                audit["events"].append(
+                    {
+                        "flag": "DUPLICATE_RESOLVED_BY_IDENTITY",
+                        "item_id": item_id,
+                        "selected_index": selected[item_id],
+                        "passing_periods": passing_periods,
+                    }
+                )
+                continue
+
+            materiality = _duplicate_materiality(
+                work,
+                item_indices=indices,
+                current_assets_index=base_indices["current_assets"],
+                periods=period_columns,
+            )
+            materiality_event = {
+                "flag": "DUPLICATE_MATERIALITY_CHECK",
+                "item_id": item_id,
+                "selected_index": selected[item_id],
+                "epsilon": config.materiality_epsilon,
+                **materiality,
+            }
+            audit["events"].append(materiality_event)
+            maximum = materiality["maximum_relative_difference"]
+            if maximum is None or float(maximum) > config.materiality_epsilon:
+                return _ambiguous(
+                    work,
+                    audit,
+                    f"per-item margin and immaterial difference not met: {item_id}",
+                )
+            _add_flag(audit, "DUPLICATE_RESOLVED_IMMATERIAL")
+            audit["events"].append(
+                {
+                    "flag": "DUPLICATE_RESOLVED_IMMATERIAL",
+                    "item_id": item_id,
+                    "selected_index": selected[item_id],
+                    "maximum_relative_difference": maximum,
+                    "source_rows": materiality["source_rows"],
+                    "period_comparisons": materiality["period_comparisons"],
+                }
+            )
+
+        for item_id, indices in duplicated_required_candidates.items():
             work = work.drop(index=[index for index in indices if index != selected[item_id]])
-        audit["flags"].append("DUPLICATE_RESOLVED_BY_IDENTITY")
-        audit["events"].append(
-            {"flag": "DUPLICATE_RESOLVED_BY_IDENTITY", "selected": selected, "passing_periods": passing_periods}
-        )
+        auxiliary_indices = candidate_indices["other_current_assets"]
+        if len(auxiliary_indices) > 1:
+            _quarantine_duplicate_auxiliary_candidates(work, candidate_indices, audit)
+            work = work.drop(index=auxiliary_indices)
 
     remaining = work["item_id"].astype(str).duplicated(keep=False)
     if bool(remaining.any()):
@@ -827,6 +925,84 @@ def _rows_identical(rows: pd.DataFrame, periods: list[Any]) -> bool:
     return all(
         bool(((row[periods] == first) | (row[periods].isna() & first.isna())).all())
         for _, row in rows.iloc[1:].iterrows()
+    )
+
+
+def _source_rows(
+    frame: pd.DataFrame, indices: list[Any], periods: list[Any]
+) -> list[dict[str, Any]]:
+    return [
+        {
+            "index": int(index),
+            "values": {
+                str(period): (None if pd.isna(frame.at[index, period]) else float(frame.at[index, period]))
+                for period in periods
+            },
+        }
+        for index in indices
+    ]
+
+
+def _duplicate_materiality(
+    frame: pd.DataFrame,
+    *,
+    item_indices: list[Any],
+    current_assets_index: Any,
+    periods: list[Any],
+) -> dict[str, Any]:
+    comparisons: list[dict[str, Any]] = []
+    relative_differences: list[float] = []
+    for left_position, left_index in enumerate(item_indices):
+        for right_index in item_indices[left_position + 1 :]:
+            for period in periods:
+                current_assets = pd.to_numeric(
+                    pd.Series([frame.at[current_assets_index, period]]), errors="coerce"
+                ).iloc[0]
+                left = pd.to_numeric(pd.Series([frame.at[left_index, period]]), errors="coerce").iloc[0]
+                right = pd.to_numeric(pd.Series([frame.at[right_index, period]]), errors="coerce").iloc[0]
+                relative = None
+                if not pd.isna(current_assets) and current_assets != 0 and not pd.isna(left) and not pd.isna(right):
+                    relative = abs(float(left) - float(right)) / abs(float(current_assets))
+                    relative_differences.append(relative)
+                comparisons.append(
+                    {
+                        "left_index": int(left_index),
+                        "right_index": int(right_index),
+                        "period": str(period),
+                        "current_assets": None if pd.isna(current_assets) else float(current_assets),
+                        "left_value": None if pd.isna(left) else float(left),
+                        "right_value": None if pd.isna(right) else float(right),
+                        "relative_difference": relative,
+                    }
+                )
+    return {
+        "maximum_relative_difference": max(relative_differences) if relative_differences else None,
+        "source_rows": _source_rows(frame, item_indices, periods),
+        "period_comparisons": comparisons,
+    }
+
+
+def _add_flag(audit: dict[str, Any], flag: str) -> None:
+    if flag not in audit["flags"]:
+        audit["flags"].append(flag)
+
+
+def _quarantine_duplicate_auxiliary_candidates(
+    work: pd.DataFrame,
+    candidate_indices: dict[str, list[Any]],
+    audit: dict[str, Any],
+) -> None:
+    indices = candidate_indices["other_current_assets"]
+    if len(indices) <= 1:
+        return
+    _add_flag(audit, "DUPLICATE_ITEM_ID_QUARANTINED")
+    audit["events"].append(
+        {
+            "flag": "DUPLICATE_ITEM_ID_QUARANTINED",
+            "item_ids": ["other_current_assets"],
+            "source_indices": [int(index) for index in indices],
+            "reason": "auxiliary identity item is outside REQUIRED_ITEMS",
+        }
     )
 
 

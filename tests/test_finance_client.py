@@ -27,6 +27,7 @@ from src.data.finance_client import (
 
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "finance"
+LIVE_VALIDATION_REPORT = Path(__file__).resolve().parents[1] / "docs" / "VALIDATE_DUP_RESOLUTION_SPRINT_3.md"
 
 
 class FixtureFinanceClient(FinanceClient):
@@ -83,6 +84,24 @@ def verified_duplicate_shapes() -> dict[str, pd.DataFrame]:
         ticker: group.drop(columns="ticker").reset_index(drop=True)
         for ticker, group in raw.groupby("ticker", sort=False)
     }
+
+
+def validation_report_shape(ticker: str) -> pd.DataFrame:
+    """Read verbatim saved raw rows; this fixture path never calls vnstock."""
+    lines = LIVE_VALIDATION_REPORT.read_text(encoding="utf-8").splitlines()
+    start = lines.index(f"## {ticker}")
+    table_start = lines.index("### Verbatim relevant raw rows", start)
+    rows: list[list[str]] = []
+    for line in lines[table_start + 4 :]:
+        if not line.startswith("|"):
+            break
+        rows.append([cell.strip() for cell in line.strip("|").split("|")])
+    columns = ["raw_index", "item", "item_en", "item_id", "2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
+    frame = pd.DataFrame(rows, columns=columns)
+    frame["raw_index"] = frame["raw_index"].astype(int)
+    for period in columns[4:]:
+        frame[period] = pd.to_numeric(frame[period].replace("NaN", pd.NA), errors="coerce")
+    return frame.set_index("raw_index")
 
 
 def test_long_shape_normalizes_to_required_tidy_schema(long_shape):
@@ -305,31 +324,26 @@ def test_verbatim_required_duplicates_resolve_by_reported_values(
     assert result[result["item_id"] == "preferred_shares"]["value"].fillna(0).eq(0).all()
 
 
-def test_verbatim_vnm_is_ambiguous_when_five_x_margin_is_not_met(
-    verified_duplicate_shapes,
-):
+@pytest.mark.parametrize("ticker", ["VNM", "HDG"])
+def test_saved_live_rows_resolve_via_per_item_margin(ticker):
     result = normalize_financial_statement(
-        verified_duplicate_shapes["VNM"],
-        ticker="VNM",
+        validation_report_shape(ticker),
+        ticker=ticker,
         statement_type=STATEMENT_BALANCE_SHEET,
         company_type="NON_FINANCIAL",
-        source="verbatim_vci_2026_07_15",
+        source="saved_live_validation_2026_07_15",
         as_of="2026-07-15",
     )
     audit = result.attrs["duplicate_resolution"]
 
-    assert result.empty
-    assert audit["ambiguous"]
-    candidate_event = next(
-        event for event in audit["events"] if event.get("flag") == "IDENTITY_CANDIDATE_ERRORS"
+    assert not result.empty
+    assert not audit["ambiguous"]
+    assert "DUPLICATE_RESOLVED_BY_IDENTITY" in audit["flags"]
+    assert any(
+        event.get("flag") == "IDENTITY_PER_ITEM_MARGIN"
+        and event.get("passed") is True
+        for event in audit["events"]
     )
-    means = sorted(
-        float(candidate["mean_error"])
-        for candidate in candidate_event["candidates"]
-        if candidate["mean_error"] is not None
-    )
-    assert means[1] / means[0] < 5.0
-    assert "REQUIRED_ITEM_AMBIGUOUS" in audit["flags"]
 
 
 def test_preferred_multiple_informative_candidates_are_ambiguous(verified_duplicate_shapes):
@@ -380,9 +394,10 @@ def test_positive_resolved_preferred_value_requires_owner_review(verified_duplic
 def test_client_reports_ambiguous_statement_without_api_error(
     verified_duplicate_shapes, tmp_path
 ):
-    client = FixtureFinanceClient(verified_duplicate_shapes["VNM"], tmp_path, use_cache=False)
+    ambiguous = validation_report_shape("C32")
+    client = FixtureFinanceClient(ambiguous, tmp_path, use_cache=False)
 
-    result = client.get_balance_sheet("VNM", "quarter", company_type="NON_FINANCIAL")
+    result = client.get_balance_sheet("C32", "quarter", company_type="NON_FINANCIAL")
 
     assert result.ok
     assert result.status == "REQUIRED_ITEM_AMBIGUOUS"
@@ -395,7 +410,8 @@ def test_identity_margin_failure_never_selects(verified_duplicate_shapes):
     raw = verified_duplicate_shapes["VNM"].copy()
     sti = list(raw.index[raw["item_id"] == "short_term_investments"])
     periods = ["2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
-    raw.loc[sti[1], periods] = raw.loc[sti[0], periods].astype(float) * 1.001
+    current_assets = raw.loc[raw["item_id"] == "current_assets", periods].iloc[0].astype(float)
+    raw.loc[sti[1], periods] = raw.loc[sti[0], periods].astype(float) + 0.011 * current_assets
 
     result = normalize_financial_statement(
         raw, ticker="VNM", statement_type=STATEMENT_BALANCE_SHEET,
@@ -405,7 +421,7 @@ def test_identity_margin_failure_never_selects(verified_duplicate_shapes):
     assert result.empty
     assert result.attrs["duplicate_resolution"]["ambiguous"]
     assert any(
-        event.get("reason") == "identity tolerance or margin not met"
+        str(event.get("reason", "")).startswith("per-item margin and immaterial difference not met")
         for event in result.attrs["duplicate_resolution"]["events"]
     )
 
@@ -437,13 +453,66 @@ def test_identical_duplicate_identity_input_is_allowed_and_logged(verified_dupli
 
     assert not result.empty
     assert any(
-        event.get("flag") == "DUPLICATE_IDENTITY_INPUT_IDENTICAL"
+        event.get("flag") == "DUPLICATE_VERIFIED_IDENTICAL"
+        for event in result.attrs["duplicate_resolution"]["events"]
+    )
+
+
+def test_hid_resolves_identical_rows_from_saved_live_report():
+    result = normalize_financial_statement(
+        validation_report_shape("HID"), ticker="HID",
+        statement_type=STATEMENT_BALANCE_SHEET, company_type="NON_FINANCIAL",
+        source="saved_live_validation_2026_07_15", as_of="2026-07-15"
+    )
+
+    assert not result.empty
+    assert "DUPLICATE_VERIFIED_IDENTICAL" in result.attrs["duplicate_resolution"]["flags"]
+
+
+@pytest.mark.parametrize("ticker", ["DRC", "TLH", "CTF"])
+def test_saved_live_rows_use_immaterial_path_only_when_they_qualify(ticker):
+    result = normalize_financial_statement(
+        validation_report_shape(ticker), ticker=ticker,
+        statement_type=STATEMENT_BALANCE_SHEET, company_type="NON_FINANCIAL",
+        source="saved_live_validation_2026_07_15", as_of="2026-07-15"
+    )
+    audit = result.attrs["duplicate_resolution"]
+    materiality_events = [
+        event for event in audit["events"] if event.get("flag") == "DUPLICATE_MATERIALITY_CHECK"
+    ]
+
+    assert materiality_events
+    qualifies = all(
+        event["maximum_relative_difference"] is not None
+        and event["maximum_relative_difference"] <= 0.01
+        for event in materiality_events
+    )
+    if qualifies:
+        assert not result.empty
+        assert "DUPLICATE_RESOLVED_IMMATERIAL" in audit["flags"]
+    else:
+        assert result.empty
+        assert "REQUIRED_ITEM_AMBIGUOUS" in audit["flags"]
+
+
+@pytest.mark.parametrize("ticker", ["C32", "VCS", "PVC"])
+def test_saved_poor_identity_fits_remain_ambiguous(ticker):
+    result = normalize_financial_statement(
+        validation_report_shape(ticker), ticker=ticker,
+        statement_type=STATEMENT_BALANCE_SHEET, company_type="NON_FINANCIAL",
+        source="saved_live_validation_2026_07_15", as_of="2026-07-15"
+    )
+
+    assert result.empty
+    assert "REQUIRED_ITEM_AMBIGUOUS" in result.attrs["duplicate_resolution"]["flags"]
+    assert any(
+        event.get("reason") == "identity tolerance not met"
         for event in result.attrs["duplicate_resolution"]["events"]
     )
 
 
 def test_named_identity_thresholds_are_loaded_from_config():
-    assert load_identity_config() == IdentityConfig(0.01, 3, 5.0)
+    assert load_identity_config() == IdentityConfig(0.01, 3, 5.0, 0.01)
 
 
 def test_content_addressed_cache_is_reused_without_api_call(long_shape, tmp_path):
