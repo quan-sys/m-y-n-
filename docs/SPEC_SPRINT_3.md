@@ -149,13 +149,16 @@ hard-coded in source:
 IDENTITY_TOL=0.01
 IDENTITY_MIN_PERIODS=3
 IDENTITY_MARGIN=5.0
+DUP_MATERIALITY_EPS=0.01
 ```
 
 - `IDENTITY_TOL` is a relative-error fraction, so `0.01` means 1%.
 - `IDENTITY_MIN_PERIODS` is the minimum number of available periods that must
   individually pass the tolerance.
 - `IDENTITY_MARGIN` is the minimum separation between the winning combination's
-  mean error and every rejected combination's mean error.
+  mean error and the best rival combination for each duplicated item.
+- `DUP_MATERIALITY_EPS` is the maximum difference between duplicate candidate
+  rows as a fraction of reported `current_assets`; `0.01` means 1%.
 - The implementation-stage change must place these settings in the approved
   project configuration and record the reason in `CHANGELOG.md`.
 
@@ -185,25 +188,56 @@ identity_error = abs(current_assets - rhs) / abs(current_assets)
   Missing values remain missing; the rule must not convert `NaN` to zero.
 - Before evaluating candidate combinations, inspect the identity inputs
   `cash_and_cash_equivalents`, `accounts_receivable`, `inventories`, and
-  `current_assets`. If an input is duplicated and its rows differ in any
-  returned period, do not extend the candidate search and do not select a row;
-  record `REQUIRED_ITEM_AMBIGUOUS` for the statement. If all duplicated rows of
-  an input are identical in every returned period (including matching missing
-  values), using their common value is allowed and the collapse must be logged.
+  `current_assets` and the candidate items. Before Rule A scoring, if all
+  duplicate rows of one identity-related item are numerically identical in
+  every returned period, collapse them to their common reported values and log
+  `DUPLICATE_VERIFIED_IDENTICAL` with all source row indices and values. For
+  this comparison, `NaN` equals `NaN`; `NaN` does not equal a number.
+- If duplicated `cash_and_cash_equivalents`, `accounts_receivable`,
+  `inventories`, or `current_assets` rows are not identical, do not extend the
+  combination search and do not apply the immaterial-difference rule to those
+  inputs. Record `REQUIRED_ITEM_AMBIGUOUS` for the statement.
 - Score each candidate combination by its mean `identity_error` across all
   periods available for that combination. The candidate with the smallest mean
   error is the provisional winner.
-- Accept exactly one provisional winner only when both conditions hold:
-  1. Its per-period `identity_error` is `<= IDENTITY_TOL` in at least
-     `IDENTITY_MIN_PERIODS` available periods.
-  2. Every rejected combination's mean error is at least
-     `IDENTITY_MARGIN` times the winner's mean error.
-- A tie is ambiguous. If the winning mean error is zero, the margin condition
-  passes only when every rejected combination has a strictly positive mean
-  error; another zero-error combination is a tie.
+- Apply the tolerance condition to that winner: its per-period
+  `identity_error` must be `<= IDENTITY_TOL` in at least
+  `IDENTITY_MIN_PERIODS` available periods. A winner that misses this condition
+  cannot be selected by either the margin or immaterial-difference path.
+- Evaluate the margin separately for each still-duplicated candidate item `X`:
+  1. `winner_X` is the best-scoring combination.
+  2. `rival_X` is the best-scoring combination whose source row for `X`
+     differs from `winner_X`; combinations that change only another item are
+     not rivals for `X`.
+  3. Accept `X` by margin only when the winner passes the tolerance condition
+     and `rival_X.mean_error >= IDENTITY_MARGIN * winner_X.mean_error`.
+- If `winner_X.mean_error` is zero, the per-item margin passes only when
+  `rival_X.mean_error` is strictly positive. A zero-error rival for `X` is a
+  tie and does not pass the margin path.
+- If a candidate item `X` differs across rows and does not pass the per-item
+  margin, calculate the maximum pairwise materiality over periods with numeric,
+  non-zero `current_assets`:
+
+```text
+duplicate_difference_X = max(|X_row_i - X_row_j| / abs(current_assets))
+```
+
+- Accept `X` through the immaterial-difference path only when the best
+  combination passes the same tolerance condition and
+  `duplicate_difference_X <= DUP_MATERIALITY_EPS`. Select the `X` row used by
+  the best identity combination, record `DUPLICATE_RESOLVED_IMMATERIAL`, and
+  log every compared source value and per-period difference. This rule applies
+  only to Rule A candidate items; it never resolves conflicting aggregate
+  identity inputs.
+- If a duplicated Rule A candidate item passes neither its per-item margin nor
+  the immaterial-difference path, the statement is ambiguous. Every duplicated
+  candidate item must resolve; resolving one item does not authorize guessing
+  another.
 - Success retains only the resolved required candidates for normalized use,
-  records `DUPLICATE_RESOLVED_BY_IDENTITY`, and logs every candidate's
-  per-period and mean errors.
+  records the applicable `DUPLICATE_RESOLVED_BY_IDENTITY`,
+  `DUPLICATE_VERIFIED_IDENTICAL`, and/or
+  `DUPLICATE_RESOLVED_IMMATERIAL` flags, and logs every candidate's per-period
+  and mean errors.
 - Failure must not select any candidate. Record `REQUIRED_ITEM_AMBIGUOUS`, retain
   the raw observation, quarantine that statement for required-item coverage,
   and exclude the ticker from the coverage numerator without removing it from
@@ -225,10 +259,11 @@ identity_error = abs(current_assets - rhs) / abs(current_assets)
 
 #### Resolution evidence and schema boundary
 
-- `DUPLICATE_RESOLVED_BY_IDENTITY`, `DUPLICATE_RESOLVED_NON_NAN`,
-  `REQUIRED_ITEM_AMBIGUOUS`, `PREFERRED_POSITIVE_REVIEW`, candidate values, and
-  identity errors must be retained in observation metadata and fetch-status
-  explanations for audit.
+- `DUPLICATE_RESOLVED_BY_IDENTITY`, `DUPLICATE_VERIFIED_IDENTICAL`,
+  `DUPLICATE_RESOLVED_IMMATERIAL`, `DUPLICATE_RESOLVED_NON_NAN`,
+  `REQUIRED_ITEM_AMBIGUOUS`, `PREFERRED_POSITIVE_REVIEW`, candidate values,
+  materiality comparisons, and identity errors must be retained in observation
+  metadata and fetch-status explanations for audit.
 - These flags do not add `provider_item_id` or authorize another new normalized
   financial-row column in this spec-review step.
 - `provider_item_id` remains outside the approved schema. It must not be
@@ -371,6 +406,19 @@ in cache or run metadata documented by `data_contract.md` v2.
 - Verify Rule A resolves the approved VNM/HPG/FPT fixtures under
   `IDENTITY_TOL=0.01`, `IDENTITY_MIN_PERIODS=3`, and
   `IDENTITY_MARGIN=5.0`.
+- Add fixture cases copied from the 24-ticker live report: VNM and HDG must
+  resolve through the per-item margin; HID must resolve through identical-row
+  verification; DRC, TLH, and CTF resolve through immaterial difference only
+  when their verbatim values satisfy `DUP_MATERIALITY_EPS=0.01`; C32, VCS, and
+  PVC must remain `REQUIRED_ITEM_AMBIGUOUS` because their best identity fit
+  misses the unchanged tolerance.
+- Verify a same-`X` combination with a different other-current-asset row is not
+  treated as `rival_X`.
+- Verify identical duplicate comparisons treat `NaN` as equal only to `NaN`,
+  never to a reported number, and log `DUPLICATE_VERIFIED_IDENTICAL`.
+- Verify the immaterial-difference path logs all values, never applies to
+  conflicting aggregate identity inputs, and cannot override a failed identity
+  tolerance.
 - Verify an ambiguous candidate set produces `REQUIRED_ITEM_AMBIGUOUS` and no
   selection.
 - Verify failure of the identity-margin condition produces
@@ -406,16 +454,17 @@ in cache or run metadata documented by `data_contract.md` v2.
 - Do not copy the comparison site's displayed unit without converting it back to raw VND for an apples-to-apples comparison.
 - Inspect the first dated universe snapshot and compare it with the latest `data/universe.csv` and `data/universe_rejects.csv` from the same run.
 - Inspect the coverage summary and require successful retrieval for ≥ 90% of the universe before declaring the Sprint 3 implementation complete.
-- After fixture tests pass, run a separate one-off live validation script on
-  VNM, HPG, FPT, VCB, and 20 randomly sampled `ACCEPTED` non-financial,
-  non-UPCoM tickers.
+- After fixture tests pass, re-run the separate one-off live validation script
+  on VNM, HPG, FPT, VCB, the same 20 sampled `ACCEPTED` non-financial,
+  non-UPCoM tickers, and 16 additional eligible tickers, for 40 total.
 - The live validation sample must use a fixed seed and print the exact sampled
-  ticker list. It must not run under pytest.
+  ticker list. Keep seed `20260715` so the original 20 remain unchanged, then
+  draw the additional 16 deterministically. It must not run under pytest.
 - For every validation ticker, report resolved versus ambiguous status, all
   identity errors, and the resolved preferred-share value or honest absence.
 - Preserve verbatim real numbers and add the simple Vietnamese summary required
   by `AGENTS.md`.
-- If the sample resolves cleanly, recompute Sprint 3 coverage using complete,
+- After the 40-ticker validation, recompute Sprint 3 coverage using complete,
   unique `REQUIRED_ITEMS`. If coverage is below 90%, stop and report; do not tune
   any threshold.
 - Any later tolerance change requires owner approval and a `CHANGELOG.md` entry

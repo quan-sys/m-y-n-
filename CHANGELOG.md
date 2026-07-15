@@ -2,6 +2,17 @@
 
 ## 2026-07-15
 
+- Approved a spec-only refinement from combination-level to per-item identity
+  margins. Reason: VNM's correct short-term-investment row beat every rival
+  short-term-investment row by about 208x, but the former comparison incorrectly
+  rejected it because another combination changed only `other_current_assets`.
+- Approved identical-duplicate verification before identity scoring. Reason:
+  rows with the same reported values in every period contain no numerical
+  disagreement, so collapsing them is auditable without guessing.
+- Added the proposed named `DUP_MATERIALITY_EPS=0.01` rule for Rule A candidates.
+  Reason: immaterial row differences up to 1% of current assets may use the best
+  identity row, while a failed 1% identity fit still remains ambiguous; the
+  existing `IDENTITY_TOL` and `IDENTITY_MARGIN` values are unchanged.
 - Implemented the owner-approved value-based duplicate resolution for required
   balance-sheet items. Identity winners require at least three periods within
   1% and a 5x mean-error margin; these named values live in
