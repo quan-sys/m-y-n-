@@ -141,6 +141,15 @@ citations in THE PLAN, section "TRẠNG THÁI XÁC MINH"):
   errors. No summaries that hide failures.
 - After each completed step, state: what was done, what was verified, what
   remains, and any OPEN QUESTIONs.
+- The owner is not a programmer. After every run and before every report,
+  explain the result in simple Vietnamese: what ran, whether it succeeded or
+  failed, what the result means, what remains, and whether the owner must decide
+  anything.
+- Minimize code jargon. Explain any necessary technical term immediately in
+  ordinary language and include one short concrete example when the behavior is
+  difficult to understand.
+- Never assume the owner understands commands, APIs, schemas, tests, branches,
+  commits, pull requests, or other software-development terms.
 - After writing a sprint spec, explain it in plain Vietnamese for an owner who
   does not know how to code: goal, inputs, workflow, outputs, exclusions,
   financial risks, open decisions, and a simple example. Do not implement the

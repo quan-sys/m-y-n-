@@ -110,6 +110,60 @@ OPEN QUESTION: Adjusted-versus-raw price behavior remains unverified until the r
 - The Sprint 3 Definition of Done is successful financial-statement retrieval for ≥ 90% of the universe, with every remaining ticker carrying an explicit `data_status` explanation.
 - No financial statement row may have a missing `available_from`.
 
+### Approved weekly point-in-time selection
+
+- The financial-statement publication lags remain unchanged:
+  `LAG_QUARTER=30`, `LAG_SEMIANNUAL=60`, and `LAG_ANNUAL=90` days.
+- These lags define when a statement is allowed to be used. They do not define
+  how often the pipeline or report runs.
+- The pipeline may run weekly with a run-level `as_of` date.
+- A weekly run may consume only statements where `available_from <= as_of`.
+- If no newer statement is eligible, the run must use the most recent eligible
+  statement and record `NO_NEW_FINANCIAL_REPORT` as the selection explanation.
+- `NO_NEW_FINANCIAL_REPORT` is not a source-data failure. The selected statement
+  keeps `data_status=OK` when its underlying data is valid.
+- A weekly run must never reduce the 30/60/90-day lags to seven days.
+
+### Approved whitelist-normalization gate — currently blocked
+
+- Future normalization may accept only a versioned `REQUIRED_ITEMS` whitelist
+  containing the `item_id` values required by the approved Sprint 4-6 formulas.
+- Duplicate `item_id` values outside `REQUIRED_ITEMS` may remain only in the
+  immutable raw observation and must be identified as
+  `DUPLICATE_ITEM_ID_QUARANTINED`; they must not block an otherwise usable
+  ticker.
+- Normalization must fail only when the intersection between duplicated
+  `item_id` values and `REQUIRED_ITEMS` is non-empty.
+- Financial coverage of at least 90% must be measured by the presence and
+  uniqueness of every `REQUIRED_ITEMS` value, not by accepting every provider
+  row.
+- Do not implement this behavior until the complete whitelist is copied from
+  the approved Sprint 4-6 formula specifications and verified against real API
+  responses.
+- The first minimum plan-derived whitelist check already found two required
+  balance-sheet identifiers used by NOA/SNOA:
+  `short_term_investments` and `preferred_shares`.
+- The 2026-07-15 public VCI check found both identifiers duplicated twice for
+  VNM, HPG, and FPT. Neither identifier was duplicated in VCB, although VCB had
+  other duplicate identifiers outside this minimum confirmed set.
+- Because required identifiers intersect the duplicate set, the owner-approved
+  stop condition is active. Do not complete the whitelist, change normalization,
+  choose a duplicate row, aggregate duplicates, or begin Sprint 4 without a new
+  owner decision.
+- The complete evidence and root-cause analysis are recorded in
+  `docs/SPRINT_3_DUPLICATE_ITEM_ID_INVESTIGATION.md`.
+
+### Proposed provider identifier — not part of the schema
+
+- The preferred resolution is for vnstock/VCI to expose the original stable
+  provider field identifier through a supported public API.
+- A future data-contract proposal may add `provider_item_id` only after a real
+  public-API smoke test proves that it is present, unique, and stable across
+  periods and company types.
+- `provider_item_id` is not approved in the current schema and must not be
+  synthesized from item names, row positions, private methods, or undocumented
+  HTTP endpoints.
+
 ## Data Rules
 
 - Never fabricate financial data.

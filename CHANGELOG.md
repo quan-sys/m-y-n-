@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-07-15
+
+- Recorded the real VCI duplicate-`item_id` investigation for VNM, HPG, FPT,
+  and VCB in `docs/SPRINT_3_DUPLICATE_ITEM_ID_INVESTIGATION.md`.
+- Documented the root cause in pinned `vnstock==4.0.3`: distinct provider fields
+  can collapse to the same normalized English display-name identifier while the
+  supported public output drops the original provider field and parent context.
+- Added the approved weekly point-in-time selection rule: keep the 30/60/90-day
+  lags, select only `available_from <= as_of`, and use
+  `NO_NEW_FINANCIAL_REPORT` as an explanation without changing valid data from
+  `data_status=OK`.
+- Added the approved whitelist-normalization policy and coverage definition, but
+  did not implement them because the minimum confirmed NOA/SNOA required items
+  `short_term_investments` and `preferred_shares` were duplicated for VNM, HPG,
+  and FPT.
+- Recorded that `provider_item_id` remains a proposal only; the schema is
+  unchanged pending a supported public identifier and real smoke verification.
+- Kept Sprint 3 incomplete, the draft PR unmerged, and Sprint 4 not started.
+
 ## 2026-07-14
 
 - Added `src/data/finance_client.py` on the public `vnstock.api.Finance`
