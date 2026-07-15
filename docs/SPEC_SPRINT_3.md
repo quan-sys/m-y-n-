@@ -124,45 +124,111 @@ OPEN QUESTION: Adjusted-versus-raw price behavior remains unverified until the r
   keeps `data_status=OK` when its underlying data is valid.
 - A weekly run must never reduce the 30/60/90-day lags to seven days.
 
-### Approved whitelist-normalization gate — currently blocked
+### Approved whitelist normalization design — implementation requires review
 
 - Future normalization may accept only a versioned `REQUIRED_ITEMS` whitelist
   containing the `item_id` values required by the approved Sprint 4-6 formulas.
-- Duplicate `item_id` values outside `REQUIRED_ITEMS` may remain only in the
-  immutable raw observation and must be identified as
-  `DUPLICATE_ITEM_ID_QUARANTINED`; they must not block an otherwise usable
-  ticker.
-- Normalization must fail only when the intersection between duplicated
-  `item_id` values and `REQUIRED_ITEMS` is non-empty.
-- Financial coverage of at least 90% must be measured by the presence and
-  uniqueness of every `REQUIRED_ITEMS` value, not by accepting every provider
-  row.
-- Do not implement this behavior until the complete whitelist is copied from
-  the approved Sprint 4-6 formula specifications and verified against real API
-  responses.
-- The first minimum plan-derived whitelist check already found two required
-  balance-sheet identifiers used by NOA/SNOA:
-  `short_term_investments` and `preferred_shares`.
-- The 2026-07-15 public VCI check found both identifiers duplicated twice for
-  VNM, HPG, and FPT. Neither identifier was duplicated in VCB, although VCB had
-  other duplicate identifiers outside this minimum confirmed set.
-- Because required identifiers intersect the duplicate set, the owner-approved
-  stop condition is active. Do not complete the whitelist, change normalization,
-  choose a duplicate row, aggregate duplicates, or begin Sprint 4 without a new
-  owner decision.
-- The complete evidence and root-cause analysis are recorded in
-  `docs/SPRINT_3_DUPLICATE_ITEM_ID_INVESTIGATION.md`.
+- Duplicate `item_id` values outside `REQUIRED_ITEMS` remain only in the
+  immutable raw observation with `DUPLICATE_ITEM_ID_QUARANTINED`; they do not
+  block an otherwise usable ticker.
+- Coverage of at least 90% is measured by the presence and uniqueness of every
+  required item after the approved disambiguation rules run, not by accepting
+  every provider row.
+- The real-number evidence is preserved in
+  `docs/VERIFY_DUP_ITEMS_SPRINT_3.md`. It supports the following two narrow,
+  value-based rules in principle. This specification amendment does not
+  authorize implementation until the owner reviews and explicitly approves the
+  diff.
 
-### Proposed provider identifier — not part of the schema
+#### Named configuration values
 
-- The preferred resolution is for vnstock/VCI to expose the original stable
-  provider field identifier through a supported public API.
-- A future data-contract proposal may add `provider_item_id` only after a real
-  public-API smoke test proves that it is present, unique, and stable across
-  periods and company types.
-- `provider_item_id` is not approved in the current schema and must not be
-  synthesized from item names, row positions, private methods, or undocumented
-  HTTP endpoints.
+The implementation must read these values from configuration; none may be
+hard-coded in source:
+
+```text
+IDENTITY_TOL=0.01
+IDENTITY_MIN_PERIODS=3
+IDENTITY_MARGIN=5.0
+```
+
+- `IDENTITY_TOL` is a relative-error fraction, so `0.01` means 1%.
+- `IDENTITY_MIN_PERIODS` is the minimum number of available periods that must
+  individually pass the tolerance.
+- `IDENTITY_MARGIN` is the minimum separation between the winning combination's
+  mean error and every rejected combination's mean error.
+- The implementation-stage change must place these settings in the approved
+  project configuration and record the reason in `CHANGELOG.md`.
+
+#### Rule A — identity-based selection for duplicated current-asset items
+
+- Apply this rule only when `short_term_investments` and/or
+  `other_current_assets` has duplicate candidate rows.
+- Build every candidate combination from one reported
+  `short_term_investments` row and one reported `other_current_assets` row. A
+  non-duplicated side contributes its single reported row.
+- Do not sum duplicate candidates. Do not use row position, source order,
+  `item`, or `item_en` to select a candidate.
+- For each available period and candidate combination, calculate:
+
+```text
+rhs = cash_and_cash_equivalents
+    + short_term_investments_candidate
+    + accounts_receivable
+    + inventories
+    + other_current_assets_candidate
+
+identity_error = abs(current_assets - rhs) / abs(current_assets)
+```
+
+- A period is available for this rule only when `current_assets` is non-zero and
+  every aggregate input and both candidate values are numeric source values.
+  Missing values remain missing; the rule must not convert `NaN` to zero.
+- Score each candidate combination by its mean `identity_error` across all
+  periods available for that combination. The candidate with the smallest mean
+  error is the provisional winner.
+- Accept exactly one provisional winner only when both conditions hold:
+  1. Its per-period `identity_error` is `<= IDENTITY_TOL` in at least
+     `IDENTITY_MIN_PERIODS` available periods.
+  2. Every rejected combination's mean error is at least
+     `IDENTITY_MARGIN` times the winner's mean error.
+- A tie is ambiguous. If the winning mean error is zero, the margin condition
+  passes only when every rejected combination has a strictly positive mean
+  error; another zero-error combination is a tie.
+- Success retains only the resolved required candidates for normalized use,
+  records `DUPLICATE_RESOLVED_BY_IDENTITY`, and logs every candidate's
+  per-period and mean errors.
+- Failure must not select any candidate. Record `REQUIRED_ITEM_AMBIGUOUS`, retain
+  the raw observation, quarantine that statement for required-item coverage,
+  and exclude the ticker from the coverage numerator without removing it from
+  the universe files.
+
+#### Rule B — duplicated `preferred_shares`
+
+- Among duplicated `preferred_shares` candidates, discard only candidates that
+  are `NaN` in every returned period. This removes an uninformative field; it is
+  not permission to convert `NaN` to zero.
+- If exactly one candidate remains, use it and record
+  `DUPLICATE_RESOLVED_NON_NAN`.
+- If zero or more than one candidate remains, do not select a value. Record
+  `REQUIRED_ITEM_AMBIGUOUS`, retain the raw observation, quarantine that
+  statement for required-item coverage, and exclude the ticker from the
+  coverage numerator without removing it from the universe files.
+- If the resolved candidate is greater than zero in any period, also record
+  `PREFERRED_POSITIVE_REVIEW`. Every such ticker requires owner inspection.
+
+#### Resolution evidence and schema boundary
+
+- `DUPLICATE_RESOLVED_BY_IDENTITY`, `DUPLICATE_RESOLVED_NON_NAN`,
+  `REQUIRED_ITEM_AMBIGUOUS`, `PREFERRED_POSITIVE_REVIEW`, candidate values, and
+  identity errors must be retained in observation metadata and fetch-status
+  explanations for audit.
+- These flags do not add `provider_item_id` or authorize another new normalized
+  financial-row column in this spec-review step.
+- `provider_item_id` remains outside the approved schema. It must not be
+  synthesized from names, row positions, private methods, or undocumented HTTP
+  endpoints.
+- The implementation must preserve the original raw observation before either
+  rule runs.
 
 ## Data Rules
 
@@ -187,7 +253,10 @@ OPEN QUESTION: Adjusted-versus-raw price behavior remains unverified until the r
 - The verified VNM current-assets example is 38,757,016,956,726 VND for 2026-Q1; it is a sanity reference, not a hard-coded production value.
 - Null values remain null and carry the correct status.
 - Negative values remain negative when supplied by the source.
-- Duplicate tidy keys are a validation failure and must not be silently summed.
+- Duplicate tidy keys must never be silently summed. Outside `REQUIRED_ITEMS`
+  they are quarantined in raw evidence. Duplicated required items may proceed
+  only through Rule A or Rule B; an unresolved case is
+  `REQUIRED_ITEM_AMBIGUOUS` and produces no normalized required-item selection.
 - Raw cached responses are immutable evidence for the fetch date.
 - Re-fetching may create a new dated cache observation; it must not rewrite an earlier observation as though the new restated value were historically known.
 - API credentials, tokens, cookies, and local authentication files must never be written to logs, fixtures, snapshots, docs, commits, or GitHub.
@@ -287,7 +356,25 @@ in cache or run metadata documented by `data_contract.md` v2.
 - Add fixture coverage for all three statement types and both quarterly and yearly period modes.
 - Verify LONG-to-tidy normalization preserves `item_id` and does not use names as keys.
 - Verify missing `item_id` fails honestly.
-- Verify duplicate tidy keys fail rather than aggregate silently.
+- After separate owner approval of this spec, add fixture tests using the
+  verbatim VNM, HPG, and FPT values in
+  `docs/VERIFY_DUP_ITEMS_SPRINT_3.md`; pytest must not call the real API.
+- Verify Rule A evaluates every value-based candidate combination, logs all
+  per-period and mean identity errors, and never uses row position or labels.
+- Verify Rule A resolves the approved VNM/HPG/FPT fixtures under
+  `IDENTITY_TOL=0.01`, `IDENTITY_MIN_PERIODS=3`, and
+  `IDENTITY_MARGIN=5.0`.
+- Verify an ambiguous candidate set produces `REQUIRED_ITEM_AMBIGUOUS` and no
+  selection.
+- Verify failure of the identity-margin condition produces
+  `REQUIRED_ITEM_AMBIGUOUS` and no selection.
+- Verify Rule B discards only all-period-`NaN` candidates without converting
+  missing values to zero.
+- Verify Rule B records `DUPLICATE_RESOLVED_NON_NAN` only when exactly one
+  candidate remains and records `PREFERRED_POSITIVE_REVIEW` when any resolved
+  period is positive.
+- Verify duplicate tidy keys outside `REQUIRED_ITEMS` are quarantined rather
+  than aggregated and do not block the ticker.
 - Verify `LAG_QUARTER=30`, `LAG_SEMIANNUAL=60`, and `LAG_ANNUAL=90` produce the expected `available_from` dates from hand-computed fixture dates.
 - Verify no normalized row has a missing `available_from`.
 - Verify missing values remain missing with `MISSING_DATA`.
@@ -312,6 +399,20 @@ in cache or run metadata documented by `data_contract.md` v2.
 - Do not copy the comparison site's displayed unit without converting it back to raw VND for an apples-to-apples comparison.
 - Inspect the first dated universe snapshot and compare it with the latest `data/universe.csv` and `data/universe_rejects.csv` from the same run.
 - Inspect the coverage summary and require successful retrieval for ≥ 90% of the universe before declaring the Sprint 3 implementation complete.
+- After fixture tests pass, run a separate one-off live validation script on
+  VNM, HPG, FPT, VCB, and 20 randomly sampled `ACCEPTED` non-financial,
+  non-UPCoM tickers.
+- The live validation sample must use a fixed seed and print the exact sampled
+  ticker list. It must not run under pytest.
+- For every validation ticker, report resolved versus ambiguous status, all
+  identity errors, and the resolved preferred-share value or honest absence.
+- Preserve verbatim real numbers and add the simple Vietnamese summary required
+  by `AGENTS.md`.
+- If the sample resolves cleanly, recompute Sprint 3 coverage using complete,
+  unique `REQUIRED_ITEMS`. If coverage is below 90%, stop and report; do not tune
+  any threshold.
+- Any later tolerance change requires owner approval and a `CHANGELOG.md` entry
+  stating the reason.
 - If Python or dependencies are unavailable, report the exact failure; do not claim that `py_compile`, `pytest`, or the real run passed.
 
 ## Must NOT Include
@@ -331,6 +432,11 @@ in cache or run metadata documented by `data_contract.md` v2.
 - `FINANCIAL_SECTOR_EXCLUDED` and `UPCOM_EXCLUDED_V1` belong to Sprint 4.
 - No changes to the acceptance logic of the current universe builder.
 - No semantic force-normalization of banks, insurers, securities companies, and non-financial companies.
+- No summing duplicate candidates.
+- No first-row, last-row, ordinal, or source-position selection.
+- No use of `item` or `item_en` as a key or tie-breaker.
+- No threshold tuning without owner approval and a documented reason.
+- No `provider_item_id` in the normalized schema.
 - No use of the corrupted `ratio` endpoint.
 - No undocumented direct provider HTTP calls.
 - No use of private vnstock methods as production interfaces.
