@@ -2,6 +2,23 @@
 
 ## 2026-07-16
 
+- Corrected Rule A's production identity input from gross `inventories` to the
+  spec-approved `inventories_net`. This is an accounting bug fix: current
+  assets contain inventory after its loss provision, and the cached rows prove
+  `inventories + provision_for_decline_in_inventories = inventories_net`.
+  `IDENTITY_TOL=0.01`, `IDENTITY_MIN_PERIODS=3`, `IDENTITY_MARGIN=5.0`, and
+  `DUP_MATERIALITY_EPS=0.01` are unchanged.
+- Recomputed rather than forced the affected fixture expectations. Mean
+  absolute inventory provision as a share of current assets is C32 2.8249%,
+  VCS 1.2388%, PVC 2.3986%, DRC 0.3106%, TLH 1.3393%, CTF 0.1550%, VHC
+  1.7733%, and HT1 0.5329%. With net inventory, each cached identity winner is
+  exact across all four periods and its different-STI rival remains positive,
+  so these cases now exercise the unchanged per-item margin path. The cached
+  report records the before/after errors and provision values verbatim.
+- Added the cache-only 40-ticker `REQUIRED_ITEMS` v1 verification report and
+  CSV evidence. The run performs no network calls, records uncached statements
+  as absence of cached evidence rather than provider absence, and stops before
+  the full-universe >=90% gate.
 - Added the owner-mentor-delivered, versioned `REQUIRED_ITEMS` v1 spec constant
   exactly as supplied: 18 balance-sheet, 10 income-statement, and 3 cash-flow
   `item_id` values. No mapping was re-derived from display names.

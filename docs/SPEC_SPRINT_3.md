@@ -518,12 +518,14 @@ in cache or run metadata documented by `data_contract.md` v2.
 - Verify Rule A resolves the approved VNM/HPG/FPT fixtures under
   `IDENTITY_TOL=0.01`, `IDENTITY_MIN_PERIODS=3`, and
   `IDENTITY_MARGIN=5.0`.
-- Add fixture cases copied from the 24-ticker live report: VNM and HDG must
-  resolve through the per-item margin; HID must resolve through identical-row
-  verification; DRC, TLH, and CTF resolve through immaterial difference only
-  when their verbatim values satisfy `DUP_MATERIALITY_EPS=0.01`; C32, VCS, and
-  PVC must remain `REQUIRED_ITEM_AMBIGUOUS` because their best identity fit
-  misses the unchanged tolerance.
+- Add fixture cases copied from the cached validation evidence: VNM and HDG
+  resolve through the per-item margin; HID resolves through identical-row
+  verification. The earlier gross-inventory fixture expectations are replaced
+  by a mechanical rerun with the accounting-correct `inventories_net` input.
+  DRC, TLH, CTF, C32, VCS, PVC, VHC, and HT1 may resolve only when their cached
+  values pass the unchanged tolerance and per-item 5x margin, or Rule R3. Tests
+  must assert the recomputed path and must not preserve or force a historical
+  status.
 - Verify a same-`X` combination with a different other-current-asset row is not
   treated as `rival_X`.
 - Verify identical duplicate comparisons treat `NaN` as equal only to `NaN`,

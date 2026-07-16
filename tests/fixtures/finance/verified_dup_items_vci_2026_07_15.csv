@@ -4,7 +4,7 @@ VNM,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_e
 VNM,Đầu tư ngắn hạn,Short-term investments,short_term_investments,23002417266337,21354863600460,21133947314899,22249418458587
 VNM,Đầu tư ngắn hạn,Short-term investments,short_term_investments,1282326057,1288677349,1292048421,1284915430
 VNM,Các khoản phải thu,Accounts receivable,accounts_receivable,5591443574678,6027719081073,5910568513570,6147236082985
-VNM,Hàng tồn kho,Inventories,inventories,7443662303421,6897878201557,6348324750984,7090237799909
+VNM,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,7399150703886,6839279842936,6308583334358,7047730548255
 VNM,Tài sản lưu động khác,Other current assets,other_current_assets,357436468461,244438664693,239285283586,312263329207
 VNM,Tài sản lưu động khác,Other current assets,other_current_assets,0,0,0,0
 VNM,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
@@ -14,7 +14,7 @@ HPG,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_e
 HPG,Đầu tư ngắn hạn,Short-term investments,short_term_investments,24267452864302,19484412761405,18903949054642,17584027436423
 HPG,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0,0,0,0
 HPG,Các khoản phải thu,Accounts receivable,accounts_receivable,16692782771439,15042323117690,13727194725111,12334925649801
-HPG,Hàng tồn kho,Inventories,inventories,43571823623004,52892273238885,45675711221795,48900263257832
+HPG,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,43515585272210,52828227344442,45623656431728,48853408114115
 HPG,Tài sản lưu động khác,Other current assets,other_current_assets,7993939737022,8003549231982,8078625164686,8153519460938
 HPG,Tài sản lưu động khác,Other current assets,other_current_assets,0,0,0,0
 HPG,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
@@ -24,7 +24,7 @@ FPT,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_e
 FPT,Đầu tư ngắn hạn,Short-term investments,short_term_investments,18751535880407,29630986737440,27125585559832,26619399709978
 FPT,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0,0,0,0
 FPT,Các khoản phải thu,Accounts receivable,accounts_receivable,12347990314058,14402017450105,13077014449004,12525313635530
-FPT,Hàng tồn kho,Inventories,inventories,1163844658543,2277393610177,2134346913983,2157814116939
+FPT,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,1094571460159,2193769802339,2050315910017,2074111218172
 FPT,Tài sản lưu động khác,Other current assets,other_current_assets,1340197793854,1388558535032,1526548213325,1472724433925
 FPT,Tài sản lưu động khác,Other current assets,other_current_assets,0,0,0,0
 FPT,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,

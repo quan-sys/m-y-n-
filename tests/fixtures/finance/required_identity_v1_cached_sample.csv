@@ -1,0 +1,111 @@
+ticker,raw_index,item,item_en,item_id,2026-Q1,2025-Q4,2025-Q3,2025-Q2
+VNM,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,38757016956726.0,36261180908033.0,38746850813464.0,38255091705279.0
+VNM,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,2077596293461.0,1794879718871.0,5154466367051.0,2498443286245.0
+VNM,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,23002417266337.0,21354863600460.0,21133947314899.0,22249418458587.0
+VNM,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,1282326057.0,1288677349.0,1292048421.0,1284915430.0
+VNM,7,Các khoản phải thu,Accounts receivable,accounts_receivable,5591443574678.0,6027719081073.0,5910568513570.0,6147236082985.0
+VNM,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,7399150703886.0,6839279842936.0,6308583334358.0,7047730548255.0
+VNM,17,Tài sản lưu động khác,Other current assets,other_current_assets,357436468461.0,244438664693.0,239285283586.0,312263329207.0
+VNM,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+VNM,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+VNM,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+HDG,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,3485552998996.0,3621267664514.0,3237267157740.0,2970525103454.0
+HDG,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,290014872498.0,265730670677.0,243271470988.0,330030990708.0
+HDG,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,1312238150107.0,1147638951603.0,967267448085.0,757629661019.0
+HDG,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,900492934250.0,629907434246.0,584227448085.0,564629661019.0
+HDG,7,Các khoản phải thu,Accounts receivable,accounts_receivable,1058057879715.0,1395850688077.0,1203412599934.0,1067036169208.0
+HDG,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,772356434474.0,768889297109.0,781472681383.0,773936116996.0
+HDG,17,Tài sản lưu động khác,Other current assets,other_current_assets,52885662202.0,43158057048.0,41842957350.0,41892165523.0
+HDG,21,Tài sản lưu động khác,Other current assets,other_current_assets,1501200.0,0.0,0.0,0.0
+HDG,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+HDG,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+HID,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,621145966638.0,624421670865.0,706164502047.0,278611896228.0
+HID,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,10037381248.0,16382823455.0,24795659619.0,48340131184.0
+HID,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+HID,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+HID,7,Các khoản phải thu,Accounts receivable,accounts_receivable,600003592234.0,597740591045.0,675994439595.0,201047438774.0
+HID,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,6018909951.0,6057266347.0,4487406435.0,24347489701.0
+HID,17,Tài sản lưu động khác,Other current assets,other_current_assets,5086083205.0,4240990018.0,886996398.0,4876836569.0
+HID,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+HID,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+HID,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+DRC,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,2624028550753.0,2824428345048.0,2737472574746.0,2934387930191.0
+DRC,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,54436391037.0,208355557908.0,75346342563.0,90488681039.0
+DRC,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,50000000000.0,0.0,0.0,0.0
+DRC,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+DRC,7,Các khoản phải thu,Accounts receivable,accounts_receivable,1002590064610.0,981975890114.0,1204362959165.0,1198217300803.0
+DRC,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,1294559409529.0,1400548546392.0,1173536704296.0,1329871952478.0
+DRC,17,Tài sản lưu động khác,Other current assets,other_current_assets,222442685577.0,233548350634.0,284226568722.0,315809995871.0
+DRC,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+DRC,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+DRC,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+TLH,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,2178367066450.0,2376975572390.0,2290723493681.0,2713982037758.0
+TLH,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,59120277599.0,20863874383.0,37497801330.0,97071327037.0
+TLH,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,43260405651.0,52214691131.0,73160283775.0,70385687200.0
+TLH,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,28244899730.0,45260996457.0,44189096716.0,38476517373.0
+TLH,7,Các khoản phải thu,Accounts receivable,accounts_receivable,378891963523.0,421552628519.0,422106557040.0,425137354048.0
+TLH,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,1636117052181.0,1814973913799.0,1705040696734.0,2044777241097.0
+TLH,17,Tài sản lưu động khác,Other current assets,other_current_assets,60977367496.0,67370464558.0,52918154802.0,76610428376.0
+TLH,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+TLH,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+TLH,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+CTF,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,2877632271240.0,2988596058799.0,3031323629689.0,3032020239624.0
+CTF,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,96771036258.0,165517214598.0,88894810963.0,68809956447.0
+CTF,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,10400000000.0,10400000000.0,0.0,0.0
+CTF,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+CTF,7,Các khoản phải thu,Accounts receivable,accounts_receivable,1829472123376.0,1897819905182.0,2005872179978.0,2104466914825.0
+CTF,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,902074826737.0,881228562600.0,890093545317.0,819549219163.0
+CTF,17,Tài sản lưu động khác,Other current assets,other_current_assets,38914284869.0,33630376419.0,46463093431.0,39194149189.0
+CTF,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+CTF,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+CTF,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+C32,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,346966070758.0,388540736004.0,313848894104.0,296897612947.0
+C32,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,46757382299.0,83712389084.0,64364640208.0,50636554427.0
+C32,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,91727604618.0,88217639318.0,44871933943.0,49714024843.0
+C32,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,54954767988.0,50385142928.0,49815968853.0,53831031055.0
+C32,7,Các khoản phải thu,Accounts receivable,accounts_receivable,79804832947.0,102902926622.0,80822278105.0,71195427439.0
+C32,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,121189279414.0,111597481643.0,119855668673.0,120160678967.0
+C32,17,Tài sản lưu động khác,Other current assets,other_current_assets,7486971480.0,2110299337.0,3934373175.0,5190927271.0
+C32,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+C32,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+C32,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+VCS,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,5175140799511.0,4803940768233.0,5989396864899.0,5607540396282.0
+VCS,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,798532997423.0,1087616933015.0,2006470091037.0,1846739651857.0
+VCS,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,1383500000000.0,588000000000.0,868000000000.0,768000000000.0
+VCS,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+VCS,7,Các khoản phải thu,Accounts receivable,accounts_receivable,1269646148964.0,1371102259035.0,1354989546805.0,1433183675014.0
+VCS,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,1530217659426.0,1588139976446.0,1611158968549.0,1461758034496.0
+VCS,17,Tài sản lưu động khác,Other current assets,other_current_assets,193243993698.0,169081599737.0,148778258508.0,97859034915.0
+VCS,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+VCS,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+VCS,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+PVC,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,2387143540582.0,2664373763173.0,2392332838013.0,2053921463661.0
+PVC,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,205105199851.0,190410177764.0,194081489992.0,197573649043.0
+PVC,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,202212900000.0,230912900000.0,245900000000.0,212550000000.0
+PVC,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+PVC,7,Các khoản phải thu,Accounts receivable,accounts_receivable,1481741056992.0,1746567466065.0,1519048264853.0,1183273540777.0
+PVC,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,479540056044.0,482487184831.0,419101318878.0,446144526591.0
+PVC,17,Tài sản lưu động khác,Other current assets,other_current_assets,18544327695.0,13996034513.0,14201764290.0,14379747250.0
+PVC,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+PVC,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+PVC,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+VHC,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,9682981516659.0,9321970265394.0,9495012256535.0,8733341549605.0
+VHC,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,2093771897470.0,2008261260343.0,1678417812091.0,1147531700332.0
+VHC,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,1943169708793.0,2377483974663.0,2699749641625.0,2071899866718.0
+VHC,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,44471156119.0,44471156119.0,24029181119.0,158814866782.0
+VHC,7,Các khoản phải thu,Accounts receivable,accounts_receivable,2624054771738.0,1984670923966.0,2213317710161.0,2229482839541.0
+VHC,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,2883391131367.0,2784994459066.0,2728134706368.0,3085743367554.0
+VHC,17,Tài sản lưu động khác,Other current assets,other_current_assets,138594007291.0,166559647356.0,175392386290.0,198683775460.0
+VHC,21,Tài sản lưu động khác,Other current assets,other_current_assets,5000000.0,0.0,0.0,0.0
+VHC,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+VHC,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0
+HT1,0,TÀI SẢN NGẮN HẠN,CURRENT ASSETS,current_assets,2098682875923.0,1657313551722.0,2132295894049.0,2035520064646.0
+HT1,1,Tiền và tương đương tiền,Cash and cash equivalents,cash_and_cash_equivalents,562315022832.0,518180034470.0,792365073448.0,901995675046.0
+HT1,4,Đầu tư ngắn hạn,Short-term investments,short_term_investments,117729476303.0,17729476303.0,17566483292.0,17014852499.0
+HT1,5,Đầu tư ngắn hạn,Short-term investments,short_term_investments,0.0,0.0,0.0,0.0
+HT1,7,Các khoản phải thu,Accounts receivable,accounts_receivable,675661327825.0,308389614241.0,557772372662.0,342249139712.0
+HT1,14,"Hàng tồn kho, ròng","Inventories, Net",inventories_net,640329036323.0,682597019484.0,670248048634.0,693340017122.0
+HT1,17,Tài sản lưu động khác,Other current assets,other_current_assets,102648012640.0,130417407224.0,94343916013.0,80920380267.0
+HT1,21,Tài sản lưu động khác,Other current assets,other_current_assets,0.0,0.0,0.0,0.0
+HT1,94,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,,,,
+HT1,113,Cổ phiếu ưu đãi,Preferred shares,preferred_shares,0.0,0.0,0.0,0.0

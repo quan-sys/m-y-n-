@@ -86,7 +86,7 @@ _SECRET_PATTERNS = [
 IDENTITY_INPUTS = (
     "cash_and_cash_equivalents",
     "accounts_receivable",
-    "inventories",
+    "inventories_net",
     "current_assets",
 )
 IDENTITY_CANDIDATES = ("short_term_investments", "other_current_assets")
@@ -803,7 +803,7 @@ def resolve_duplicate_items(
                             work.at[base_indices["cash_and_cash_equivalents"], period],
                             work.at[sti_index, period],
                             work.at[base_indices["accounts_receivable"], period],
-                            work.at[base_indices["inventories"], period],
+                            work.at[base_indices["inventories_net"], period],
                             work.at[other_index, period],
                         ]
                     ),

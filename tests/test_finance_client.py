@@ -27,7 +27,6 @@ from src.data.finance_client import (
 
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "finance"
-LIVE_VALIDATION_REPORT = Path(__file__).resolve().parents[1] / "docs" / "VALIDATE_DUP_RESOLUTION_SPRINT_3.md"
 
 
 class FixtureFinanceClient(FinanceClient):
@@ -87,21 +86,10 @@ def verified_duplicate_shapes() -> dict[str, pd.DataFrame]:
 
 
 def validation_report_shape(ticker: str) -> pd.DataFrame:
-    """Read verbatim saved raw rows; this fixture path never calls vnstock."""
-    lines = LIVE_VALIDATION_REPORT.read_text(encoding="utf-8").splitlines()
-    start = lines.index(f"## {ticker}")
-    table_start = lines.index("### Verbatim relevant raw rows", start)
-    rows: list[list[str]] = []
-    for line in lines[table_start + 4 :]:
-        if not line.startswith("|"):
-            break
-        rows.append([cell.strip() for cell in line.strip("|").split("|")])
-    columns = ["raw_index", "item", "item_en", "item_id", "2026-Q1", "2025-Q4", "2025-Q3", "2025-Q2"]
-    frame = pd.DataFrame(rows, columns=columns)
-    frame["raw_index"] = frame["raw_index"].astype(int)
-    for period in columns[4:]:
-        frame[period] = pd.to_numeric(frame[period].replace("NaN", pd.NA), errors="coerce")
-    return frame.set_index("raw_index")
+    """Read verbatim cached identity rows; this fixture never calls vnstock."""
+    frame = pd.read_csv(FIXTURES / "required_identity_v1_cached_sample.csv")
+    selected = frame.loc[frame["ticker"].eq(ticker)].drop(columns="ticker").copy()
+    return selected.set_index("raw_index")
 
 
 def test_long_shape_normalizes_to_required_tidy_schema(long_shape):
@@ -395,6 +383,7 @@ def test_client_reports_ambiguous_statement_without_api_error(
     verified_duplicate_shapes, tmp_path
 ):
     ambiguous = validation_report_shape("C32")
+    ambiguous = ambiguous.loc[~ambiguous["item_id"].eq("inventories_net")].copy()
     client = FixtureFinanceClient(ambiguous, tmp_path, use_cache=False)
 
     result = client.get_balance_sheet("C32", "quarter", company_type="NON_FINANCIAL")
@@ -469,46 +458,31 @@ def test_hid_resolves_identical_rows_from_saved_live_report():
     assert "DUPLICATE_VERIFIED_IDENTICAL" in result.attrs["duplicate_resolution"]["flags"]
 
 
-@pytest.mark.parametrize("ticker", ["DRC", "TLH", "CTF"])
-def test_saved_live_rows_use_immaterial_path_only_when_they_qualify(ticker):
+@pytest.mark.parametrize(
+    "ticker",
+    ["DRC", "TLH", "CTF", "C32", "VCS", "PVC", "VHC", "HT1"],
+)
+def test_cached_rows_resolve_mechanically_with_net_inventory(ticker):
     result = normalize_financial_statement(
         validation_report_shape(ticker), ticker=ticker,
         statement_type=STATEMENT_BALANCE_SHEET, company_type="NON_FINANCIAL",
         source="saved_live_validation_2026_07_15", as_of="2026-07-15"
     )
     audit = result.attrs["duplicate_resolution"]
-    materiality_events = [
-        event for event in audit["events"] if event.get("flag") == "DUPLICATE_MATERIALITY_CHECK"
+    margin_events = [
+        event
+        for event in audit["events"]
+        if event.get("flag") == "IDENTITY_PER_ITEM_MARGIN"
     ]
 
-    assert materiality_events
-    qualifies = all(
-        event["maximum_relative_difference"] is not None
-        and event["maximum_relative_difference"] <= 0.01
-        for event in materiality_events
-    )
-    if qualifies:
-        assert not result.empty
-        assert "DUPLICATE_RESOLVED_IMMATERIAL" in audit["flags"]
-    else:
-        assert result.empty
-        assert "REQUIRED_ITEM_AMBIGUOUS" in audit["flags"]
-
-
-@pytest.mark.parametrize("ticker", ["C32", "VCS", "PVC"])
-def test_saved_poor_identity_fits_remain_ambiguous(ticker):
-    result = normalize_financial_statement(
-        validation_report_shape(ticker), ticker=ticker,
-        statement_type=STATEMENT_BALANCE_SHEET, company_type="NON_FINANCIAL",
-        source="saved_live_validation_2026_07_15", as_of="2026-07-15"
-    )
-
-    assert result.empty
-    assert "REQUIRED_ITEM_AMBIGUOUS" in result.attrs["duplicate_resolution"]["flags"]
-    assert any(
-        event.get("reason") == "identity tolerance not met"
-        for event in result.attrs["duplicate_resolution"]["events"]
-    )
+    assert not result.empty
+    assert not audit["ambiguous"]
+    assert "DUPLICATE_RESOLVED_BY_IDENTITY" in audit["flags"]
+    assert "DUPLICATE_RESOLVED_IMMATERIAL" not in audit["flags"]
+    assert margin_events
+    assert all(event["passed"] is True for event in margin_events)
+    assert all(event["winner_mean_error"] == 0 for event in margin_events)
+    assert all(event["rival_mean_error"] > 0 for event in margin_events)
 
 
 def test_named_identity_thresholds_are_loaded_from_config():

@@ -17,3 +17,9 @@ API shape check. Unit tests never call the live API.
 quarterly values recorded in `docs/VERIFY_DUP_ITEMS_SPRINT_3.md`, plus the
 identity-input rows from the same public VCI responses re-read on 2026-07-15.
 It is saved evidence only; pytest never calls the API.
+
+`required_identity_v1_cached_sample.csv` contains the verbatim identity rows
+from the frozen 40-ticker validation raw cache for VNM, HDG, HID, DRC, TLH,
+CTF, C32, VCS, PVC, VHC, and HT1. It includes the owner-approved
+`inventories_net` input; pytest reads this file offline and never calls the
+API.
