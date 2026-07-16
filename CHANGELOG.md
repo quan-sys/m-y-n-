@@ -2,6 +2,16 @@
 
 ## 2026-07-16
 
+- Ran the owner-approved controlled live validation on 12 existing `ACCEPTED`
+  non-financial sample tickers: FPT, CSM, DVP, C32, VOS, PHR, DP3, DHC, DRC,
+  VCS, TLH, and HID. All 36 quarterly statement requests were fresh public VCI
+  fetches with 2.8-3.6 second polite sleeps and were cached by content hash.
+- Verified all 156 ticker-item checks for the 10 income-statement and 3
+  cash-flow `REQUIRED_ITEMS` v1 fields are present and unique in the live raw
+  responses. Across all three statements, all 372 ticker-item checks are
+  `PRESENT_UNIQUE`; there are no missing or newly duplicated required items.
+  The full-universe coverage job, thresholds, Sprint 4, and PR merge remain
+  untouched pending owner review.
 - Corrected Rule A's production identity input from gross `inventories` to the
   spec-approved `inventories_net`. This is an accounting bug fix: current
   assets contain inventory after its loss provision, and the cached rows prove
