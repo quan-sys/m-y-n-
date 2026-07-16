@@ -341,6 +341,10 @@ def main() -> int:
                 "resolved_preferred_shares": _resolved_values(
                     balance_normalized, "preferred_shares"
                 ),
+                "cached_statements": {
+                    statement_type: _cached_raw(ticker, statement_type)[0] is not None
+                    for statement_type in REQUIRED_ITEMS
+                },
             }
         )
         helper_source = _source_rows(raw_balance, HELPER_ITEM)
@@ -454,12 +458,14 @@ def main() -> int:
         )
 
     ticker_lines = [
-        "| ticker | scope | balance Rule A/B status | path | identity mean error | identity errors by period | resolved STI | resolved preferred |",
-        "| --- | --- | --- | --- | ---: | --- | --- | --- |",
+        "| ticker | scope | cached statements | balance Rule A/B status | path | identity mean error | identity errors by period | resolved STI | resolved preferred |",
+        "| --- | --- | --- | --- | --- | ---: | --- | --- | --- |",
     ]
     for row in ticker_rows:
         ticker_lines.append(
-            f"| {row['ticker']} | {row['scope']} | {row['balance_rule_status']} | "
+            f"| {row['ticker']} | {row['scope']} | "
+            f"`{_compact_json(row.get('cached_statements'))}` | "
+            f"{row['balance_rule_status']} | "
             f"{row.get('resolution_path', '')} | "
             f"{'' if row.get('identity_mean_error') is None else format(row['identity_mean_error'], '.12%')} | "
             f"`{_compact_json(row.get('identity_period_errors'))}` | "
@@ -509,7 +515,7 @@ def main() -> int:
             "",
             "## Tóm tắt đơn giản cho chủ project",
             "",
-            f"- Đã đọc lại dữ liệu đã lưu của đúng 40 mã, không tải rộng từ mạng. Phần kiểm tra bảng cân đối chạy thành công cho {resolved_balances}/39 mã phi tài chính; VCB là ngân hàng nên chỉ kiểm tra có dữ liệu thô.",
+            f"- Đã đọc lại dữ liệu đã lưu của đúng 40 mã, không tải rộng từ mạng. Phần kiểm tra bảng cân đối chạy thành công cho {resolved_balances}/39 mã phi tài chính; VCB là ngân hàng và đã có đủ ba báo cáo thô trong cache (cân đối, thu nhập, luồng tiền).",
             f"- Cả {comparison_resolved}/7 mã từng bị cách ly nay tự vượt quy tắc khi dùng hàng tồn kho ròng. Không mã nào được ép qua và không ngưỡng nào bị đổi.",
             "- Ví dụ: nếu hàng tồn kho gộp là 100 và dự phòng là -3 thì tài sản ngắn hạn chỉ chứa 97. Dùng 100 làm phép cộng sẽ tạo sai số giả 3; sửa sang 97 làm đẳng thức khớp đúng.",
             f"- Có {missing_statement_count} báo cáo thu nhập/luồng tiền của mẫu chưa nằm trong bộ nhớ đệm. Các mục thuộc những báo cáo đó được ghi `MISSING` kèm lý do `STATEMENT_NOT_CACHED_NOT_PROVIDER_MISSING`; điều này không có nghĩa nhà cung cấp chắc chắn thiếu dữ liệu.",
