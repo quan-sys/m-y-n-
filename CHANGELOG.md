@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-07-16
+
+- Added the owner-mentor-delivered, versioned `REQUIRED_ITEMS` v1 spec constant
+  exactly as supplied: 18 balance-sheet, 10 income-statement, and 3 cash-flow
+  `item_id` values. No mapping was re-derived from display names.
+- Documented mandatory `other_current_assets` and optional
+  `held_to_maturity_investment` as fetch helpers outside formula coverage;
+  missing the mandatory helper makes Rule A ambiguous rather than guessable.
+- Limited whitelist completeness coverage to `ACCEPTED` non-financial tickers
+  while retaining raw-fetch obligations and universe membership for financial
+  templates.
+- Recorded the five owner-approved input caveats for the broader tax-payable
+  approximation, current-versus-legacy minority interests, price-API share
+  counts, EBIT construction, and the M-Score DEPI approximation.
+- Changed the next validation gate to a cached-first 40-ticker per-item report
+  followed by a hard stop before any full-universe run. Thresholds, code,
+  schema, normalization, and Sprint 4 remain unchanged in this spec-only step.
+
 ## 2026-07-15
 
 - Implemented the approved R1 per-item margin so a candidate is compared only

@@ -124,13 +124,18 @@ OPEN QUESTION: Adjusted-versus-raw price behavior remains unverified until the r
   keeps `data_status=OK` when its underlying data is valid.
 - A weekly run must never reduce the 30/60/90-day lags to seven days.
 
-### Approved whitelist normalization design — implementation requires review
+### Approved whitelist normalization design
 
-- Future normalization may accept only a versioned `REQUIRED_ITEMS` whitelist
-  containing the `item_id` values required by the approved Sprint 4-6 formulas.
+- Normalization may accept only the versioned `REQUIRED_ITEMS` whitelist below.
+  These exact `item_id` values were mapped by the owner's mentor from the frozen
+  Sprint 4-6 formulas using `docs/ITEM_INVENTORY_SPRINT_3.md`. Do not re-derive,
+  rename, or extend them without a later owner-approved spec amendment.
 - Duplicate `item_id` values outside `REQUIRED_ITEMS` remain only in the
   immutable raw observation with `DUPLICATE_ITEM_ID_QUARANTINED`; they do not
-  block an otherwise usable ticker.
+  block an otherwise usable ticker. The sole approved processing exception is
+  the mandatory `other_current_assets` helper: its raw candidates may
+  participate in Rule A only to resolve `short_term_investments`, after which
+  the helper remains outside formula coverage and duplicate normalized output.
 - Coverage of at least 90% is measured by the presence and uniqueness of every
   required item after the approved disambiguation rules run, not by accepting
   every provider row.
@@ -139,6 +144,113 @@ OPEN QUESTION: Adjusted-versus-raw price behavior remains unverified until the r
   value-based rules in principle. This specification amendment does not
   authorize implementation until the owner reviews and explicitly approves the
   diff.
+
+#### `REQUIRED_ITEMS` v1 — spec constant
+
+```text
+REQUIRED_ITEMS_VERSION=v1
+
+BALANCE_SHEET_REQUIRED_ITEMS=
+  current_assets
+  cash_and_cash_equivalents
+  short_term_investments
+  accounts_receivable
+  inventories_net
+  fixed_assets
+  tangible_fixed_assets
+  total_assets
+  current_liabilities
+  short_term_borrowings
+  taxes_and_other_payable_to_state_budget
+  long_term_liabilities
+  long_term_borrowings
+  owners_equity
+  undistributed_earnings
+  minority_interests
+  preferred_shares
+  paid_in_capital
+
+INCOME_STATEMENT_REQUIRED_ITEMS=
+  net_sales
+  cost_of_sales
+  gross_profit
+  selling_expenses
+  general_and_admin_expenses
+  operating_profit_loss
+  interest_expenses
+  net_accounting_profit_loss_before_tax
+  net_profit_loss_after_tax
+  attributable_to_parent_company
+
+CASH_FLOW_REQUIRED_ITEMS=
+  depreciation_and_amortization
+  net_cash_inflows_outflows_from_operating_activities
+  proceeds_from_issue_of_shares
+```
+
+- Version `v1` contains exactly 31 formula items: 18 balance-sheet items, 10
+  income-statement items, and 3 cash-flow items.
+- Presence means the exact `item_id` is returned for the correct statement.
+  Uniqueness means exactly one normalized row per required `item_id` and report
+  period after the approved duplicate rules run.
+- A required item that is missing, remains duplicated, or is unresolved by the
+  approved rules makes that ticker incomplete for formula coverage. Do not use
+  `item` or `item_en` to replace it.
+
+#### Fetch-required helper items — outside formula coverage
+
+- `other_current_assets` is a mandatory Rule A helper. It is the closing term
+  in the approved identity:
+
+```text
+current_assets = cash_and_cash_equivalents
+    + short_term_investments
+    + accounts_receivable
+    + inventories_net
+    + other_current_assets
+```
+
+- `other_current_assets` is not counted among the 31 formula coverage items,
+  but Rule A cannot run without it. If it is missing for a ticker whose
+  `short_term_investments` requires Rule A, do not guess; record
+  `REQUIRED_ITEM_AMBIGUOUS` and quarantine that statement.
+- `held_to_maturity_investment` is an optional fetch helper for auditing the
+  observed short-term-investment split. Its absence does not block Rule A or
+  formula coverage, and it must not be summed into or substituted for a required
+  item.
+
+#### Coverage scope and financial template boundary
+
+- `REQUIRED_ITEMS` v1 applies only to the non-financial statement template.
+- The Sprint 3 coverage denominator is the non-financial tickers whose universe
+  status is `ACCEPTED`.
+- Bank, insurer, securities, and other financial-sector tickers remain in the
+  universe and still require successful immutable raw fetch evidence. They are
+  not required to satisfy whitelist completeness and are neither the numerator
+  nor denominator of the formula-coverage percentage.
+- This coverage boundary is not the Sprint 4
+  `FINANCIAL_SECTOR_EXCLUDED` screening decision and does not remove any ticker
+  from the universe or sector monitor.
+
+#### Approved formula-input caveats — documentation only
+
+1. `taxes_and_other_payable_to_state_budget` is broader than the Sloan
+   formulation's taxes-payable input. The owner accepts it as an approximation;
+   every later consumer and report must disclose that limitation.
+2. Use `minority_interests` for the current reporting regime. If
+   `minority_interests_before_2015` is non-zero, log a warning; do not silently
+   combine or substitute the legacy field.
+3. Shares outstanding for TEV must come from the price API, never from the
+   balance sheet.
+4. Later EBIT is computed as
+   `net_accounting_profit_loss_before_tax + interest_expenses`, not from
+   `operating_profit_loss`. VAS line 30 already nets financial income and
+   expense, so it is not clean EBIT. Keep `operating_profit_loss` only for the
+   later EBITDA distress proxy.
+5. The later M-Score DEPI input uses `tangible_fixed_assets` (net book value)
+   plus `depreciation_and_amortization` as an accepted approximation of the
+   original gross-PP&E plus accumulated-depreciation formulation. Reports must
+   disclose this approximation.
 
 #### Named configuration values
 
@@ -177,7 +289,7 @@ DUP_MATERIALITY_EPS=0.01
 rhs = cash_and_cash_equivalents
     + short_term_investments_candidate
     + accounts_receivable
-    + inventories
+    + inventories_net
     + other_current_assets_candidate
 
 identity_error = abs(current_assets - rhs) / abs(current_assets)
@@ -187,14 +299,14 @@ identity_error = abs(current_assets - rhs) / abs(current_assets)
   every aggregate input and both candidate values are numeric source values.
   Missing values remain missing; the rule must not convert `NaN` to zero.
 - Before evaluating candidate combinations, inspect the identity inputs
-  `cash_and_cash_equivalents`, `accounts_receivable`, `inventories`, and
+  `cash_and_cash_equivalents`, `accounts_receivable`, `inventories_net`, and
   `current_assets` and the candidate items. Before Rule A scoring, if all
   duplicate rows of one identity-related item are numerically identical in
   every returned period, collapse them to their common reported values and log
   `DUPLICATE_VERIFIED_IDENTICAL` with all source row indices and values. For
   this comparison, `NaN` equals `NaN`; `NaN` does not equal a number.
 - If duplicated `cash_and_cash_equivalents`, `accounts_receivable`,
-  `inventories`, or `current_assets` rows are not identical, do not extend the
+  `inventories_net`, or `current_assets` rows are not identical, do not extend the
   combination search and do not apply the immaterial-difference rule to those
   inputs. Record `REQUIRED_ITEM_AMBIGUOUS` for the statement.
 - Score each candidate combination by its mean `identity_error` across all
@@ -453,7 +565,10 @@ in cache or run metadata documented by `data_contract.md` v2.
 - The VNM unit check must remain raw VND at ~1e13 scale.
 - Do not copy the comparison site's displayed unit without converting it back to raw VND for an apples-to-apples comparison.
 - Inspect the first dated universe snapshot and compare it with the latest `data/universe.csv` and `data/universe_rejects.csv` from the same run.
-- Inspect the coverage summary and require successful retrieval for ≥ 90% of the universe before declaring the Sprint 3 implementation complete.
+- Inspect the coverage summary and require complete, unique `REQUIRED_ITEMS` v1
+  for at least 90% of the `ACCEPTED` non-financial denominator before declaring
+  Sprint 3 complete. Financial-sector tickers require raw fetch success but do
+  not enter this formula-coverage percentage.
 - After fixture tests pass, re-run the separate one-off live validation script
   on VNM, HPG, FPT, VCB, the same 20 sampled `ACCEPTED` non-financial,
   non-UPCoM tickers, and 16 additional eligible tickers, for 40 total.
@@ -464,9 +579,14 @@ in cache or run metadata documented by `data_contract.md` v2.
   identity errors, and the resolved preferred-share value or honest absence.
 - Preserve verbatim real numbers and add the simple Vietnamese summary required
   by `AGENTS.md`.
-- After the 40-ticker validation, recompute Sprint 3 coverage using complete,
-  unique `REQUIRED_ITEMS`. If coverage is below 90%, stop and report; do not tune
-  any threshold.
+- After separate owner approval of this amendment, verify the existing
+  40-ticker sample using cached raw observations where available. For every
+  non-financial ticker, report every `REQUIRED_ITEMS` v1 item as present and
+  unique, missing, duplicated, or ambiguous after Rules A/B/R1-R3. Report the
+  mandatory `other_current_assets` helper separately.
+- The sample report must preserve verbatim evidence and include the simple
+  Vietnamese summary required by `AGENTS.md`. Stop after that sample report; do
+  not run the full-universe coverage job until a later owner decision.
 - Any later tolerance change requires owner approval and a `CHANGELOG.md` entry
   stating the reason.
 - If Python or dependencies are unavailable, report the exact failure; do not claim that `py_compile`, `pytest`, or the real run passed.
@@ -484,7 +604,9 @@ in cache or run metadata documented by `data_contract.md` v2.
 - No live trading, order placement, broker integration, or real-money action.
 - No backtesting, walk-forward testing, or performance metrics.
 - No UPCoM exclusion.
-- No financial-sector exclusion.
+- No removal of financial-sector tickers from the universe or sector monitor;
+  the approved non-financial whitelist-coverage denominator is only a data
+  template boundary, not a Sprint 4 screening exclusion.
 - `FINANCIAL_SECTOR_EXCLUDED` and `UPCOM_EXCLUDED_V1` belong to Sprint 4.
 - No changes to the acceptance logic of the current universe builder.
 - No semantic force-normalization of banks, insurers, securities companies, and non-financial companies.
