@@ -23,6 +23,7 @@
 - Kept PR #1 unmerged and stopped before Sprint 4 for owner and mentor review.
 - Sprint 3 CLOSED — full ACCEPTED universe REQUIRED_ITEMS v1 coverage 97.78%, PR #1 merged.
 - Specify Sprint 4 step-1 cleaning (accruals STA/SNOA, Beneish M-Score, distress PFD); spec only, no implementation.
+- Revise Sprint 4 step-1 cleaning spec to freeze AQI/TATA inputs and block the net-debt-to-EBITDA sub-signal pending an owner-approved cap; spec only, no implementation.
 
 ## 2026-07-16
 

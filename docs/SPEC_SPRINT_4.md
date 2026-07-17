@@ -63,18 +63,20 @@ Eight indices, each a ratio of year N to year N−1 unless noted:
 
 - **DSRI** (Days Sales in Receivables) = (Receivables_N / Sales_N) / (Receivables_{N−1} / Sales_{N−1}). Receivables = `accounts_receivable` — confirmed to be the AGGREGATE short-term receivables line (VAS 130), which already rolls up trade receivables and construction-progress receivables, so DSRI does NOT undercount for construction/contractor firms. Sales = `net_sales`.
 - **GMI** (Gross Margin Index) = GrossMargin_{N−1} / GrossMargin_N, where GrossMargin = `gross_profit` / `net_sales`.
-- **AQI** (Asset Quality Index) = AQ_N / AQ_{N−1}, where AQ = 1 − (Current Assets + Net PP&E) / Total Assets. Net PP&E = `tangible_fixed_assets` (or `fixed_assets` per repo item convention — coder must state which and unit-test it).
+- **AQI** (Asset Quality Index) = AQ_N / AQ_{N−1}, where AQ = 1 − (Current Assets + Net PP&E) / Total Assets. Net PP&E = `tangible_fixed_assets` — FROZEN. This is the same line the project already uses for DEPI (decision #8), so both M-Score PP&E inputs stay consistent. Do NOT substitute `fixed_assets`; the coder has no choice here.
 - **SGI** (Sales Growth Index) = Sales_N / Sales_{N−1}.
 - **DEPI** (Depreciation Index) = DepRate_{N−1} / DepRate_N, where DepRate = Depreciation / (Depreciation + Net PP&E). Depreciation = `depreciation_and_amortization`.
 - **SGAI** (SG&A Index) = (SGA_N / Sales_N) / (SGA_{N−1} / Sales_{N−1}), SGA = `selling_expenses` + `general_and_admin_expenses`.
 - **LVGI** (Leverage Index) = Leverage_N / Leverage_{N−1}, Leverage = (Current Liabilities + Long-term Liabilities) / Total Assets. Use `current_liabilities` + `long_term_liabilities`.
-- **TATA** (Total Accruals to Total Assets) = (Income from continuing operations − Cash from operations) / Total Assets. Use `net_accounting_profit_loss_before_tax`-derived earnings per repo convention and `net_cash_inflows_outflows_from_operating_activities`; coder states exact earnings line and unit-tests it.
+- **TATA** (Total Accruals to Total Assets) = (Income from continuing operations − Cash from operations) / Total Assets. FROZEN inputs: Income from continuing operations = `net_profit_loss_after_tax` (total after-tax profit of the whole company, BEFORE the minority-interest split — the standard Beneish "income from continuing operations"); Cash from operations = `net_cash_inflows_outflows_from_operating_activities`; Total Assets = `total_assets`. Do NOT substitute a pre-tax line or `attributable_to_parent_company`. Mandatory VNM hand-check against cafef/vietstock before this index is accepted.
 
 Threshold: **M > −1.78 ⇒ flag** (probability 3.76%, tuned for a 20:1–30:1 error-cost ratio). Keep −1.78 as the default but ALSO log each ticker's M-Score percentile within the VN universe so a later walk-forward (Sprint 8) can retune. When documenting results, describe the model honestly: holdout catches ≈50% of manipulators before public detection at 7.2% false positives — a coarse screen, not a precise fraud detector. (The "76%" in the old handoff is NOT the holdout figure; use 50% / 7.2%.)
 
 ## Financial distress — PFD
 
-Primary (ship this): a simple, transparent filter → `PFD_HIGH_RISK` if any of: accumulated losses (`undistributed_earnings` < 0), negative owners' equity (`owners_equity` < 0), net-debt-to-EBITDA above a config cap, or (if obtainable) HOSE warning/control list membership.
+Primary (ship this): a simple, transparent filter → `PFD_HIGH_RISK` if ANY of: accumulated losses (`undistributed_earnings` < 0) OR negative owners' equity (`owners_equity` < 0) OR (if obtainable) HOSE warning/control-list membership. These three signals need NO threshold.
+
+The net-debt-to-EBITDA sub-signal is BLOCKED for v1: `PLAN_quant_screener_myn.md` has no owner-approved cap, so per the no-invention rule it is deferred until the owner sets `NET_DEBT_EBITDA_CAP` explicitly. Do NOT invent a cap and do NOT flag on net-debt/EBITDA until that value exists. The distress filter ships and works on the three threshold-free signals alone.
 
 Optional / parallel experimental only: the full Campbell (2006) logit. Coefficients are already verified — paste, do NOT let the coder invent them:
 
@@ -110,7 +112,7 @@ Every value used in a Δ or ratio must come from a row whose `available_from` (=
 
 ## Config keys (new, in config/screener.yaml — additive only)
 
-`ACCRUAL_WORST_PCT: 0.10`, `MSCORE_THRESHOLD: -1.78`, `NET_DEBT_EBITDA_CAP: <owner to set>`, `SECTOR_MODE: whole_universe_log`. Do NOT touch the four existing Sprint-3 thresholds.
+`ACCRUAL_WORST_PCT: 0.10`, `MSCORE_THRESHOLD: -1.78`, `SECTOR_MODE: whole_universe_log`. `NET_DEBT_EBITDA_CAP` is intentionally ABSENT (blocked — the owner will set it later); the net-debt/EBITDA distress sub-signal stays disabled until it is added. Every threshold here is either a concrete value or explicitly blocked — none are left as empty fill-in placeholders. Do NOT touch the four existing Sprint-3 thresholds.
 
 ## Required output schema
 
