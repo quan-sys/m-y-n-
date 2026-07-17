@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-07-17
+
+- Completed the owner-approved full `ACCEPTED` universe Sprint 3 run with
+  controlled public-API batching and cache reuse: 378 tickers, including 315
+  non-financial coverage candidates and 63 financial-sector raw-fetch-only
+  tickers. No threshold or screener configuration value changed.
+- Measured `REQUIRED_ITEMS` v1 coverage at 308/315 non-financial tickers, or
+  97.777777777778%, above the 90% Definition of Done gate. The seven honest
+  failures are AGX, BAF, DBC, DSH, GTD, ODE, and TAB; the detailed report keeps
+  each provider-missing or `REQUIRED_ITEM_AMBIGUOUS` reason instead of guessing.
+- Audited 271,862 normalized fundamentals rows: zero missing `report_period`,
+  zero missing `available_from`, and zero 30/60/90-day lag mismatches. All 63
+  financial-sector tickers completed their three raw fetches.
+- Wrote point-in-time universe and reject snapshots for the run spanning
+  2026-07-16 and 2026-07-17, and recorded the first snapshot as 2026-07-16.
+  The full fixture-only pytest suite is green at 100% with exit code 0.
+- Kept PR #1 unmerged and stopped before Sprint 4 for owner and mentor review.
+
 ## 2026-07-16
 
 - Ran the owner-approved controlled live validation on 12 existing `ACCEPTED`
