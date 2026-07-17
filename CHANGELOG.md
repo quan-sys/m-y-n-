@@ -22,6 +22,7 @@
   The full fixture-only pytest suite is green at 100% with exit code 0.
 - Kept PR #1 unmerged and stopped before Sprint 4 for owner and mentor review.
 - Sprint 3 CLOSED — full ACCEPTED universe REQUIRED_ITEMS v1 coverage 97.78%, PR #1 merged.
+- Specify Sprint 4 step-1 cleaning (accruals STA/SNOA, Beneish M-Score, distress PFD); spec only, no implementation.
 
 ## 2026-07-16
 
