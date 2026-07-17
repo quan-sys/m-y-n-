@@ -8,12 +8,25 @@ This file is the local source of truth for Sprint 4. It is derived verbatim from
 Sprint 4 is limited to the following work:
 
 - Add `src/screener/step1_cleaning.py` and `config/screener.yaml` cleaning thresholds (all cutoffs live in config, never hard-coded).
-- Consume the Sprint 3 point-in-time normalized fundamentals and the 378-ticker ACCEPTED universe. Do NOT re-fetch or change any Sprint 3 data-layer, dedup, or threshold code.
+- Consume the Sprint 3 point-in-time normalized fundamentals and the 378-ticker ACCEPTED universe. Do NOT change the Sprint 3 data-layer, dedup, parser, normalization, or threshold code. EXCEPTION (see Step 0): Sprint 3 cached only QUARTERLY statements; the ANNUAL statements that STA/SNOA/M-Score require were never fetched, so Sprint 4 begins by fetching the annual period type through the UNCHANGED existing client. "No re-fetch" forbids re-pulling or altering the quarterly layer — it does NOT forbid fetching the annual period Sprint 4 needs.
 - Apply five cleaning filters in a fixed order, each producing a labelled reject reason.
 - Emit `data/screener/step1_survivors.csv` and extend `universe_rejects.csv` with the new labels.
 - Every formula ships with a unit test whose expected numbers were computed by hand.
 
 Sprint 4 does NOT: compute EBIT/TEV or E/P (Sprint 5), compute F-Score or Franchise Power (Sprint 6), rank or weight anything, or change any Sprint 3 config value.
+
+## Step 0 — Annual fundamentals fetch (prerequisite, do this FIRST)
+
+STA, SNOA, and all eight Beneish M-Score indices are ANNUAL constructs requiring two consecutive annual periods (N and N−1). The Sprint 3 coverage run cached quarterly statements only — annual was never fetched — so without this step every accrual and M-Score value would be INSUFFICIENT_DATA. Before any filter code:
+
+- Fetch annual balance sheet, income statement, and cash flow for the non-financial ACCEPTED universe (~315 tickers) using the EXISTING `finance_client` with `period='year'`. Do NOT modify the client, parser, dedup, normalization, or any Sprint-3 threshold. A thin new run script that only CALLS the unchanged client is allowed; changing the client is not.
+- The API returns the 4 most recent annual periods (~2022–2025). Cache them in the same layout Sprint 3 uses, with the same point-in-time stamp `available_from = period_end + LAG_ANNUAL (90 days)`.
+- Point-in-time selection for the filters: use the two most-recent annual periods whose `available_from <= evaluation date` as N and N−1 (a mid-2026 run → N = 2025 annual, available_from 2026-03-31; N−1 = 2024).
+- Going forward, every fundamentals fetch/snapshot must cover BOTH quarterly and annual period types so this gap does not recur.
+- Restatement caveat: vnstock annual data is restated. Using the latest published annual pair for a live screen today is acceptable; it is NOT a clean basis for historical backtest (already recorded for Sprint 8).
+- Output `docs/COVERAGE_SPRINT_4_ANNUAL.md`: per non-financial ACCEPTED ticker, how many consecutive annual periods are available and whether the specific items each formula needs (STA, SNOA, each M-Score index) are present for N and N−1. List every ticker that would fall to INSUFFICIENT_DATA_FOR_<FORMULA> and the missing item. Mirror the Sprint 3 quarterly coverage report structure.
+
+Gate: STOP after Step 0 and report annual coverage. The five-filter code proceeds only after the owner reviews this coverage. If a large share of tickers lack two consecutive annual periods, flag it before writing any filter logic.
 
 ## Filter order (fixed) and labels
 
