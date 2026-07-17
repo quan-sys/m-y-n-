@@ -2,6 +2,10 @@
 
 ## 2026-07-17
 
+- Added a consolidated 2026-07-17 project handoff that supersedes the older
+  2026-07-15 handoff, preserves every owner-approved Sprint 3 decision and
+  result, identifies the authoritative files for a new chat, and records the
+  exact hard stop before PR merge or Sprint 4.
 - Completed the owner-approved full `ACCEPTED` universe Sprint 3 run with
   controlled public-API batching and cache reuse: 378 tickers, including 315
   non-financial coverage candidates and 63 financial-sector raw-fetch-only
