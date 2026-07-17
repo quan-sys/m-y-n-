@@ -29,6 +29,12 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Process only the first N ICB2 sectors for a quick local check. Do not use for final report.",
     )
+    parser.add_argument(
+        "--market-cap-limit",
+        type=int,
+        default=0,
+        help="Maximum controlled live market-cap requests; default 0 disables them.",
+    )
     return parser.parse_args()
 
 
@@ -38,6 +44,7 @@ def main() -> int:
         universe_path=ROOT / "data" / "universe.csv",
         reports_root=ROOT / "reports",
         limit_sectors=args.limit_sectors,
+        market_cap_limit=args.market_cap_limit,
     )
 
     warnings = result.data_quality["coverage_status"].value_counts().to_dict()

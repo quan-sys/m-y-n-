@@ -30,6 +30,8 @@ MIN_ACCEPTED_SYMBOLS = 700
 EXPECTED_ICB2_COUNT = 19
 SUPPORTED_EXCHANGES = {"HOSE", "HNX", "UPCOM"}
 UNSUPPORTED_EXCHANGE_REASON = "UNSUPPORTED_EXCHANGE"
+PRICE_TO_VND_MULTIPLIER = 1000.0
+MARKET_CAP_SOURCE_PROXY = "SHARES_X_LAST_CLOSE_X1000_PROXY"
 
 
 @dataclass(frozen=True)
@@ -48,7 +50,12 @@ def build_universe(
     limit: int | None = None,
     max_consecutive_api_errors: int = 10,
     fetch_market_cap: bool = False,
+    market_cap_limit: int | None = None,
 ) -> UniverseBuildResult:
+    if fetch_market_cap and market_cap_limit is None:
+        raise ValueError("market_cap_limit is required when fetch_market_cap is enabled")
+    if market_cap_limit is not None and market_cap_limit < 0:
+        raise ValueError("market_cap_limit must be zero or greater")
     client = client or VnstockClient()
     output_dir = Path(output_dir)
     config_dir = Path(config_dir)
@@ -73,6 +80,7 @@ def build_universe(
     rows: list[dict[str, Any]] = []
     consecutive_api_errors = 0
     soft_stop_reason = ""
+    market_cap_fetch_count = 0
     for _, symbol_row in symbols.iterrows():
         ticker = _clean_text(symbol_row.get("ticker"))
         exchange = _clean_text(symbol_row.get("exchange"))
@@ -156,15 +164,28 @@ def build_universe(
             rows.append(_reject(row, "LOW_LIQUIDITY", row["data_status"]))
             continue
 
-        if fetch_market_cap:
+        should_fetch_market_cap = (
+            fetch_market_cap
+            and market_cap_limit is not None
+            and market_cap_fetch_count < market_cap_limit
+        )
+        if should_fetch_market_cap:
+            market_cap_fetch_count += 1
             market_cap_result = _as_result(client.get_market_cap(ticker), source=source)
             if market_cap_result.ok:
                 market_cap, market_cap_source = _extract_market_cap_with_source(market_cap_result.data)
                 row["market_cap"] = market_cap
                 if market_cap_source:
                     row["source"] = _combine_sources(row["source"], market_cap_source)
+                if market_cap is None:
+                    row["source"] = _combine_sources(row["source"], "market_cap_MISSING_DATA")
                 if market_cap_result.status == "STALE_DATA":
                     row["data_status"] = "STALE_DATA"
+            else:
+                row["source"] = _combine_sources(row["source"], "market_cap_API_ERROR")
+                row["data_status"] = "API_ERROR"
+        elif fetch_market_cap:
+            row["source"] = _combine_sources(row["source"], "market_cap_not_fetched_batch_limit")
 
         row["status"] = "ACCEPTED"
         row["reject_reason"] = ""
@@ -191,6 +212,8 @@ def build_universe(
         icb_status=icb_result.status,
         limit=limit,
         soft_stop_reason=soft_stop_reason,
+        market_cap_fetch_limit=market_cap_limit,
+        market_cap_fetch_count=market_cap_fetch_count,
     )
     return UniverseBuildResult(accepted=accepted, rejects=rejects, summary=summary)
 
@@ -227,6 +250,15 @@ def print_summary(summary: dict[str, Any]) -> None:
 
     print(f"Universe output: {summary['universe_path']}")
     print(f"Reject log output: {summary['rejects_path']}")
+    if summary.get("market_cap_fetch_limit") is not None:
+        print(
+            "Market-cap fetches: "
+            f"{summary['market_cap_fetch_count']}/{summary['market_cap_fetch_limit']} controlled requests"
+        )
+    if summary.get("snapshot_path"):
+        print(f"Universe snapshot: {summary['snapshot_path']}")
+    elif summary.get("snapshot_status"):
+        print(f"Universe snapshot status: {summary['snapshot_status']}")
 
 
 def _as_result(value: Any, source: str) -> FetchResult:
@@ -468,7 +500,7 @@ def _extract_market_cap_with_source(data: Any) -> tuple[float | None, str | None
             shares_value = float(shares.iloc[-1])
             close_value = float(closes.iloc[-1])
             if shares_value > 0 and close_value > 0:
-                return shares_value * close_value, "SHARES_X_LAST_CLOSE_PROXY"
+                return shares_value * close_value * PRICE_TO_VND_MULTIPLIER, MARKET_CAP_SOURCE_PROXY
 
     return None, None
 
@@ -485,6 +517,8 @@ def _build_summary(
     icb_status: str,
     limit: int | None,
     soft_stop_reason: str,
+    market_cap_fetch_limit: int | None,
+    market_cap_fetch_count: int,
 ) -> dict[str, Any]:
     icb2_counts = accepted["icb2"].replace("", pd.NA).dropna().value_counts() if not accepted.empty else pd.Series()
     top_rejects = list(rejects["reject_reason"].value_counts().head(10).items()) if not rejects.empty else []
@@ -519,7 +553,56 @@ def _build_summary(
         "warnings": warnings,
         "universe_path": str((output_dir / "universe.csv").resolve()),
         "rejects_path": str((output_dir / "universe_rejects.csv").resolve()),
+        "market_cap_fetch_limit": market_cap_fetch_limit,
+        "market_cap_fetch_count": market_cap_fetch_count,
     }
+
+
+def write_universe_snapshot(
+    accepted: pd.DataFrame,
+    rejects: pd.DataFrame,
+    snapshots_root: str | Path,
+    *,
+    run_date: str | None = None,
+) -> Path:
+    snapshot_date = run_date or date.today().isoformat()
+    if not pd.Series([snapshot_date]).str.fullmatch(r"\d{4}-\d{2}-\d{2}").iloc[0]:
+        raise ValueError("snapshot run_date must use YYYY-MM-DD")
+
+    frames = {
+        "universe.csv": accepted,
+        "universe_rejects.csv": rejects,
+    }
+    if not accepted.empty and not accepted["status"].eq("ACCEPTED").all():
+        raise ValueError("universe.csv snapshot contains non-ACCEPTED rows")
+    if not rejects.empty:
+        if not rejects["status"].eq("REJECTED").all():
+            raise ValueError("universe_rejects.csv snapshot contains non-REJECTED rows")
+        missing_reason = rejects["reject_reason"].fillna("").astype(str).str.strip().eq("")
+        if bool(missing_reason.any()):
+            raise ValueError("universe_rejects.csv snapshot has an empty reject_reason")
+    serialized: dict[str, str] = {}
+    for name, frame in frames.items():
+        if list(frame.columns) != OUTPUT_COLUMNS:
+            raise ValueError(f"{name} does not match the required universe schema")
+        serialized[name] = frame.to_csv(index=False, lineterminator="\n")
+
+    snapshot_dir = Path(snapshots_root) / snapshot_date
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+
+    for name, content in serialized.items():
+        path = snapshot_dir / name
+        if path.exists() and path.read_text(encoding="utf-8") != content:
+            raise FileExistsError(
+                f"snapshot conflict for {path}: an observation for {snapshot_date} already exists"
+            )
+
+    for name, content in serialized.items():
+        path = snapshot_dir / name
+        if not path.exists():
+            path.write_text(content, encoding="utf-8", newline="")
+
+    return snapshot_dir
 
 
 def _base_row(ticker: str, exchange: str, source: str, as_of: str, data_status: str) -> dict[str, Any]:

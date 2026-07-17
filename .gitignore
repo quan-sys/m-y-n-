@@ -1,6 +1,17 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+data/fundamentals/**/*.parquet
+data/fundamentals/**/*.csv
+data/fundamentals/**/*.json
+smoke_output/
 src/data/cache/**/*.parquet
 src/data/cache/**/*.csv
 src/data/cache/**/*.json

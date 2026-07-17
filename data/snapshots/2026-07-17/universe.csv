@@ -1,0 +1,379 @@
+ticker,exchange,icb2,icb3,icb4,market_cap,adtv_20d,status,reject_reason,as_of,source,data_status
+AAA,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,7386383600.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ABT,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,554309000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ACB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,435155708976.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ADS,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,1393212131.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AFX,HOSE,BÁN LẺ,PHÂN PHỐI THỰC PHẨM & DƯỢC PHẨM,PHÂN PHỐI THỰC PHẨM,,750184750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AGG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,3835484500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AGR,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,9060149500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ANV,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,12126511000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+APG,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,3820845850.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+APH,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CONTAINERS & ĐÓNG GÓI,,588377350.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ASM,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,1636357750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ASP,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,PHÂN PHỐI XĂNG DẦU & KHÍ ĐỐT,,1993330650.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BAF,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,51716818163.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BCG,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,TÀI CHÍNH ĐẶC BIỆT,,19954726000.0,ACCEPTED,,2025-10-08,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BCM,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,15442683500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BFC,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,7192539500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BIC,HOSE,BẢO HIỂM,BẢO HIỂM PHI NHÂN THỌ,BẢO HIỂM PHI NHÂN THỌ,,1264423250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BID,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,167357388250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BKG,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG GIA DỤNG,THIẾT BỊ GIA DỤNG,,523489300.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BMI,HOSE,BẢO HIỂM,BẢO HIỂM PHI NHÂN THỌ,BẢO HIỂM PHI NHÂN THỌ,,1350047250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BMP,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,21571856000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BSI,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,23399921321.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BSR,HOSE,DẦU KHÍ,SẢN XUẤT DẦU KHÍ,SẢN XUẤT VÀ KHAI THÁC DẦU KHÍ,,209027218000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BVH,HOSE,BẢO HIỂM,BẢO HIỂM NHÂN THỌ,BẢO HIỂM NHÂN THỌ,,22034350000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BWE,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,NƯỚC,,2830371500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+C32,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1664322500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CDC,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,2224247250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CIG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,626500300.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CII,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,195867320000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CLW,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,NƯỚC,,1045293220.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CMG,HOSE,CÔNG NGHỆ THÔNG TIN,PHẦN MỀM & DỊCH VỤ MÁY TÍNH,DỊCH VỤ MÁY TÍNH,,4754034000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CRC,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,2544455250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CRE,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1114194100.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CSM,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,LỐP XE,,3054315000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CSV,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,3966952250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTD,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,32266967500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTF,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,SẢN XUẤT Ô TÔ,,4696349500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTG,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,213865571750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTI,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,4343095500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTR,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,24495538500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTS,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,55719629510.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+D2D,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1042067750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DBC,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,20038133632.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DBD,HOSE,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,1900735500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DC4,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,647617280.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DCL,HOSE,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,16047937000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DCM,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,82908057750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DGC,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,36434539500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DGW,HOSE,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,28802010500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DHA,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1316382000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DHC,HOSE,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,SẢN XUẤT GIẤY,,8396062226.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DHG,HOSE,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,685768000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DIG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,46944636500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DLG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,3534499350.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DPG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,13465552243.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DPM,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,66202046000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DPR,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,11248627500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DRC,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,LỐP XE,,2269397995.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DSE,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,10673552500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DVP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,512996840.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DXG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,109658652930.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DXS,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,"TƯ VẤN, ĐỊNH GIÁ, MÔI GIỚI BẤT ĐỘNG SẢN",,9115520550.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+EIB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,83165826750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ELC,HOSE,CÔNG NGHỆ THÔNG TIN,THIẾT BỊ VÀ PHẦN CỨNG,THIẾT BỊ VIỄN THÔNG,,5960366500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+EVF,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,TÀI CHÍNH CÁ NHÂN,,36907848750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+EVG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1639706767.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FCN,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,4514753750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FIR,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,604804550.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FIT,HOSE,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,1210805900.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FMC,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,572318750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FPT,HOSE,CÔNG NGHỆ THÔNG TIN,PHẦN MỀM & DỊCH VỤ MÁY TÍNH,PHẦN MỀM,,543996791810.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FRT,HOSE,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,49689871488.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FTS,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,47091266250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GAS,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,PHÂN PHỐI XĂNG DẦU & KHÍ ĐỐT,,84624295500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GEE,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,ĐIỆN TỬ & THIẾT BỊ ĐIỆN,THIẾT BỊ ĐIỆN,,127674853310.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GEG,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,5118787607.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GEX,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,ĐIỆN TỬ & THIẾT BỊ ĐIỆN,THIẾT BỊ ĐIỆN,,330530200000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GIL,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,944956000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GMD,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,81401550500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GVR,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,74168625000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HAG,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,39924659000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HAH,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,33325425000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HAX,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,SẢN XUẤT Ô TÔ,,1024768900.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HCM,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,116854550000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HDB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,242520825500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HDC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,19487022001.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HDG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,27017001755.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HHP,HOSE,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,SẢN XUẤT GIẤY,,12376780250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HHS,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,SẢN XUẤT Ô TÔ,,11174840750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HHV,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,32314752000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HID,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1192425800.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HII,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,919832466.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HPG,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,392482959250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HPX,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1152250550.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HQC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,10146846150.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HSG,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,29698014000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HSL,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,6732173050.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HT1,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1922849500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HTN,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,755618950.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HVH,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1261821452.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HVN,HOSE,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,HÀNG KHÔNG,,26892394500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+IDI,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,1353402000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+IJC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,6954566161.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ITC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1007349750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ITD,HOSE,CÔNG NGHỆ THÔNG TIN,PHẦN MỀM & DỊCH VỤ MÁY TÍNH,PHẦN MỀM,,597280000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KBC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,57097490500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KDC,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,34068488750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KDH,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,88512431250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KHG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,17447346550.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KLB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,9410416119.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KOS,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,12022119250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KSB,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,7781545250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LAF,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,591430750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LCG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,7774107364.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LDG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,5912658200.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LHG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1247390500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LPB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,129861240500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MBB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,296820654500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MCH,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,50657642500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MCM,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,1247081500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MCP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CONTAINERS & ĐÓNG GÓI,,577576500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MIG,HOSE,BẢO HIỂM,BẢO HIỂM PHI NHÂN THỌ,BẢO HIỂM PHI NHÂN THỌ,,1593932000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MSB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,149172128750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MSH,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,2810426750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MSN,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,183754787000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MWG,HOSE,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,319165458500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MZG,HOSE,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,SẢN XUẤT GIẤY,,3890018250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NAB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,27129544250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NAF,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,BIA VÀ ĐỒ UỐNG,ĐỒ UỐNG & GIẢI KHÁT,,21479404500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NBB,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,520234000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NCT,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,1681472000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NHA,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,770873750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NKG,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,16756713136.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NLG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,57664170855.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NNC,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1572903750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NT2,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,9648125750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NTC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1092898500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NTL,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,2506648500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NVL,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,165272586084.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+OCB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,63381894859.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+OGC,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,TÀI CHÍNH ĐẶC BIỆT,,807562300.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ORS,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,62698777000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PAC,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,ĐIỆN TỬ & THIẾT BỊ ĐIỆN,HÀNG ĐIỆN & ĐIỆN TỬ,,3499800235.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PAN,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,7864438787.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PC1,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,106378830000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PDR,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,85168523500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PET,HOSE,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,48292995500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PHR,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,21182507500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PLX,HOSE,DẦU KHÍ,SẢN XUẤT DẦU KHÍ,SẢN XUẤT VÀ KHAI THÁC DẦU KHÍ,,80738019000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PNJ,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG CÁ NHÂN,,67215057500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+POW,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,154605234000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PPC,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,969527650.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PTB,HOSE,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,LÂM SẢN VÀ CHẾ BIẾN GỖ,,2760365500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVD,HOSE,DẦU KHÍ,"THIẾT BỊ, DỊCH VỤ VÀ PHÂN PHỐI DẦU KHÍ",THIẾT BỊ VÀ DỊCH VỤ DẦU KHÍ,,83194482500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,DỊCH VỤ VẬN TẢI,,10048871250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVT,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,VẬN TẢI THỦY,,50515000337.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+QCG,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,2533607500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+RAL,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG GIA DỤNG,THIẾT BỊ GIA DỤNG,,2737756000.0,ACCEPTED,,2026-07-02,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+REE,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,17513202500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+RYG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1334972750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SAB,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,BIA VÀ ĐỒ UỐNG,SẢN XUẤT BIA,,29804582500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SAM,HOSE,CÔNG NGHỆ THÔNG TIN,THIẾT BỊ VÀ PHẦN CỨNG,THIẾT BỊ VIỄN THÔNG,,537604649.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SBG,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CÔNG NGHIỆP PHỨC HỢP,,3210146002.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SBT,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,12019134500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SCR,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,5620071000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SCS,HOSE,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,HÀNG KHÔNG,,6760417000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SGR,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1696633000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SHB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,627389876500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SHI,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,2139878000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SIP,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,9313580750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SJD,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,681296000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SJS,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1065244500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SMC,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,2892917250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SSB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,36742320710.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SSI,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,367423480750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+STB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,352353932500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SZC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,8903679500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SZL,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1124936250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TAL,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,3416246485.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,396305781500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCD,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,2548023300.0,ACCEPTED,,2025-10-08,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCH,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,58964595250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCI,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,3461741000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCM,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,16547258250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCO,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,1213599250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TCX,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,83287282500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TDC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,"TƯ VẤN, ĐỊNH GIÁ, MÔI GIỚI BẤT ĐỘNG SẢN",,726302054.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TDP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CONTAINERS & ĐÓNG GÓI,,3928514000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+THG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,527371977.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TIP,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,618259750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TLD,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1832808000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TLG,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG GIA DỤNG,ĐỒ GIA DỤNG MỘT LẦN,,4188292250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TLH,HOSE,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,590261000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TNH,HOSE,Y TẾ,THIẾT BỊ VÀ DỊCH VỤ Y TẾ,CHĂM SÓC Y TẾ,,1487192200.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TPB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,226905087750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TPC,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,1126828900.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TRA,HOSE,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,544652000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TRC,HOSE,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,4797174000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TSA,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1761098250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TSC,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,682833500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TTA,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,6657895250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TTF,HOSE,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,LÂM SẢN VÀ CHẾ BIẾN GỖ,,1247763250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TV2,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,TƯ VẤN & HỖ TRỢ KINH DOANH,TƯ VẤN & HỖ TRỢ KD,,4941926250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TVS,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,4385526500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VAB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,11959648750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VCB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,244307963500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VCG,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,68305848500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VCI,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,151260721500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VCK,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,144670278000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VDS,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,17621583250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VFG,HOSE,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,666927750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VGC,HOSE,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,15337570000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VHC,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,14750120000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VHM,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,692522178565.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,149041501250.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIC,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,685274950500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,VẬN TẢI THỦY,,1432896906.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIX,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,509625848500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VJC,HOSE,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,HÀNG KHÔNG,,134713051946.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VND,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,286042268525.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VNM,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,162120848983.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VOS,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,VẬN TẢI THỦY,,5312178750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VPB,HOSE,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,334991465000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VPG,HOSE,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI KHOÁNG,,707531550.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VPI,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,77327194500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VPL,HOSE,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,DỊCH VỤ GIẢI TRÍ,,74966071500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VPX,HOSE,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,37337324500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VRE,HOSE,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,143420292217.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VSC,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,69491348500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VTO,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,VẬN TẢI THỦY,,1598994760.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VTP,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,CHUYỂN PHÁT NHANH,,15934075500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VVS,HOSE,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,SẢN XUẤT Ô TÔ,,9807796777.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+YEG,HOSE,TRUYỀN THÔNG,TRUYỀN THÔNG,GIẢI TRÍ & TRUYỀN THÔNG,,9137631600.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+API,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,2075952000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+APS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,3626529000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BNA,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,980754500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BVS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,13513148000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+C69,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,15460007500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CAP,HNX,TÀI NGUYÊN CƠ BẢN,LÂM NGHIỆP VÀ GIẤY,SẢN XUẤT GIẤY,,3389185500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CEO,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,72940305043.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CMS,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,780980000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CTP,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,BIA VÀ ĐỒ UỐNG,ĐỒ UỐNG & GIẢI KHÁT,,1114870500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DL1,HNX,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,1518154000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DP3,HNX,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,941731000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DST,HNX,TRUYỀN THÔNG,TRUYỀN THÔNG,"SÁCH, ẤN BẢN & SẢN PHẨM VĂN HÓA",,4667284500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DTD,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1147951960.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DVM,HNX,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,611602000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DXP,HNX,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,1354751000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+EVS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,1335515000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GKM,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,657952500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HHC,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,1243779500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HUT,HNX,Ô TÔ VÀ PHỤ TÙNG,Ô TÔ VÀ PHỤ TÙNG,SẢN XUẤT Ô TÔ,,16862156000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+IDC,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,46281669500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+IDJ,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,6359136500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+IPA,HNX,HÀNG & DỊCH VỤ CÔNG NGHIỆP,TƯ VẤN & HỖ TRỢ KINH DOANH,TƯ VẤN & HỖ TRỢ KD,,649764500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KSF,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,15038866000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KSV,HNX,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI KHOÁNG,,2672652000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+L14,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,860074500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+L40,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1699543880.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LAS,HNX,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,2104507000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LBE,HNX,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG CÁ NHÂN,,726126807.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LDP,HNX,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,1148937500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LHC,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1253136572.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MBG,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1160178000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MBS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,105035904500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MST,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,9881798500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NDN,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1800537000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NRC,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,7882615500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NTP,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,4842011860.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+NVB,HNX,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,9877967500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+OCH,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,623458000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PCH,HNX,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,1826647500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PLC,HNX,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,2053032000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PPT,HNX,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,PHÂN PHỐI XĂNG DẦU & KHÍ ĐỐT,,3803250500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PSD,HNX,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,538987500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PSI,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,2466083000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVB,HNX,DẦU KHÍ,"THIẾT BỊ, DỊCH VỤ VÀ PHÂN PHỐI DẦU KHÍ",THIẾT BỊ VÀ DỊCH VỤ DẦU KHÍ,,1333339000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVC,HNX,DẦU KHÍ,"THIẾT BỊ, DỊCH VỤ VÀ PHÂN PHỐI DẦU KHÍ",THIẾT BỊ VÀ DỊCH VỤ DẦU KHÍ,,7088601500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVI,HNX,BẢO HIỂM,BẢO HIỂM PHI NHÂN THỌ,BẢO HIỂM PHI NHÂN THỌ,,2628053000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVS,HNX,DẦU KHÍ,"THIẾT BỊ, DỊCH VỤ VÀ PHÂN PHỐI DẦU KHÍ",THIẾT BỊ VÀ DỊCH VỤ DẦU KHÍ,,79291377500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SCG,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1703092000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SHN,HNX,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI THÁC THAN,,659503500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SHS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,246060472500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SRA,HNX,Y TẾ,THIẾT BỊ VÀ DỊCH VỤ Y TẾ,THIẾT BỊ Y TẾ,,566025000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SVN,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1459614500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+THD,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,"TƯ VẤN, ĐỊNH GIÁ, MÔI GIỚI BẤT ĐỘNG SẢN",,6414608000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TIG,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,3478898500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TNG,HNX,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,10754584000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TVC,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,TÀI CHÍNH ĐẶC BIỆT,,8841056000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+UNI,HNX,CÔNG NGHỆ THÔNG TIN,PHẦN MỀM & DỊCH VỤ MÁY TÍNH,DỊCH VỤ MÁY TÍNH,,6564626000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VC3,HNX,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,"TƯ VẤN, ĐỊNH GIÁ, MÔI GIỚI BẤT ĐỘNG SẢN",,30206761000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VC7,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1115951500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VCS,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1666571744.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VFS,HNX,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,10300596500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VGS,HNX,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,3251002750.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VHE,HNX,Y TẾ,DƯỢC PHẨM,DƯỢC PHẨM,,659097000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIT,HNX,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1195206387.5,ACCEPTED,,2026-07-02,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VTZ,HNX,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,18938903000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AAH,UPCOM,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI THÁC THAN,,975435500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AAS,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,9710153000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AAV,UPCOM,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,5259934000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ABB,UPCOM,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,28040186500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ABW,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,4208587500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ACM,UPCOM,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI KHOÁNG,,503406000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ACV,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,24390875000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AGX,UPCOM,BÁN LẺ,PHÂN PHỐI THỰC PHẨM & DƯỢC PHẨM,PHÂN PHỐI THỰC PHẨM,,553914500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AIG,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,2406918000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+AMS,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,TƯ VẤN & HỖ TRỢ KINH DOANH,NHÀ CUNG CẤP THIẾT BỊ,,1567566500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+APF,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,2959176820.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ATG,UPCOM,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI KHOÁNG,,630448000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BCR,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,2713239500.0,ACCEPTED,,2026-06-19,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BDT,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1372422500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BGE,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,1948920000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BIG,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,1417905410.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BMS,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,1774247699.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BOT,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,763841000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+BVB,UPCOM,NGÂN HÀNG,NGÂN HÀNG,NGÂN HÀNG,,34347308500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+C4G,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1182115000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CLX,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,699271500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CQN,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,674565927.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+CVN,UPCOM,Y TẾ,THIẾT BỊ VÀ DỊCH VỤ Y TẾ,THIẾT BỊ Y TẾ,,735620500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DAG,UPCOM,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,511767520.0,ACCEPTED,,2024-08-14,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DDB,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,896701500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DDG,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,PHÂN PHỐI XĂNG DẦU & KHÍ ĐỐT,,1728354000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DDV,UPCOM,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,8248059717.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DFF,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,569258000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DRI,UPCOM,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,7168505000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+DSH,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,1260152000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+F88,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,TÀI CHÍNH CÁ NHÂN,,16424015590.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FOC,UPCOM,TRUYỀN THÔNG,TRUYỀN THÔNG,DỊCH VỤ TRUYỀN THÔNG,,2200867000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+FOX,UPCOM,VIỄN THÔNG,VIỄN THÔNG CỐ ĐỊNH,VIỄN THÔNG CỐ ĐỊNH,,7355168500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+G36,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,518040000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GCF,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,568440000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+GTD,UPCOM,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,GIẦY DÉP,,1852577000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HBC,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,3422772000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HNG,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,14143248500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+HNM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,3138811000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ILS,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CONTAINERS & ĐÓNG GÓI,,561805000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ITA,UPCOM,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,4736058650.0,ACCEPTED,,2024-09-25,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+KPF,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,571006000.0,ACCEPTED,,2025-02-25,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LSG,UPCOM,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,,1099229500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+LTG,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,1036070000.0,ACCEPTED,,2026-06-19,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+MSR,UPCOM,TÀI NGUYÊN CƠ BẢN,KHAI KHOÁNG,KHAI KHOÁNG,,26516586500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+ODE,UPCOM,TRUYỀN THÔNG,TRUYỀN THÔNG,GIẢI TRÍ & TRUYỀN THÔNG,,800337000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+OIL,UPCOM,DẦU KHÍ,SẢN XUẤT DẦU KHÍ,SẢN XUẤT VÀ KHAI THÁC DẦU KHÍ,,18113623500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PAT,UPCOM,HÓA CHẤT,HÓA CHẤT,"SẢN PHẨM HÓA DẦU, NÔNG DƯỢC & HÓA CHẤT KHÁC",,1009487500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PHP,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,4398276401.5,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PIV,UPCOM,BẤT ĐỘNG SẢN,BẤT ĐỘNG SẢN,"TƯ VẤN, ĐỊNH GIÁ, MÔI GIỚI BẤT ĐỘNG SẢN",,816801500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+POM,UPCOM,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,16266530000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PSH,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",NƯỚC & KHÍ ĐỐT,PHÂN PHỐI XĂNG DẦU & KHÍ ĐỐT,,1676415000.0,ACCEPTED,,2025-03-11,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+PVX,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,5170078500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+QNS,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,4504082000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+QTP,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",SẢN XUẤT & PHÂN PHỐI ĐIỆN,SẢN XUẤT & PHÂN PHỐI ĐIỆN,,2480944500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+RDP,UPCOM,HÓA CHẤT,HÓA CHẤT,"NHỰA, CAO SU & SỢI",,969530300.0,ACCEPTED,,2024-11-27,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SAS,UPCOM,BÁN LẺ,BÁN LẺ,PHÂN PHỐI HÀNG CHUYÊN DỤNG,,835472000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SBS,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,MÔI GIỚI CHỨNG KHOÁN,,3296223000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SCL,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,862620183.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SGP,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,617629500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+SPD,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,856727500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+STH,UPCOM,TRUYỀN THÔNG,TRUYỀN THÔNG,"SÁCH, ẤN BẢN & SẢN PHẨM VĂN HÓA",,2740816500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TAB,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,DỊCH VỤ VẬN TẢI,,941720000.0,ACCEPTED,,2026-06-18,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TIN,UPCOM,DỊCH VỤ TÀI CHÍNH,DỊCH VỤ TÀI CHÍNH,QUẢN LÝ TÀI SẢN,,2463080500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TNA,UPCOM,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,577770750.0,ACCEPTED,,2024-09-13,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TOS,UPCOM,DẦU KHÍ,"THIẾT BỊ, DỊCH VỤ VÀ PHÂN PHỐI DẦU KHÍ",THIẾT BỊ VÀ DỊCH VỤ DẦU KHÍ,,768469149.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TV1,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,TƯ VẤN & HỖ TRỢ KINH DOANH,TƯ VẤN & HỖ TRỢ KD,,1166218500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+TVN,UPCOM,TÀI NGUYÊN CƠ BẢN,KIM LOẠI,THÉP VÀ SẢN PHẨM THÉP,,9416094000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VEA,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,CÔNG NGHIỆP NẶNG,MÁY CÔNG NGHIỆP,,6913990500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VGI,UPCOM,VIỄN THÔNG,VIỄN THÔNG DI ĐỘNG,VIỄN THÔNG DI ĐỘNG,,25021932500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VGR,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,VẬN TẢI,"KHO BÃI, HẬU CẦN VÀ BẢO DƯỠNG",,11278484000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VGT,UPCOM,HÀNG CÁ NHÂN & GIA DỤNG,HÀNG CÁ NHÂN,HÀNG MAY MẶC,,4241741000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VHG,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,HÀNG CÔNG NGHIỆP,CÔNG NGHIỆP PHỨC HỢP,,508935500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VIW,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG,,12083030000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VLB,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,XÂY DỰNG VÀ VẬT LIỆU,VẬT LIỆU XÂY DỰNG & NỘI THẤT,,1486652500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VLC,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,NUÔI TRỒNG NÔNG & HẢI SẢN,,751755500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VNZ,UPCOM,TRUYỀN THÔNG,TRUYỀN THÔNG,GIẢI TRÍ & TRUYỀN THÔNG,,2048337000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VSF,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,SẢN XUẤT THỰC PHẨM,THỰC PHẨM,,527612500.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VTD,UPCOM,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,VẬN TẢI HÀNH KHÁCH & DU LỊCH,,1440719000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK
+VTR,UPCOM,DU LỊCH VÀ GIẢI TRÍ,DU LỊCH & GIẢI TRÍ,VẬN TẢI HÀNH KHÁCH & DU LỊCH,,556356000.0,ACCEPTED,,2026-07-03,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,OK

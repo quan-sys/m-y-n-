@@ -64,6 +64,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         default=None,
         help="Optional quick-check limit when building a fresh weekly report.",
     )
+    parser.add_argument(
+        "--market-cap-limit",
+        type=int,
+        default=0,
+        help="Maximum controlled live market-cap requests; default 0 disables them.",
+    )
     return parser.parse_args(argv)
 
 
@@ -77,6 +83,7 @@ def main(argv: list[str] | None = None) -> int:
         universe_path=ROOT / "data" / "universe.csv",
         reports_root=ROOT / "reports",
         limit_sectors=args.limit_sectors,
+        market_cap_limit=args.market_cap_limit,
     )
     return _run_existing_report(result.output_dir)
 
