@@ -57,11 +57,15 @@ STA      = Accruals / average Total Assets      (average of TA at N and N−1)
 Item map (Sprint-3 whitelist): ΔCurrent Assets=`current_assets`, ΔCash=`cash_and_cash_equivalents`, ΔCurrent Liabilities=`current_liabilities`, ΔShort-term Debt=`short_term_borrowings`, ΔTaxes Payable=`taxes_and_other_payable_to_state_budget` (⚠️ broader than Sloan's US "taxes payable" — accepted approximation, already caveated in Sprint 3), Depreciation=`depreciation_and_amortization` (cash-flow), Total Assets=`total_assets`.
 
 **SNOA — Scaled Net Operating Assets (Hirshleifer et al. 2004), VAS-adjusted:**
+
+```
 Operating Assets      = Total Assets − Cash & short-term investments
 Operating Liabilities = Total Assets − Short-term Debt − Long-term Debt − Owners' Equity
 NOA                   = Operating Assets − Operating Liabilities
 = Short-term Debt + Long-term Debt + Owners' Equity − Cash & short-term investments
 SNOA                  = NOA / beginning Total Assets      (Total Assets at N−1)
+```
+
 Item map: Cash & short-term investments = `cash_and_cash_equivalents` + `short_term_investments`; Short-term Debt = `short_term_borrowings`; Long-term Debt = `long_term_borrowings`; Owners' Equity = `owners_equity` (VAS balance-sheet code 400). Higher SNOA = balance-sheet bloat = worse.
 
 > ⚠️ **VAS ADJUSTMENT — do NOT re-introduce a separate Minority Interest / Preferred Stock subtraction.** Under Vietnamese VAS (Circular 200), `owners_equity` (code 400) ALREADY INCLUDES minority interest (`minority_interests`, code 429) and preferred capital, and the sheet balances as `Total Assets = Short-term Liabilities + Long-term Liabilities + owners_equity` (hand-checked VNM 2024: 18,459.55 + 415.11 + 36,174.40 = 55,049.06 = Total Assets). The original US Hirshleifer formula subtracts Minority Interest and Preferred Stock as SEPARATE financing claims because US GAAP presents common equity WITHOUT them. Subtracting them here would remove minority/preferred TWICE (double-count), inflating SNOA by ≈ (minority + preferred) / beginning Total Assets — for VNM ≈ +0.07, enough to mis-flag `HIGH_ACCRUAL`; worst for holding/conglomerate structures. `minority_interests` and `preferred_shares` MUST NOT appear anywhere in the SNOA computation.
