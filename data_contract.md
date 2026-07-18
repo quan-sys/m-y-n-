@@ -44,9 +44,17 @@ reject_reason
 as_of
 source
 data_status
+filter_stage
+reason_label
+trigger_metric
+trigger_value
+threshold_or_cutoff
 ```
 
 Every row in this file must have `status = REJECTED` and a non-empty `reject_reason`.
+The five Sprint 4 audit columns are blank for historical rows and populated only
+for newly appended Sprint 4 cleaning rejects; historical row order and values
+in the original twelve columns remain unchanged.
 
 ## Column Meanings
 
@@ -62,6 +70,11 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 - `as_of`: Date of the latest source data used for the row, or the run date when no market data was available.
 - `source`: Source name and relevant calculation note, for example `vnstock` or `vnstock+adtv_close_x_volume_proxy`.
 - `data_status`: Data availability status.
+- `filter_stage`: One-based position of the first Sprint 4 cleaning filter that rejected the ticker.
+- `reason_label`: The ticker's single primary Sprint 4 rejection reason.
+- `trigger_metric`: Formula metric, signal, or upstream field that caused the rejection.
+- `trigger_value`: Cached value or known signal that triggered the rejection.
+- `threshold_or_cutoff`: Fixed threshold or observed whole-universe cutoff applied by that filter.
 
 ## Valid `reject_reason` Values
 
@@ -73,6 +86,11 @@ Every row in this file must have `status = REJECTED` and a non-empty `reject_rea
 - `API_ERROR`
 - `MISSING_ICB_CLASSIFICATION`
 - `UNSUPPORTED_EXCHANGE`
+- `FINANCIAL_SECTOR_EXCLUDED`
+- `UPCOM_EXCLUDED_V1`
+- `HIGH_ACCRUAL`
+- `M_SCORE_FLAG`
+- `PFD_HIGH_RISK`
 
 ## Valid `data_status` Values
 

@@ -1,0 +1,173 @@
+COMMAND: python -m py_compile src/screener/step1_cleaning.py src/screener/step1_data.py src/screener/step1_pipeline.py scripts/run_sprint4_step1_cleaning.py
+EXIT CODE: 0
+STDOUT:
+STDERR:
+
+COMMAND: python -m pytest -q
+EXIT CODE: 0
+STDOUT:
+........................................................................ [ 36%]
+........................................................................ [ 72%]
+.......................................................                  [100%]
+STDERR:
+
+COMMAND: python scripts/run_sprint4_step1_cleaning.py --evaluation-date 2026-07-18
+EXIT CODE: 0
+STDOUT:
+{
+  "evaluation_date": "2026-07-18",
+  "input_paths": [
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\universe.csv",
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\universe_rejects.csv",
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\fundamentals\\run_state\\sprint4_annual\\2026-07-17\\normalized"
+  ],
+  "input_universe_rows": 378,
+  "formula_stage_rows": 243,
+  "filter_stats": [
+    {
+      "filter_stage": 1,
+      "filter": "FINANCIAL_SECTOR_EXCLUDED",
+      "entering": 378,
+      "removed": 63,
+      "removal_pct": 0.16666666666666666
+    },
+    {
+      "filter_stage": 2,
+      "filter": "UPCOM_EXCLUDED_V1",
+      "entering": 315,
+      "removed": 72,
+      "removal_pct": 0.22857142857142856
+    },
+    {
+      "filter_stage": 3,
+      "filter": "HIGH_ACCRUAL",
+      "entering": 243,
+      "removed": 42,
+      "removal_pct": 0.1728395061728395
+    },
+    {
+      "filter_stage": 4,
+      "filter": "M_SCORE_FLAG",
+      "entering": 201,
+      "removed": 35,
+      "removal_pct": 0.17412935323383086
+    },
+    {
+      "filter_stage": 5,
+      "filter": "PFD_HIGH_RISK",
+      "entering": 166,
+      "removed": 10,
+      "removal_pct": 0.060240963855421686
+    }
+  ],
+  "cutoffs": {
+    "STA": {
+      "valid_count": 243,
+      "cut_count": 25,
+      "cutoff": 0.23389126844758945
+    },
+    "SNOA": {
+      "valid_count": 243,
+      "cut_count": 25,
+      "cutoff": 0.9859440018428138
+    }
+  },
+  "sta_only": 17,
+  "snoa_only": 17,
+  "both": 8,
+  "union": 42,
+  "m_score_valid": 234,
+  "m_score_formula_stage_flagged": 54,
+  "distress_high_risk": 13,
+  "missing_warning": 243,
+  "formula_counts": [
+    {
+      "formula": "STA",
+      "valid": 243,
+      "insufficient": 0
+    },
+    {
+      "formula": "SNOA",
+      "valid": 243,
+      "insufficient": 0
+    },
+    {
+      "formula": "DSRI",
+      "valid": 242,
+      "insufficient": 1
+    },
+    {
+      "formula": "GMI",
+      "valid": 242,
+      "insufficient": 1
+    },
+    {
+      "formula": "AQI",
+      "valid": 241,
+      "insufficient": 2
+    },
+    {
+      "formula": "SGI",
+      "valid": 243,
+      "insufficient": 0
+    },
+    {
+      "formula": "DEPI",
+      "valid": 235,
+      "insufficient": 8
+    },
+    {
+      "formula": "SGAI",
+      "valid": 242,
+      "insufficient": 1
+    },
+    {
+      "formula": "LVGI",
+      "valid": 243,
+      "insufficient": 0
+    },
+    {
+      "formula": "TATA",
+      "valid": 243,
+      "insufficient": 0
+    },
+    {
+      "formula": "M_SCORE",
+      "valid": 234,
+      "insufficient": 9
+    },
+    {
+      "formula": "DISTRESS",
+      "valid": 0,
+      "insufficient": 243
+    }
+  ],
+  "guard_triggered": false,
+  "sector_warnings": [
+    "B\u00c1N L\u1eba"
+  ],
+  "output_rows": {
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\screener\\step1_survivors.csv": 156,
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\screener\\step1_rejects.csv": 222,
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\docs\\DIAG_SECTOR_A_REJECT_MIX_SPRINT_4.csv": 15,
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\docs\\DIAG_SECTOR_B_WHATIF_SPRINT_4.csv": 15,
+    "C:\\Users\\ACER\\OneDrive\\Documents\\may-tiep-sprint3\\data\\universe_rejects.csv": 1589
+  },
+  "reject_history_proof": {
+    "historical_row_count": 1367,
+    "appended_sprint4_row_count": 222,
+    "final_row_count": 1589,
+    "historical_hash_before": "108ebb24f385b4134e4f6d7ba553399441ed5fc61fd80ca1a5469ea560102a49",
+    "historical_hash_after": "108ebb24f385b4134e4f6d7ba553399441ed5fc61fd80ca1a5469ea560102a49",
+    "historical_rows_preserved": true
+  },
+  "cache_before": {
+    "file_count": 945,
+    "manifest_sha256": "5c3cef796abcc8d1fa54a49769720534724a60ab7ee4b1336450ed756027ac17"
+  },
+  "cache_after": {
+    "file_count": 945,
+    "manifest_sha256": "5c3cef796abcc8d1fa54a49769720534724a60ab7ee4b1336450ed756027ac17"
+  }
+}
+STDERR:

@@ -2,6 +2,7 @@
 
 ## 2026-07-18
 
+- Complete Sprint 4 Step 1 cleaning from the reviewed annual cache: run the five fixed-order filters, write survivor/reject and sector-diagnostic outputs, additively extend reject history with audit fields, and record test and review evidence; no live API call or merge.
 - Prepare Sprint 4 Step 1 cleaning inputs from the existing point-in-time annual cache, fix independent distress signals, record the owner-approved HIGH_ACCRUAL UNION rule and reporting rules, and add VNM formula evidence; no five-filter run or live API call.
 
 ## 2026-07-17
