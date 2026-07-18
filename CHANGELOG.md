@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-18
+
+- Prepare Sprint 4 Step 1 cleaning inputs from the existing point-in-time annual cache, fix independent distress signals, record the owner-approved HIGH_ACCRUAL UNION rule and reporting rules, and add VNM formula evidence; no five-filter run or live API call.
+
 ## 2026-07-17
 
 - Added a consolidated 2026-07-17 project handoff that supersedes the older

@@ -158,6 +158,28 @@ citations in THE PLAN, section "TRẠNG THÁI XÁC MINH"):
 - Uncertainty labels in docs and reports: ✅ verified / ⚠️ estimate or
   secondary source / ❓ unverified. Never present ⚠️ or ❓ material as fact.
 
+### Owner-review reporting rules
+
+- Before every owner report, reread the reporting rules in this `AGENTS.md`.
+- Every review report uses exactly nine numbered sections.
+- Each section normally contains exactly one complete summary sentence.
+- Section 1 states what Codex actually accomplished, including freshly fetched
+  HEAD and the complete diff scope.
+- Section 2 states the practical impact in ordinary Vietnamese.
+- Every number identifies the file, command, or calculation from which it was
+  independently obtained.
+- Codex summaries, recommendations, claimed test results, and conclusions are
+  not evidence.
+- Use only ✅ confirmed, ⚠️ estimate, and ❓ unclear.
+- Every pytest statement says that fixture tests show behavior on those
+  fixtures but do not prove real-world financial correctness.
+- Use only step names already present in the current SPEC or PLAN.
+- Section 8 contains PASS, PARTIAL, or FAIL.
+- Section 9 states the next task and explains the purpose of the next prompt in
+  one sentence.
+- Do not list low-value file, commit, diff, or command details unless they
+  affect the conclusion.
+
 ## 10. GitHub publishing and secret safety
 
 - This local project and `https://github.com/quan-sys/m-y-n-` are one

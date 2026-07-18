@@ -34,7 +34,14 @@ Run filters in this exact order; a ticker exits at the first filter it fails and
 
 1. `FINANCIAL_SECTOR_EXCLUDED` — ICB2 in banking, insurance, financial services / securities. EBIT/TEV, F-Score, and accruals are meaningless on bank/insurer statements. These are the 63 `FINANCIAL_RAW_FETCH_ONLY` tickers from Sprint 3 plus any other financial-ICB2 names. They stay in the sector monitor, out of the screener.
 2. `UPCOM_EXCLUDED_V1` — exchange == UPCOM. Quarterly-disclosure obligations for UPCoM firms are looser than for listed firms (⚠️ re-check TT96 detail if later relaxing), missing quarters silently corrupt TTM EBIT, and all VN E/P evidence (Huang/Liu/Shu 2023) covers only HOSE+HNX. UPCoM names stay in the sector monitor.
-3. `HIGH_ACCRUAL` — worst accruals percentile on STA and SNOA (default worst 10%, in config).
+3. `HIGH_ACCRUAL` — UNION rule: a ticker is flagged if it is in the worst
+   ACCRUAL_WORST_PCT of the whole non-financial universe by STA, OR in the
+   worst ACCRUAL_WORST_PCT by SNOA, or both. The two percentile cutoffs are
+   computed INDEPENDENTLY on their own valid-observation populations. This
+   follows Gray & Carlisle (Quantitative Value), where Sloan STA (single-year
+   accrual flow) and Hirshleifer SNOA (multi-year balance-sheet bloat) are two
+   distinct defects, each screened separately. Intersection and blended-score
+   variants are explicitly rejected.
 4. `M_SCORE_FLAG` — Beneish M-Score above threshold (default −1.78, in config).
 5. `PFD_HIGH_RISK` — financial-distress screen (simple transparent filter is primary; full Campbell optional/parallel).
 

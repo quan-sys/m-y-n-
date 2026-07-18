@@ -475,14 +475,17 @@ def calculate_simple_distress(
 ) -> DistressResult:
     """Evaluate accumulated loss, negative equity, and a supplied HoSE warning."""
 
-    values, numeric_error = _numbers(
-        "DISTRESS",
-        undistributed_earnings_n=undistributed_earnings_n,
-        owners_equity_n=owners_equity_n,
+    earnings_values, earnings_error = _numbers(
+        "DISTRESS", undistributed_earnings_n=undistributed_earnings_n
+    )
+    equity_values, equity_error = _numbers(
+        "DISTRESS", owners_equity_n=owners_equity_n
     )
     invalid: list[str] = []
-    if numeric_error:
-        invalid.extend(numeric_error.invalid_inputs)
+    if earnings_error:
+        invalid.extend(earnings_error.invalid_inputs)
+    if equity_error:
+        invalid.extend(equity_error.invalid_inputs)
     warning_value: bool | None
     if hose_warning is None:
         warning_value = None
@@ -493,8 +496,14 @@ def calculate_simple_distress(
         warning_value = None
         invalid.append("hose_warning")
 
-    accumulated_loss = None if values is None else values["undistributed_earnings_n"] < 0
-    negative_equity = None if values is None else values["owners_equity_n"] < 0
+    accumulated_loss = (
+        None
+        if earnings_values is None
+        else earnings_values["undistributed_earnings_n"] < 0
+    )
+    negative_equity = (
+        None if equity_values is None else equity_values["owners_equity_n"] < 0
+    )
     known_signals = (accumulated_loss, negative_equity, warning_value)
     if any(signal is True for signal in known_signals):
         high_risk: bool | None = True
