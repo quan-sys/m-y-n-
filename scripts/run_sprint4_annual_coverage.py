@@ -63,8 +63,6 @@ FORMULA_REQUIREMENTS: dict[str, tuple[tuple[str, str, str], ...]] = {
         (STATEMENT_BALANCE_SHEET, "short_term_investments", "BOTH"),
         (STATEMENT_BALANCE_SHEET, "short_term_borrowings", "BOTH"),
         (STATEMENT_BALANCE_SHEET, "long_term_borrowings", "BOTH"),
-        (STATEMENT_BALANCE_SHEET, "minority_interests", "BOTH"),
-        (STATEMENT_BALANCE_SHEET, "preferred_shares", "BOTH"),
         (STATEMENT_BALANCE_SHEET, "owners_equity", "BOTH"),
     ),
     "DSRI": (
