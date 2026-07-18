@@ -139,6 +139,7 @@ citations in THE PLAN, section "TRẠNG THÁI XÁC MINH"):
 
 - Report what actually happened: exact commands, exact output, exact
   errors. No summaries that hide failures.
+- Never treat Codex summaries, recommendations, claimed test results, or conclusions as evidence. Before reporting to the owner, independently inspect the actual repository state, PR, commits, diff, changed files, and available test evidence. Anything that cannot be independently verified must be labelled UNVERIFIED. Green tests alone do not prove sprint completion.
 - After each completed step, state: what was done, what was verified, what
   remains, and any OPEN QUESTIONs.
 - The owner is not a programmer. After every run and before every report,
