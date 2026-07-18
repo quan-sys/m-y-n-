@@ -80,6 +80,14 @@ def finite_number(value: Any) -> bool:
         return False
 
 
+def known_boolean_true(value: Any) -> bool:
+    """Return true only for an available Python or NumPy boolean true value."""
+
+    if value is None or value is pd.NA:
+        return False
+    return pd.api.types.is_bool(value) and bool(value)
+
+
 def higher_tail_flags(values: pd.Series, worst_pct: float) -> TailCutoff:
     """Flag the observed higher tail, including every tie at the boundary."""
 
@@ -175,7 +183,7 @@ def add_formula_flags(frame: pd.DataFrame, worst_pct: float, mscore_threshold: f
     result["snoa_flag"] = snoa.flags
     result["high_accrual_flag"] = result["sta_flag"] | result["snoa_flag"]
     result["m_score_flag"] = pd.to_numeric(result["m_score"], errors="coerce").gt(float(mscore_threshold))
-    result["pfd_high_risk_flag"] = result["distress_high_risk"].map(lambda value: value is True)
+    result["pfd_high_risk_flag"] = result["distress_high_risk"].map(known_boolean_true)
     return result, {"STA": sta, "SNOA": snoa}
 
 
@@ -208,7 +216,7 @@ def assign_primary_rejections(full_universe: pd.DataFrame, evaluated: pd.DataFra
                 reason, metric = FILTER_ORDER[4], "DISTRESS"
                 signals = [
                     name for name in ("accumulated_loss", "negative_equity", "hose_warning")
-                    if details[f"distress_{name}"] is True
+                    if known_boolean_true(details[f"distress_{name}"])
                 ]
                 value, threshold = "|".join(signals), "high_risk is True"
         if reason:

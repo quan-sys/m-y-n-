@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import socket
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -163,6 +164,56 @@ def test_known_distress_signal_with_other_missing_inputs():
     assert rejects.loc[rejects.ticker == "AAA", "reason_label"].item() == "PFD_HIGH_RISK"
 
 
+def pfd_trigger_value(**signals):
+    frame = formula_frame(
+        distress_high_risk=[False, True, False, False],
+        distress_accumulated_loss=[False, signals.get("accumulated_loss"), False, False],
+        distress_negative_equity=[False, signals.get("negative_equity"), False, False],
+        distress_hose_warning=[None, signals.get("hose_warning"), None, None],
+    )
+    rejects, _, _ = assigned(frame)
+    return rejects.loc[rejects.ticker == "BBB", "trigger_value"].item()
+
+
+def test_pfd_audit_python_true_signal_name():
+    assert pfd_trigger_value(accumulated_loss=True) == "accumulated_loss"
+
+
+def test_pfd_audit_numpy_true_signal_name():
+    assert pfd_trigger_value(negative_equity=np.bool_(True)) == "negative_equity"
+
+
+def test_pfd_audit_two_true_signal_names():
+    assert pfd_trigger_value(accumulated_loss=True, hose_warning=np.bool_(True)) == "accumulated_loss|hose_warning"
+
+
+def test_pfd_audit_omits_false_and_unavailable_values():
+    assert pfd_trigger_value(
+        accumulated_loss=True,
+        negative_equity=False,
+        hose_warning=None,
+    ) == "accumulated_loss"
+    assert pfd_trigger_value(
+        accumulated_loss=True,
+        negative_equity=float("nan"),
+        hose_warning=pd.NA,
+    ) == "accumulated_loss"
+
+
+def test_every_generated_pfd_reject_has_trigger_value():
+    frame = formula_frame(
+        sta=[0.0, 0.0, 10.0, 1.0],
+        snoa=[0.0, 0.0, 1.0, 10.0],
+        distress_high_risk=[True, True, False, False],
+        distress_accumulated_loss=[True, False, False, False],
+        distress_negative_equity=[False, np.bool_(True), False, False],
+    )
+    rejects, _, _ = assigned(frame)
+    pfd = rejects.loc[rejects.reason_label == "PFD_HIGH_RISK"]
+    assert pfd["trigger_value"].tolist() == ["accumulated_loss", "negative_equity"]
+    assert pfd["trigger_value"].str.len().gt(0).all()
+
+
 def test_missing_warning_does_not_cause_rejection():
     frame = formula_frame(sta=[0, 1, 2, 3], snoa=[0, 1, 2, 3])
     frame, cuts = add_formula_flags(frame, 0.25, -1.78)
@@ -214,11 +265,42 @@ def test_preservation_of_historical_reject_rows():
 
 
 def test_future_available_from_exclusion():
-    rows = pd.DataFrame(
-        [["AAA", "balance_sheet", "total_assets", 1, "VND", "ANNUAL", "2025", "2026-08-01", "2026-07-18", "x", "OK", "", "", "", ""]],
-        columns=ANNUAL_COLUMNS,
-    )
-    assert select_latest_eligible_pair(rows, "2026-07-18").eligible_rows.empty
+    records = [
+        {
+            "ticker": "AAA",
+            "company_type": "non_financial",
+            "statement_type": "BALANCE_SHEET",
+            "period_type": "ANNUAL",
+            "report_period": str(year),
+            "period_end": f"{year}-12-31",
+            "available_from": available_from,
+            "item_id": "total_assets",
+            "item": "Total assets",
+            "item_en": "Total assets",
+            "value": 1.0,
+            "currency": "VND",
+            "source": "saved_fixture",
+            "as_of": "2026-07-18",
+            "data_status": "OK",
+        }
+        for year, available_from in (
+            (2026, "2026-08-01"),
+            (2025, "2026-03-31"),
+            (2024, "2025-03-31"),
+        )
+    ]
+    rows = pd.DataFrame.from_records(records, columns=ANNUAL_COLUMNS)
+    assert tuple(rows.columns) == ANNUAL_COLUMNS
+    assert rows["period_type"].eq("ANNUAL").all()
+
+    future_selection = select_latest_eligible_pair(rows, "2026-07-18")
+    assert set(future_selection.eligible_rows["report_period"]) == {"2025", "2024"}
+    assert future_selection.pair == (2025, 2024)
+
+    rows.loc[rows["report_period"].eq("2026"), "available_from"] = "2026-07-01"
+    eligible_selection = select_latest_eligible_pair(rows, "2026-07-18")
+    assert "2026" in set(eligible_selection.eligible_rows["report_period"])
+    assert eligible_selection.pair == (2026, 2025)
 
 
 def test_unit_consistency():

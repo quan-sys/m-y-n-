@@ -2,11 +2,11 @@
 
 ## 1. Starting and final HEAD
 
-- Reviewer-approved starting HEAD: `d58ae313887e29269cf5b7f8496926f372264f4e`.
-- Pipeline implementation commit: `f5dd55e` (`Implement Sprint 4 Step 1 cleaning pipeline`).
+- Reviewer-approved starting HEAD for the PFD/future-date review fix: `70e161ff345f37b66a1717a9200187a9dd37646e`.
+- Original cleaning implementation commits: `f5dd55e` and `70e161f`.
 - Final HEAD is the commit containing this evidence file. Its exact SHA is reported by PR #4 and the required five-line owner handoff; a commit cannot contain its own SHA because changing this line changes that SHA.
 
-## 2. Exact commit list for this task
+## 2. Original cleaning implementation commit list
 
 ```text
 <output/evidence commit containing this file> Write Sprint 4 Step 1 cleaning evidence
@@ -14,7 +14,7 @@ f5dd55e Implement Sprint 4 Step 1 cleaning pipeline
 d58ae31 Prepare Sprint 4 cleaning data prerequisites
 ```
 
-## 3. Exact task-only changed-file list
+## 3. Original cleaning implementation changed-file list
 
 ```text
 CHANGELOG.md
@@ -32,7 +32,7 @@ src/screener/step1_pipeline.py
 tests/test_step1_pipeline.py
 ```
 
-## 4. Exact task-only diff stat
+## 4. Original cleaning implementation diff stat
 
 ```text
  CHANGELOG.md                               |    1 +
@@ -51,7 +51,7 @@ tests/test_step1_pipeline.py
  13 files changed, 3233 insertions(+), 1368 deletions(-)
 ```
 
-## 5. Exact final `origin/main..HEAD` diff stat
+## 5. Original cleaning implementation `origin/main..HEAD` diff stat
 
 ```text
  AGENTS.md                                  |   23 +
@@ -227,7 +227,7 @@ index 94ef444..e342ff9 100644
 
 ## 15. No forbidden changes or network/refetch
 
-- Task-only changed files contain no Sprint 3 production file and no pre-existing test file.
+- The original cleaning implementation changed no Sprint 3 production file or pre-existing test file.
 - `docs/SPEC_SPRINT_4.md`, `config/screener.yaml`, dependencies, Sprint 3 parser/client/normalization/cache generation, and existing tests are unchanged by this task.
 - The new production call path imports only `step1_data` and `step1_cleaning`; neither the runner nor pipeline imports `vnstock`, an HTTP client, or a fetcher.
 - Network access is blocked by the focused fixture test.
@@ -235,6 +235,111 @@ index 94ef444..e342ff9 100644
 - No live API call and no refetch occurred.
 
 ## 16. Exact PR state
+
+```text
+url: https://github.com/quan-sys/m-y-n-/pull/4
+base: main
+head: agent/sprint4-step0-annual
+state: OPEN
+isDraft: true
+mergedAt: null
+autoMergeRequest: null
+title: Sprint 4 — Step 1: CLEANING
+```
+
+## 17. PFD and future-`available_from` review correction
+
+### Reviewer-approved starting HEAD and correction commit
+
+```text
+starting HEAD: 70e161ff345f37b66a1717a9200187a9dd37646e
+final HEAD: <the correction commit containing this evidence; exact SHA is in PR #4 and the five-line handoff>
+task-only commits:
+<correction commit containing this evidence> Fix Sprint 4 PFD audit and future-date test
+```
+
+### Exact review-fix changed-file list
+
+```text
+data/screener/step1_rejects.csv
+data/universe_rejects.csv
+docs/REVIEW_EVIDENCE_SPRINT_4_CLEANING.md
+docs/TEST_LOG_SPRINT_4_CLEANING.txt
+src/screener/step1_pipeline.py
+tests/test_step1_pipeline.py
+```
+
+### Exact review-fix diff stat
+
+```text
+ data/screener/step1_rejects.csv           |  20 ++---
+ data/universe_rejects.csv                 |  20 ++---
+ docs/REVIEW_EVIDENCE_SPRINT_4_CLEANING.md | 119 ++++++++++++++++++++++++++++--
+ docs/TEST_LOG_SPRINT_4_CLEANING.txt       |   6 +-
+ src/screener/step1_pipeline.py            |  12 ++-
+ tests/test_step1_pipeline.py              |  92 ++++++++++++++++++++++--
+ 6 files changed, 232 insertions(+), 37 deletions(-)
+```
+
+### Exact full unfiltered test result
+
+```text
+........................................................................ [ 35%]
+........................................................................ [ 70%]
+............................................................             [100%]
+exit code: 0
+```
+
+The exact commands, stdout, stderr, and exit codes for `py_compile`, full unfiltered pytest, and the cache-only pipeline are stored in `docs/TEST_LOG_SPRINT_4_CLEANING.txt`.
+
+### All PFD primary rejects and corrected triggering signals
+
+| ticker | trigger_value |
+|---|---|
+| APH | accumulated_loss |
+| ASP | accumulated_loss |
+| HVN | accumulated_loss |
+| LDG | accumulated_loss |
+| TLH | accumulated_loss |
+| TSC | accumulated_loss |
+| TTF | accumulated_loss |
+| VPG | accumulated_loss |
+| GKM | accumulated_loss |
+| OCH | accumulated_loss |
+
+PFD primary rejects: `10`; empty `trigger_value`: `0`. The serialization accepts Python `True` and NumPy/pandas boolean true scalars, while `False`, `None`, `NaN`, and `pd.NA` do not become printed financial signals. The rejection decision remains based on the reviewed `distress_high_risk` result.
+
+### Corrected future-date regression proof
+
+- Only `tests/test_step1_pipeline.py::test_future_available_from_exclusion` changed; `tests/test_step1_data.py::test_future_available_from_rows_are_excluded` remains byte-for-byte unchanged from starting HEAD `70e161f`.
+- The corrected test builds keyed records and explicitly passes `columns=ANNUAL_COLUMNS`.
+- It asserts the resulting column tuple equals `ANNUAL_COLUMNS` and every `period_type` equals `ANNUAL`, excluding malformed-row explanations.
+- With the valid 2026 row at `available_from='2026-08-01'` and evaluation date `2026-07-18`, eligible periods are exactly 2025 and 2024 and the selected pair is `(2025, 2024)`.
+- For the same 2026 row changed only to `available_from='2026-07-01'`, 2026 becomes eligible and the selected pair is `(2026, 2025)`. This positive control proves the date gate does not reject everything.
+
+### Regenerated-output and preservation proof
+
+```text
+survivors: 156
+detailed rejects: 222
+PFD_HIGH_RISK primary rejects: 10
+PFD_HIGH_RISK rows with non-empty trigger_value: 10
+historical rejects: 1367
+appended Sprint 4 rejects: 222
+final reject history: 1589
+duplicate Sprint 4 reject tickers: 0
+historical_hash_before: 108ebb24f385b4134e4f6d7ba553399441ed5fc61fd80ca1a5469ea560102a49
+historical_hash_after: 108ebb24f385b4134e4f6d7ba553399441ed5fc61fd80ca1a5469ea560102a49
+historical_rows_preserved: true
+cache_file_count_before: 945
+cache_file_count_after: 945
+cache_manifest_before: 5c3cef796abcc8d1fa54a49769720534724a60ab7ee4b1336450ed756027ac17
+cache_manifest_after: 5c3cef796abcc8d1fa54a49769720534724a60ab7ee4b1336450ed756027ac17
+```
+
+No rejection decision, formula, threshold, cutoff, filter order, spec, config, Sprint 3 production/test file, dependency, or cache source changed. No live API call or refetch occurred.
+
+### PR state after correction packaging
 
 ```text
 url: https://github.com/quan-sys/m-y-n-/pull/4

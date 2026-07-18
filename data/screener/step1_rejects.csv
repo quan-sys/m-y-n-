@@ -3,8 +3,8 @@ ACB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,N
 AFX,4,M_SCORE_FLAG,M_SCORE,-1.1854153623122157,>-1.78,HOSE,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
 AGR,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 APG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
-APH,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
-ASP,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock_VCI_financial,2026-07-17,OK
+APH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+ASP,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock_VCI_financial,2026-07-17,OK
 BAF,4,M_SCORE_FLAG,M_SCORE,-1.3341457862593922,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
 BCG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2025-10-08,OK
 BFC,3,HIGH_ACCRUAL,STA,STA=0.29412668151452775,STA>=0.23389126844758945,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
@@ -41,13 +41,13 @@ HHS,3,HIGH_ACCRUAL,STA+SNOA,STA=0.9851453143346587;SNOA=2.4927772331033933,STA>=
 HID,3,HIGH_ACCRUAL,SNOA,SNOA=0.990234696031504,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
 HSL,4,M_SCORE_FLAG,M_SCORE,-0.4379056454557322,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
 HVH,4,M_SCORE_FLAG,M_SCORE,-0.5693335737891447,>-1.78,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
-HVN,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,DU LỊCH VÀ GIẢI TRÍ,vnstock_VCI_financial,2026-07-17,OK
+HVN,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,DU LỊCH VÀ GIẢI TRÍ,vnstock_VCI_financial,2026-07-17,OK
 KBC,3,HIGH_ACCRUAL,STA+SNOA,STA=0.254060498583599;SNOA=1.0086672070652132,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 KDH,4,M_SCORE_FLAG,M_SCORE,-1.3447178100255934,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 KHG,3,HIGH_ACCRUAL,SNOA,SNOA=0.9859440018428138,SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 KLB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 LAF,3,HIGH_ACCRUAL,STA+SNOA,STA=0.2792612229651382;SNOA=1.3411019221671168,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
-LDG,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+LDG,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 LPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 MBB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 MCH,4,M_SCORE_FLAG,M_SCORE,-1.1455843181715084,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
@@ -82,11 +82,11 @@ TCI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 excl
 TCX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 TDC,4,M_SCORE_FLAG,M_SCORE,-0.5021681679661352,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 TLD,3,HIGH_ACCRUAL,SNOA,SNOA=1.123872686670078,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
-TLH,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+TLH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
 TNH,3,HIGH_ACCRUAL,SNOA,SNOA=1.0781687787505156,SNOA>=0.9859440018428138,HOSE,Y TẾ,vnstock_VCI_financial,2026-07-17,OK
 TPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
-TSC,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
-TTF,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+TSC,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+TTF,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
 TVS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 VAB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 VCB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
@@ -100,7 +100,7 @@ VIX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 excl
 VND,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 VOS,4,M_SCORE_FLAG,M_SCORE,-1.308398559597698,>-1.78,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
 VPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
-VPG,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+VPG,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
 VPI,3,HIGH_ACCRUAL,SNOA,SNOA=0.9927058841695853,SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 VPX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
 VRE,4,M_SCORE_FLAG,M_SCORE,-1.2233967798083614,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
@@ -111,7 +111,7 @@ C69,3,HIGH_ACCRUAL,SNOA,SNOA=1.054954128816256,SNOA>=0.9859440018428138,HNX,XÂY
 CMS,4,M_SCORE_FLAG,M_SCORE,-1.5716849847085723,>-1.78,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
 DST,3,HIGH_ACCRUAL,SNOA,SNOA=0.991343890129596,SNOA>=0.9859440018428138,HNX,TRUYỀN THÔNG,vnstock_VCI_financial,2026-07-17,OK
 EVS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
-GKM,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+GKM,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
 HUT,3,HIGH_ACCRUAL,STA+SNOA,STA=0.24250988187713762;SNOA=1.148633155735191,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,Ô TÔ VÀ PHỤ TÙNG,vnstock_VCI_financial,2026-07-17,OK
 IPA,3,HIGH_ACCRUAL,SNOA,SNOA=1.0551442588169566,SNOA>=0.9859440018428138,HNX,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
 KSF,3,HIGH_ACCRUAL,STA+SNOA,STA=0.47661331298968157;SNOA=1.7723448141770413,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
@@ -124,7 +124,7 @@ MBS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 excl
 MST,3,HIGH_ACCRUAL,STA,STA=0.5213728708139835,STA>=0.23389126844758945,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
 NRC,4,M_SCORE_FLAG,M_SCORE,13.433727004856571,>-1.78,HNX,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
 NVB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HNX,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
-OCH,5,PFD_HIGH_RISK,DISTRESS,,high_risk is True,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+OCH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
 PCH,4,M_SCORE_FLAG,M_SCORE,-1.2825061496739163,>-1.78,HNX,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
 PSD,3,HIGH_ACCRUAL,STA,STA=0.2807165353521178,STA>=0.23389126844758945,HNX,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
 PSI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
