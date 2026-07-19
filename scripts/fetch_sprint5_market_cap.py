@@ -3,9 +3,12 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
+import sys
+import time
 from datetime import date, datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import pandas as pd
 
@@ -17,6 +20,22 @@ PUBLIC_METHODS = (
     ("KBS", "vnstock.api.company.Company", "overview"),
     ("KBS", "vnstock.api.trading.Trading", "price_board"),
 )
+UNIVERSE_COLUMNS = [
+    "ticker",
+    "price_vnd",
+    "price_as_of",
+    "shares_outstanding",
+    "shares_as_of",
+    "market_cap_vnd",
+    "source_method",
+    "guard_flags",
+]
+SOURCE_METHOD = (
+    "KBS Company.overview().outstanding_shares x "
+    "KBS Trading.price_board().close_price (VND)"
+)
+PRICE_BOARD_BATCH_SIZE = 50
+MAX_FAILURES = 20
 
 
 def _json_value(value: Any) -> Any:
@@ -56,6 +75,21 @@ def _compact_row(frame: pd.DataFrame, ticker: str, position: int = 0) -> dict[st
     if selected.empty:
         return {}
     return {str(key): _json_value(value) for key, value in selected.iloc[0].items()}
+
+
+def _strict_ticker_row(frame: pd.DataFrame, ticker: str) -> dict[str, Any]:
+    if frame.empty:
+        return {}
+    for column in frame.columns:
+        if str(column).lower() not in {"symbol", "ticker"}:
+            continue
+        match = frame[column].astype(str).str.upper().eq(ticker)
+        if match.any():
+            return {
+                str(key): _json_value(value)
+                for key, value in frame.loc[match].iloc[0].items()
+            }
+    return {}
 
 
 def _payload_hash(payload: dict[str, Any]) -> str:
@@ -196,6 +230,233 @@ def record_passes_contract(record: dict[str, Any]) -> bool:
     return direct_pass or proxy_pass
 
 
+def _finite_number(value: Any) -> float | None:
+    if value is None or value is pd.NA or value == "":
+        return None
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if math.isfinite(number) else None
+
+
+def guard_market_cap_inputs(price_vnd: Any, shares_outstanding: Any) -> list[str]:
+    price = _finite_number(price_vnd)
+    shares = _finite_number(shares_outstanding)
+    if price is None or shares is None:
+        return ["MISSING_INPUT"]
+    flags: list[str] = []
+    if price < 1_000 or price > 1_000_000:
+        flags.append("PRICE_OUT_OF_RANGE")
+    if shares <= 1_000_000:
+        flags.append("SHARES_SUSPECT")
+    return flags
+
+
+def calculate_market_cap_vnd(price_vnd: Any, shares_outstanding: Any) -> int | None:
+    if guard_market_cap_inputs(price_vnd, shares_outstanding):
+        return None
+    price = _finite_number(price_vnd)
+    shares = _finite_number(shares_outstanding)
+    assert price is not None and shares is not None
+    return int(round(price * shares))
+
+
+def _normalized_integer(value: Any) -> int | str:
+    number = _finite_number(value)
+    if number is None:
+        return ""
+    return int(round(number))
+
+
+def _normalized_date(value: Any) -> str:
+    if value is None or value is pd.NA or value == "":
+        return ""
+    parsed = pd.to_datetime(value, dayfirst="/" in str(value), errors="coerce")
+    return "" if pd.isna(parsed) else parsed.strftime("%Y-%m-%d")
+
+
+def _valid_checkpoint_row(row: pd.Series) -> bool:
+    flags = "" if pd.isna(row.get("guard_flags")) else str(row.get("guard_flags", ""))
+    market_cap = _finite_number(row.get("market_cap_vnd"))
+    return not flags and market_cap is not None and market_cap > 0
+
+
+def _write_checkpoint(rows: list[dict[str, Any]], tickers: list[str], output_path: Path) -> None:
+    frame = pd.DataFrame(rows, columns=UNIVERSE_COLUMNS)
+    if not frame.empty:
+        order = {ticker: index for index, ticker in enumerate(tickers)}
+        frame = frame.drop_duplicates("ticker", keep="last")
+        frame["_order"] = frame["ticker"].map(order)
+        frame = frame.sort_values("_order").drop(columns="_order")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = output_path.with_suffix(".tmp")
+    frame.to_csv(temporary, index=False, lineterminator="\n")
+    temporary.replace(output_path)
+
+
+def _retry_frame(
+    call: Callable[[], pd.DataFrame],
+    *,
+    max_retries: int,
+    backoff_base: float,
+    sleep_fn: Callable[[float], None],
+) -> tuple[pd.DataFrame, int, str]:
+    calls = 0
+    last_error = ""
+    for attempt in range(max_retries + 1):
+        calls += 1
+        try:
+            frame = call()
+            if frame is None or frame.empty:
+                raise ValueError("provider returned an empty DataFrame")
+            return frame, calls, ""
+        except Exception as exc:
+            last_error = f"{type(exc).__name__}: {exc}"
+            if attempt < max_retries:
+                sleep_fn(backoff_base * (2**attempt))
+    return pd.DataFrame(), calls, last_error
+
+
+def run_full_universe(
+    *,
+    survivors_path: Path,
+    output_path: Path,
+    expected_count: int = 156,
+    sleep_seconds: float = 1.0,
+    max_retries: int = 3,
+    backoff_base: float = 1.0,
+    sleep_fn: Callable[[float], None] = time.sleep,
+    overview_fetcher: Callable[[str], pd.DataFrame] | None = None,
+    board_fetcher: Callable[[list[str]], pd.DataFrame] | None = None,
+    include_probe_tickers: bool = False,
+) -> dict[str, Any]:
+    survivors = pd.read_csv(survivors_path)
+    if "ticker" not in survivors.columns:
+        raise ValueError("survivor input is missing ticker")
+    survivor_tickers = survivors["ticker"].astype(str).str.strip().str.upper().tolist()
+    if len(survivor_tickers) != expected_count or len(set(survivor_tickers)) != expected_count:
+        raise ValueError(
+            f"survivor input must contain exactly {expected_count} unique tickers; "
+            f"found rows={len(survivor_tickers)} unique={len(set(survivor_tickers))}"
+        )
+    tickers = list(survivor_tickers)
+    if include_probe_tickers:
+        tickers.extend(ticker for ticker in PROBE_TICKERS if ticker not in tickers)
+    overview_fetcher = overview_fetcher or (lambda ticker: _call_company("KBS", ticker))
+    board_fetcher = board_fetcher or (lambda batch: _call_board("KBS", batch))
+
+    saved_rows: list[dict[str, Any]] = []
+    completed: set[str] = set()
+    if output_path.exists():
+        checkpoint = pd.read_csv(output_path)
+        missing_columns = [column for column in UNIVERSE_COLUMNS if column not in checkpoint.columns]
+        if missing_columns:
+            raise ValueError(f"checkpoint missing columns: {missing_columns}")
+        checkpoint = checkpoint[checkpoint["ticker"].astype(str).isin(tickers)]
+        for _, row in checkpoint.iterrows():
+            if _valid_checkpoint_row(row):
+                record = {
+                    column: ("" if pd.isna(row[column]) else row[column])
+                    for column in UNIVERSE_COLUMNS
+                }
+                record["ticker"] = str(record["ticker"]).upper()
+                for column in ("price_vnd", "shares_outstanding", "market_cap_vnd"):
+                    record[column] = _normalized_integer(record[column])
+                record["price_as_of"] = _normalized_date(record["price_as_of"])
+                record["shares_as_of"] = _normalized_date(record["shares_as_of"])
+                saved_rows.append(record)
+                completed.add(record["ticker"])
+
+    pending = [ticker for ticker in tickers if ticker not in completed]
+    api_calls = 0
+    price_rows: dict[str, dict[str, Any]] = {}
+    price_errors: dict[str, str] = {}
+    for start in range(0, len(pending), PRICE_BOARD_BATCH_SIZE):
+        batch = pending[start : start + PRICE_BOARD_BATCH_SIZE]
+        frame, calls, error = _retry_frame(
+            lambda batch=batch: board_fetcher(batch),
+            max_retries=max_retries,
+            backoff_base=backoff_base,
+            sleep_fn=sleep_fn,
+        )
+        api_calls += calls
+        if error:
+            price_errors.update({ticker: error for ticker in batch})
+            continue
+        for ticker in batch:
+            price_rows[ticker] = _strict_ticker_row(frame, ticker)
+
+    rows = list(saved_rows)
+    failures: list[dict[str, str]] = []
+    previous_overview_called = False
+    for ticker in pending:
+        price_row = price_rows.get(ticker, {})
+        if previous_overview_called:
+            sleep_fn(sleep_seconds)
+        overview, calls, overview_error = _retry_frame(
+            lambda ticker=ticker: overview_fetcher(ticker),
+            max_retries=max_retries,
+            backoff_base=backoff_base,
+            sleep_fn=sleep_fn,
+        )
+        api_calls += calls
+        previous_overview_called = True
+        overview_row = _strict_ticker_row(overview, ticker)
+
+        price = _normalized_integer(price_row.get("close_price"))
+        shares = _normalized_integer(overview_row.get("outstanding_shares"))
+        flags = guard_market_cap_inputs(price, shares)
+        market_cap = calculate_market_cap_vnd(price, shares)
+        record = {
+            "ticker": ticker,
+            "price_vnd": price,
+            "price_as_of": _normalized_date(price_row.get("TD")),
+            "shares_outstanding": shares,
+            "shares_as_of": _normalized_date(overview_row.get("as_of_date")),
+            "market_cap_vnd": "" if market_cap is None else market_cap,
+            "source_method": SOURCE_METHOD,
+            "guard_flags": ";".join(flags),
+        }
+        rows.append(record)
+        _write_checkpoint(rows, tickers, output_path)
+        if flags:
+            failure_parts = list(flags)
+            if ticker in price_errors:
+                failure_parts.append(f"PRICE_API_ERROR={price_errors[ticker]}")
+            if overview_error:
+                failure_parts.append(f"OVERVIEW_API_ERROR={overview_error}")
+            failures.append({"ticker": ticker, "reason": ";".join(failure_parts)})
+            if len(failures) > MAX_FAILURES:
+                return {
+                    "status": "STOPPED_TOO_MANY_FAILURES",
+                    "api_calls": api_calls,
+                    "cache_hits": len(completed),
+                    "rows": len(pd.DataFrame(rows).drop_duplicates("ticker")),
+                    "selected_coverage": sum(
+                        _finite_number(row.get("market_cap_vnd")) is not None for row in rows
+                    ),
+                    "failures": failures,
+                    "output": output_path.as_posix(),
+                }
+
+    final = pd.read_csv(output_path) if output_path.exists() else pd.DataFrame(columns=UNIVERSE_COLUMNS)
+    survivor_final = final[final["ticker"].isin(survivor_tickers)]
+    selected = int(
+        pd.to_numeric(survivor_final["market_cap_vnd"], errors="coerce").notna().sum()
+    )
+    return {
+        "status": "OK",
+        "api_calls": api_calls,
+        "cache_hits": len(completed),
+        "rows": len(final),
+        "survivor_rows": len(survivor_final),
+        "selected_coverage": selected,
+        "failures": failures,
+        "output": output_path.as_posix(),
+    }
+
+
 def run_probe(output_dir: Path, cache_only: bool = False) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     records: list[dict[str, Any]] = []
@@ -300,15 +561,41 @@ def run_probe(output_dir: Path, cache_only: bool = False) -> dict[str, Any]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Probe public vnstock market-cap inputs safely.")
     parser.add_argument("--evaluation-date", required=True)
-    parser.add_argument("--probe-only", action="store_true", required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--probe-only", action="store_true")
+    mode.add_argument("--full-universe", action="store_true")
     parser.add_argument("--cache-only", action="store_true")
     parser.add_argument("--output-root", type=Path, default=Path("data/market_cap"))
+    parser.add_argument(
+        "--survivors", type=Path, default=Path("data/screener/step1_survivors.csv")
+    )
+    parser.add_argument("--sleep-seconds", type=float, default=1.0)
+    parser.add_argument("--max-retries", type=int, default=3)
+    parser.add_argument("--backoff-base", type=float, default=1.0)
     return parser.parse_args()
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
     args = parse_args()
     output_dir = args.output_root / args.evaluation_date
+    if args.full_universe:
+        if args.cache_only:
+            raise ValueError("--cache-only is available only with --probe-only")
+        if args.sleep_seconds < 1:
+            raise ValueError("--sleep-seconds must be at least 1 for live overview calls")
+        summary = run_full_universe(
+            survivors_path=args.survivors,
+            output_path=output_dir / "universe_market_cap.csv",
+            sleep_seconds=args.sleep_seconds,
+            max_retries=args.max_retries,
+            backoff_base=args.backoff_base,
+            include_probe_tickers=True,
+        )
+        print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+        return 0 if summary["status"] == "OK" else 3
     summary = run_probe(output_dir, cache_only=args.cache_only)
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
     return 0 if summary["contract_passed"] else 2

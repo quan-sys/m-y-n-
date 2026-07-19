@@ -480,6 +480,12 @@ not be silently aggregated.
 
 The probe evidence is not an accepted market-cap dataset. A direct value requires an explicit VND unit and quote/as-of date. A proxy requires a current unadjusted price with explicit VND or thousand-VND unit, true shares outstanding, and quote/as-of date. Missing proof remains missing and is never converted to zero.
 
+## Sprint 5 calibrated universe market cap
+
+`data/market_cap/<run-date>/universe_market_cap.csv` contains one checkpointed row per Sprint 4 survivor. Its exact columns are `ticker`, `price_vnd`, `price_as_of`, `shares_outstanding`, `shares_as_of`, `market_cap_vnd`, `source_method`, and `guard_flags`.
+
+`price_vnd` is the current unadjusted KBS `Trading.price_board().close_price` in VND and is never multiplied by `1000`. `shares_outstanding` is KBS `Company.overview().outstanding_shares`. `market_cap_vnd` is their direct product only when both inputs are present, price is within `[1,000; 1,000,000]`, and shares are greater than `1,000,000`; otherwise it stays missing and `guard_flags` records `MISSING_INPUT`, `PRICE_OUT_OF_RANGE`, or `SHARES_SUSPECT`.
+
 The ≥ 90% full-universe coverage check and first real full-universe dated
 snapshot have not been completed. Sprint 3 must not be declared complete until
 those checks pass and the duplicate-ID issue is resolved or explicitly

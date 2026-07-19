@@ -79,7 +79,7 @@ The owner-approved economic definition is binding:
 
 ```text
 interest_expense_magnitude =
-    the financing interest expense represented as a positive magnitude
+    abs(raw interest_expenses)
 
 EBIT_PROXY_VAS =
     TTM(net_accounting_profit_loss_before_tax)
@@ -95,15 +95,9 @@ interest_expenses
 
 This result must be called `EBIT_PROXY_VAS`, not clean EBIT or an exact IFRS EBIT subtotal. `operating_profit_loss` is not a production EBIT input because the Vietnamese operating-profit line already reflects finance income and finance expenses and is not a clean financing-neutral EBIT subtotal.
 
-The sign rule is a mandatory safety gate. The audit must never blindly use the raw `interest_expenses` value and must never hide mixed signs by applying `abs()`.
+The owner-verified VAS print convention records expenses as positive numbers and negatives in parentheses. The HAG 2026Q1 press match in `docs/SPRINT_5_CALIBRATION_EVIDENCE.md` confirms that the cached `+582,851,166,000` is a positive interest expense, while the cached negative quarters are provider sign flips rather than accounting reversals. Therefore the mixed-sign gate is resolved by applying `abs(raw interest_expenses)` per ticker-quarter.
 
-The existing cache does not demonstrate one safe global sign convention. Across the selected quarters it contains 568 negative values, 3 positive values, 51 zero values, and 2 missing quarters; HAG, IDI, and DTD each contain mixed non-zero signs. Therefore:
-
-```text
-OPEN QUESTION: INTEREST_EXPENSE_SIGN_AMBIGUOUS
-```
-
-Production `EBIT_PROXY_VAS` is blocked until a separately approved mapping explains the mixed real-cache signs. The audit may show arithmetic for a real ticker whose four rows have one consistent sign, but that example does not create a global production rule.
+Every ticker-quarter where `abs(interest_expenses) > abs(financial_expenses)` must be logged as an anomaly row in future EBIT audits and must never be silently dropped. HAG 2026Q1 is the documented legitimate example because a 750 billion VND interest remission was booked in that quarter. This specification change does not compute production EBIT.
 
 ## 7. Settled E/P definition
 
@@ -155,6 +149,12 @@ The current-market-cap input remains `current_parent_equity_market_cap_vnd`, wit
 
 The public-source probe is restricted to VNM, FPT, and VCB before any 156-ticker fetch. Every accepted method must prove source, method, unit, current quote/as-of date, and—when using a proxy—the economic definition of shares outstanding. Values that merely look plausible are not evidence. `listedValue`, charter capital, adjusted history, and ambiguous `issueShare`/`listedShare` fields are not accepted substitutes.
 
-The 2026-07-19 public `vnstock==4.0.3` probe found no method satisfying that contract. The full-universe market-cap fetch is therefore blocked, no market-cap snapshot is created, and the market-cap foundation conclusion is `FAIL`.
+The owner-approved accepted method is KBS `Company.overview().outstanding_shares`, carrying its `as_of_date`, multiplied by the current unadjusted KBS `Trading.price_board().close_price`, carrying its `TD` date. The price unit is VND and is calibrated in `docs/SPRINT_5_CALIBRATION_EVIDENCE.md`. Multiplying this price by `1000` is **FORBIDDEN**.
 
-The separate HAG/IDI/DTD raw-cache investigation does not resolve the interest-expense sign gate. All three remain `SOURCE_AMBIGUOUS`, so `INTEREST_EXPENSE_SIGN_AMBIGUOUS` continues to block production `EBIT_PROXY_VAS`.
+Automatic guards apply to every ticker:
+
+- `price_vnd` must be in `[1,000; 1,000,000]` VND; otherwise flag `PRICE_OUT_OF_RANGE`.
+- `shares_outstanding` must be greater than `1,000,000`; otherwise flag `SHARES_SUSPECT`.
+- Both fields must be present; otherwise flag `MISSING_INPUT`.
+
+The calibrated KBS proxy is accepted only when no guard flag is present. No direct market cap, adjusted price history, `issueShare`, `listedShare`, charter capital, or `×1000` conversion may replace it.
