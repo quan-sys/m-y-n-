@@ -1,0 +1,15 @@
+{
+  "accepted_record_count": 0,
+  "accepted_source_method": "NONE",
+  "api_requests": 0,
+  "cache_hits": 12,
+  "contract_passed": false,
+  "evidence_file": "data/market_cap/2026-07-19/probe_public_methods.jsonl",
+  "generated_at_utc": "2026-07-19T14:06:17.419189+00:00",
+  "probe_tickers": [
+    "VNM",
+    "FPT",
+    "VCB"
+  ],
+  "record_count": 12
+}

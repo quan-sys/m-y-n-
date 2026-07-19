@@ -1,0 +1,49 @@
+Command:
+python -m py_compile scripts/fetch_sprint5_market_cap.py scripts/investigate_sprint5_interest_sign.py tests/test_sprint5_market_cap.py tests/test_sprint5_interest_sign.py
+
+stdout:
+
+stderr:
+
+exit code: 0
+
+Command:
+python -m pytest -q
+
+stdout:
+........................................................................ [ 31%]
+........................................................................ [ 62%]
+........................................................................ [ 93%]
+...............                                                          [100%]
+
+stderr:
+
+exit code: 0
+
+Fetch/probe command:
+python scripts/fetch_sprint5_market_cap.py --evaluation-date 2026-07-19 --probe-only
+
+Compact result:
+{"accepted_record_count": 0, "accepted_source_method": "NONE", "api_requests": 8, "cache_hits": 0, "contract_passed": false, "evidence_file": "data/market_cap/2026-07-19/probe_public_methods.jsonl", "probe_tickers": ["VNM", "FPT", "VCB"], "record_count": 12}
+
+exit code: 2 (intentional contract-failure signal)
+
+Cache-only reassessment command:
+python scripts/fetch_sprint5_market_cap.py --evaluation-date 2026-07-19 --probe-only --cache-only
+
+Compact result:
+{"accepted_record_count": 0, "accepted_source_method": "NONE", "api_requests": 0, "cache_hits": 12, "contract_passed": false, "evidence_file": "data/market_cap/2026-07-19/probe_public_methods.jsonl", "probe_tickers": ["VNM", "FPT", "VCB"], "record_count": 12}
+
+exit code: 2 (intentional contract-failure signal)
+
+Interest-sign investigation command:
+python scripts/investigate_sprint5_interest_sign.py
+
+stdout:
+rows=12
+classifications=HAG:SOURCE_AMBIGUOUS,IDI:SOURCE_AMBIGUOUS,DTD:SOURCE_AMBIGUOUS
+ebit_sign_gate=INTEREST_EXPENSE_SIGN_AMBIGUOUS
+
+stderr:
+
+exit code: 0
