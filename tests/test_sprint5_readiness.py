@@ -4,9 +4,17 @@ import pandas as pd
 import pytest
 
 from scripts.audit_sprint5_readiness import (
+    EP_PRODUCTION_ITEM_ID,
+    INTEREST_RULE_BLOCKED,
+    INTEREST_RULE_NEGATE_RAW,
+    INTEREST_RULE_RAW_POSITIVE,
     classify_price_adjustment,
     component_present_at_quarter,
+    determine_interest_expense_magnitude_rule,
+    interest_expense_pattern_is_ready,
+    interest_expense_sign_evidence,
     item_present_for_quarters,
+    normalize_interest_expense_magnitude,
     quarter_ordinal,
     rows_available_by,
     select_latest_four_quarters,
@@ -145,3 +153,78 @@ def test_component_future_row_is_not_available_at_evaluation_date() -> None:
     after_release = rows_available_by(rows, "2026-08-02")
     assert component_present_at_quarter(before_release, "cash_and_cash_equivalents", "2026Q1") is False
     assert component_present_at_quarter(after_release, "cash_and_cash_equivalents", "2026Q1") is True
+
+
+def interest_rows(values: list[float | None]) -> pd.DataFrame:
+    periods = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    return pd.DataFrame(
+        [
+            {
+                "period_type": "QUARTER",
+                "report_period": period,
+                "available_from": "2026-04-30",
+                "item_id": "interest_expenses",
+                "value": value,
+            }
+            for period, value in zip(periods, values, strict=True)
+        ]
+    )
+
+
+def test_all_negative_interest_expenses_map_to_positive_magnitude() -> None:
+    rows = interest_rows([-10, -20, -30, -40])
+    quarters = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    evidence = interest_expense_sign_evidence(rows, quarters)
+    assert evidence.sign_pattern == "ALL_NEGATIVE"
+    assert determine_interest_expense_magnitude_rule(0, 4) == INTEREST_RULE_NEGATE_RAW
+    result = normalize_interest_expense_magnitude(rows["value"], INTEREST_RULE_NEGATE_RAW)
+    assert result.tolist() == [10, 20, 30, 40]
+
+
+def test_all_positive_interest_expenses_support_raw_positive_convention() -> None:
+    rows = interest_rows([10, 20, 30, 40])
+    quarters = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    evidence = interest_expense_sign_evidence(rows, quarters)
+    assert evidence.sign_pattern == "ALL_POSITIVE"
+    assert determine_interest_expense_magnitude_rule(4, 0) == INTEREST_RULE_RAW_POSITIVE
+    result = normalize_interest_expense_magnitude(rows["value"], INTEREST_RULE_RAW_POSITIVE)
+    assert result.tolist() == [10, 20, 30, 40]
+
+
+def test_mixed_nonzero_interest_signs_block_instead_of_hiding_with_absolute_value() -> None:
+    rows = interest_rows([-10, 20, -30, -40])
+    quarters = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    evidence = interest_expense_sign_evidence(rows, quarters)
+    assert evidence.sign_pattern == "MIXED_NONZERO_SIGNS"
+    assert determine_interest_expense_magnitude_rule(1, 3) == INTEREST_RULE_BLOCKED
+    with pytest.raises(ValueError, match="rule is blocked"):
+        normalize_interest_expense_magnitude(rows["value"], INTEREST_RULE_BLOCKED)
+
+
+@pytest.mark.parametrize("case", ["missing", "duplicate"])
+def test_missing_or_duplicate_interest_quarters_are_not_sign_ready(case: str) -> None:
+    rows = interest_rows([-10, -20, -30, -40])
+    if case == "missing":
+        rows = rows.iloc[:-1].copy()
+    else:
+        rows = pd.concat([rows, rows.iloc[[0]]], ignore_index=True)
+    quarters = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    evidence = interest_expense_sign_evidence(rows, quarters)
+    assert evidence.sign_pattern == "MISSING_OR_INCOMPLETE"
+    assert interest_expense_pattern_is_ready(
+        evidence.sign_pattern, INTEREST_RULE_NEGATE_RAW
+    ) is False
+
+
+def test_future_interest_row_remains_excluded_from_sign_evidence() -> None:
+    rows = interest_rows([-10, -20, -30, -40])
+    rows.loc[rows["report_period"].eq("2026Q1"), "available_from"] = "2026-08-01"
+    eligible = rows_available_by(rows, "2026-07-18")
+    quarters = ("2026Q1", "2025Q4", "2025Q3", "2025Q2")
+    evidence = interest_expense_sign_evidence(eligible, quarters)
+    assert evidence.sign_pattern == "MISSING_OR_INCOMPLETE"
+    assert evidence.missing_quarter_count == 1
+
+
+def test_ep_production_mapping_is_parent_attributable_profit() -> None:
+    assert EP_PRODUCTION_ITEM_ID == "attributable_to_parent_company"

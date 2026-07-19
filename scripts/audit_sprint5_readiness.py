@@ -17,6 +17,15 @@ FUNDAMENTALS_ROOT = ROOT / "data" / "fundamentals"
 MARKET_CACHE_ROOT = ROOT / "src" / "data" / "cache"
 OUTPUT_PATH = ROOT / "data" / "screener" / "sprint5_readiness_audit.csv"
 EVALUATION_DATE = "2026-07-18"
+EBIT_PRODUCTION_ITEM_IDS = (
+    "net_accounting_profit_loss_before_tax",
+    "interest_expenses",
+)
+EP_PRODUCTION_ITEM_ID = "attributable_to_parent_company"
+EP_DIAGNOSTIC_ITEM_ID = "net_profit_loss_after_tax"
+INTEREST_RULE_NEGATE_RAW = "NEGATE_RAW"
+INTEREST_RULE_RAW_POSITIVE = "RAW_POSITIVE"
+INTEREST_RULE_BLOCKED = "BLOCKED_SIGN_AMBIGUOUS"
 
 EBIT_CANDIDATE_ITEM_IDS = (
     "operating_profit_loss",
@@ -85,6 +94,17 @@ class QuarterSelection:
     @property
     def four_consecutive(self) -> bool:
         return len(self.selected_quarters) == 4 and self.missing_quarter_count == 0
+
+
+@dataclass(frozen=True)
+class InterestExpenseSignEvidence:
+    nonzero_count: int
+    positive_count: int
+    negative_count: int
+    zero_count: int
+    missing_quarter_count: int
+    duplicate_value_case: bool
+    sign_pattern: str
 
 
 def quarter_ordinal(value: Any) -> int:
@@ -186,6 +206,93 @@ def rows_available_by(rows: pd.DataFrame, evaluation_date: str) -> pd.DataFrame:
     return rows.loc[available.notna() & available.le(pd.Timestamp(evaluation_date))].copy()
 
 
+def interest_expense_sign_evidence(
+    rows: pd.DataFrame, quarters: tuple[str, ...]
+) -> InterestExpenseSignEvidence:
+    """Classify cached interest-expense signs without normalizing the values."""
+
+    if rows.empty:
+        matches = pd.DataFrame(columns=["report_period", "item_id", "value"])
+    else:
+        matches = rows.loc[
+            rows["item_id"].astype(str).eq("interest_expenses")
+            & rows["report_period"].astype(str).isin(quarters)
+        ].copy()
+    duplicate_case = bool(
+        not matches.empty
+        and matches.duplicated(["report_period", "item_id"], keep=False).any()
+    )
+    values = pd.to_numeric(matches.get("value", pd.Series(dtype=float)), errors="coerce")
+    numeric_periods = set(matches.loc[values.notna(), "report_period"].astype(str))
+    expected_periods = set(quarters) if len(quarters) == 4 else set(quarters)
+    missing_count = max(4 - len(expected_periods), 0) + len(expected_periods - numeric_periods)
+    positive_count = int(values.gt(0).sum())
+    negative_count = int(values.lt(0).sum())
+    zero_count = int(values.eq(0).sum())
+
+    complete = len(quarters) == 4 and missing_count == 0 and not duplicate_case
+    if not complete:
+        pattern = "MISSING_OR_INCOMPLETE"
+    elif positive_count and negative_count:
+        pattern = "MIXED_NONZERO_SIGNS"
+    elif negative_count == 4:
+        pattern = "ALL_NEGATIVE"
+    elif positive_count == 4:
+        pattern = "ALL_POSITIVE"
+    elif zero_count == 4:
+        pattern = "ALL_ZERO"
+    elif negative_count and not positive_count:
+        pattern = "NEGATIVE_AND_ZERO"
+    elif positive_count and not negative_count:
+        pattern = "POSITIVE_AND_ZERO"
+    else:
+        pattern = "MISSING_OR_INCOMPLETE"
+    return InterestExpenseSignEvidence(
+        nonzero_count=positive_count + negative_count,
+        positive_count=positive_count,
+        negative_count=negative_count,
+        zero_count=zero_count,
+        missing_quarter_count=missing_count,
+        duplicate_value_case=duplicate_case,
+        sign_pattern=pattern,
+    )
+
+
+def determine_interest_expense_magnitude_rule(
+    positive_count: int, negative_count: int
+) -> str:
+    if negative_count > 0 and positive_count == 0:
+        return INTEREST_RULE_NEGATE_RAW
+    if positive_count > 0 and negative_count == 0:
+        return INTEREST_RULE_RAW_POSITIVE
+    return INTEREST_RULE_BLOCKED
+
+
+def normalize_interest_expense_magnitude(values: pd.Series, rule: str) -> pd.Series:
+    """Apply only an explicit sign rule; mixed signs are never hidden."""
+
+    numeric = pd.to_numeric(values, errors="coerce")
+    if numeric.isna().any():
+        raise ValueError("interest_expenses contains missing or non-numeric values")
+    if rule == INTEREST_RULE_NEGATE_RAW:
+        if numeric.gt(0).any():
+            raise ValueError("positive interest_expenses conflicts with NEGATE_RAW")
+        return -numeric
+    if rule == INTEREST_RULE_RAW_POSITIVE:
+        if numeric.lt(0).any():
+            raise ValueError("negative interest_expenses conflicts with RAW_POSITIVE")
+        return numeric.copy()
+    raise ValueError("interest-expense magnitude rule is blocked")
+
+
+def interest_expense_pattern_is_ready(pattern: str, rule: str) -> bool:
+    compatible_patterns = {
+        INTEREST_RULE_NEGATE_RAW: {"ALL_NEGATIVE", "NEGATIVE_AND_ZERO", "ALL_ZERO"},
+        INTEREST_RULE_RAW_POSITIVE: {"ALL_POSITIVE", "POSITIVE_AND_ZERO", "ALL_ZERO"},
+    }.get(rule, set())
+    return pattern in compatible_patterns
+
+
 def classify_price_adjustment(metadata: dict[str, Any] | None, source_exists: bool) -> str:
     """Require an explicit raw/adjusted flag; absence is a proxy blocker."""
 
@@ -282,8 +389,12 @@ def audit_survivor(row: dict[str, Any]) -> dict[str, Any]:
     balance, balance_path, balance_observations = _latest_normalized(ticker, "balance_sheet")
     selection = select_latest_four_quarters(income, EVALUATION_DATE) if not income.empty else QuarterSelection((), (), 0, 4, False, 0, 0)
     latest_quarter = selection.selected_quarters[0] if selection.selected_quarters else None
+    eligible_income = rows_available_by(income, EVALUATION_DATE)
     eligible_balance = rows_available_by(balance, EVALUATION_DATE)
     market = _cached_market_inputs(ticker)
+    sign_evidence = interest_expense_sign_evidence(
+        eligible_income, selection.selected_quarters
+    )
 
     survivor_market_cap = pd.to_numeric(pd.Series([row.get("market_cap")]), errors="coerce").iloc[0]
     source_text = str(row.get("source", ""))
@@ -326,6 +437,13 @@ def audit_survivor(row: dict[str, Any]) -> dict[str, Any]:
         "duplicate_period_case": selection.duplicate_period_case,
         "future_period_exclusion_count": selection.future_period_exclusion_count,
         "future_row_exclusion_count": selection.future_row_exclusion_count,
+        "interest_expenses_nonzero_quarter_count": sign_evidence.nonzero_count,
+        "interest_expenses_positive_quarter_count": sign_evidence.positive_count,
+        "interest_expenses_negative_quarter_count": sign_evidence.negative_count,
+        "interest_expenses_zero_quarter_count": sign_evidence.zero_count,
+        "interest_expenses_missing_quarter_count": sign_evidence.missing_quarter_count,
+        "interest_expenses_duplicate_value_case": sign_evidence.duplicate_value_case,
+        "interest_expenses_sign_pattern": sign_evidence.sign_pattern,
         "direct_market_cap_available": direct_available,
         "direct_market_cap_value": float(survivor_market_cap) if direct_documented else market["cached_direct_market_cap_value"],
         "direct_market_cap_method": "SOURCE_REPORTED_MARKET_CAP" if direct_available else "UNAVAILABLE",
@@ -337,9 +455,9 @@ def audit_survivor(row: dict[str, Any]) -> dict[str, Any]:
             eligible_balance, item_id, latest_quarter
         )
     for item_id in EBIT_CANDIDATE_ITEM_IDS:
-        result[f"ebit_candidate_{item_id}_4q_available"] = selection.four_consecutive and item_present_for_quarters(income, item_id, selection.selected_quarters)
+        result[f"ebit_candidate_{item_id}_4q_available"] = selection.four_consecutive and item_present_for_quarters(eligible_income, item_id, selection.selected_quarters)
     for item_id in EARNINGS_CANDIDATE_ITEM_IDS:
-        result[f"earnings_candidate_{item_id}_4q_available"] = selection.four_consecutive and item_present_for_quarters(income, item_id, selection.selected_quarters)
+        result[f"earnings_candidate_{item_id}_4q_available"] = selection.four_consecutive and item_present_for_quarters(eligible_income, item_id, selection.selected_quarters)
 
     required_tev = (
         result["short_term_borrowings_available"],
@@ -355,13 +473,9 @@ def audit_survivor(row: dict[str, Any]) -> dict[str, Any]:
         result["ebit_candidate_net_accounting_profit_loss_before_tax_4q_available"]
         and result["ebit_candidate_interest_expenses_4q_available"]
     )
-    result["complete_ebit_tev_data_ready"] = bool(
-        result["complete_tev_input_available"]
-        and (
-            result["ebit_candidate_operating_line_inputs_available"]
-            or result["ebit_candidate_pretax_interest_inputs_available"]
-        )
-    )
+    result["ebit_production_item_ids"] = "|".join(EBIT_PRODUCTION_ITEM_IDS)
+    result["ep_production_item_id"] = EP_PRODUCTION_ITEM_ID
+    result["ep_diagnostic_item_id"] = EP_DIAGNOSTIC_ITEM_ID
     result["complete_ep_total_data_ready"] = bool(
         market_cap_ready and result["earnings_candidate_net_profit_loss_after_tax_4q_available"]
     )
@@ -384,6 +498,26 @@ def run_audit() -> pd.DataFrame:
     audited = pd.DataFrame(audit_survivor(row) for row in survivors.to_dict("records"))
     if len(audited) != len(survivors):
         raise AssertionError("readiness audit row count does not match survivors")
+    positive_count = int(audited["interest_expenses_positive_quarter_count"].sum())
+    negative_count = int(audited["interest_expenses_negative_quarter_count"].sum())
+    magnitude_rule = determine_interest_expense_magnitude_rule(
+        positive_count, negative_count
+    )
+    audited["interest_expense_magnitude_rule"] = magnitude_rule
+    audited["interest_expense_magnitude_rule_ready"] = (
+        audited["interest_expenses_sign_pattern"].map(
+            lambda pattern: interest_expense_pattern_is_ready(pattern, magnitude_rule)
+        )
+        & audited["ebit_candidate_pretax_interest_inputs_available"]
+    )
+    audited["complete_ebit_tev_data_ready"] = (
+        audited["complete_tev_input_available"]
+        & audited["ebit_candidate_pretax_interest_inputs_available"]
+        & audited["interest_expense_magnitude_rule_ready"]
+    )
+    audited["complete_ep_production_data_ready"] = audited[
+        "complete_ep_parent_data_ready"
+    ]
     return audited
 
 
@@ -396,6 +530,14 @@ def main() -> int:
     print(f"four_consecutive={int(audited['four_consecutive_eligible_quarters'].sum())}")
     print(f"direct_market_cap={int(audited['direct_market_cap_available'].sum())}")
     print(f"proxy_eligible={int(audited['proxy_market_cap_eligible'].sum())}")
+    print(
+        "interest_sign="
+        f"positive={int(audited['interest_expenses_positive_quarter_count'].sum())}; "
+        f"negative={int(audited['interest_expenses_negative_quarter_count'].sum())}; "
+        f"zero={int(audited['interest_expenses_zero_quarter_count'].sum())}; "
+        f"mixed_tickers={int(audited['interest_expenses_sign_pattern'].eq('MIXED_NONZERO_SIGNS').sum())}; "
+        f"rule={audited['interest_expense_magnitude_rule'].iloc[0]}"
+    )
     print("network_calls=0; valuation_values=0; rankings=0")
     return 0
 

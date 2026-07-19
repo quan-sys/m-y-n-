@@ -73,40 +73,55 @@ The existing data contract records the VCI historical price series as `ADJUSTED_
 - Missing means neither pass nor fail.
 - No within-sector ranking and no combined value score are allowed.
 
-## 6. OPEN QUESTION — EBIT DEFINITION
+## 6. Settled EBIT economic definition and sign gate
 
-**Production EBIT is BLOCKED pending owner approval.** The PLAN freezes the use of four published quarters but does not freeze the exact EBIT line or construction.
+The owner-approved economic definition is binding:
 
-Actual normalized income-statement item IDs in the cache that can inform an EBIT definition are listed below. Coverage is the count of survivors with the item present and numeric in all four eligible quarters, measured by `scripts/audit_sprint5_readiness.py` against `data/screener/sprint5_readiness_audit.csv`.
+```text
+interest_expense_magnitude =
+    the financing interest expense represented as a positive magnitude
 
-| Actual normalized item_id | Four-quarter coverage | Practical role/difference |
-|---|---:|---|
-| `operating_profit_loss` | 154/156 | Direct operating-profit line; closest direct operating result, but its provider/accounting scope must be owner-approved. |
-| `net_accounting_profit_loss_before_tax` | 154/156 | Pre-tax accounting profit; includes non-operating items and therefore is not EBIT by itself. |
-| `interest_expenses` | 154/156 | Candidate add-back to pre-tax profit; whether this exact line is the approved financing-cost add-back remains open. |
-| `financial_income` | 154/156 | Finance-income context; including or excluding it changes the operating/non-operating boundary. |
-| `financial_expenses` | 154/156 | Broader than interest expense and may contain non-interest finance costs; it must not silently replace `interest_expenses`. |
-| `other_incomes` | 154/156 | Other-income context; treatment can materially change EBIT for one-off items. |
-| `other_expenses` | 154/156 | Other-expense context; treatment can materially change EBIT for one-off items. |
-| `net_other_income_expenses` | 154/156 | Net other-result context; using both this net line and its gross components could double-count. |
+EBIT_PROXY_VAS =
+    TTM(net_accounting_profit_loss_before_tax)
+    + TTM(interest_expense_magnitude)
+```
 
-Owner decision required between these two candidate constructions:
+Binding normalized item IDs:
 
-1. **Operating-line candidate:** `operating_profit_loss`. Joint input coverage: **154/156**.
-2. **Pre-tax-plus-interest candidate:** `net_accounting_profit_loss_before_tax` plus `interest_expenses`. Joint input coverage: **154/156**.
+```text
+net_accounting_profit_loss_before_tax
+interest_expenses
+```
 
-No construction is selected by this specification. The owner must approve the accounting meaning and exact item map before production.
+This result must be called `EBIT_PROXY_VAS`, not clean EBIT or an exact IFRS EBIT subtotal. `operating_profit_loss` is not a production EBIT input because the Vietnamese operating-profit line already reflects finance income and finance expenses and is not a clean financing-neutral EBIT subtotal.
 
-## 7. OPEN QUESTION — E/P EARNINGS DEFINITION
+The sign rule is a mandatory safety gate. The audit must never blindly use the raw `interest_expenses` value and must never hide mixed signs by applying `abs()`.
 
-**Production E/P is BLOCKED pending owner approval.** The exact earnings numerator is not frozen.
+The existing cache does not demonstrate one safe global sign convention. Across the selected quarters it contains 568 negative values, 3 positive values, 51 zero values, and 2 missing quarters; HAG, IDI, and DTD each contain mixed non-zero signs. Therefore:
 
-| Candidate normalized item_id | Four-quarter coverage | Practical difference |
-|---|---:|---|
-| `net_profit_loss_after_tax` | 154/156 | Total company profit after tax; this is normally consistent with whole-company market capitalization. |
-| `attributable_to_parent_company` | 154/156 | Profit attributable to parent shareholders; pairing it with whole-company market capitalization can mismatch the ownership scope unless the denominator is aligned. |
+```text
+OPEN QUESTION: INTEREST_EXPENSE_SIGN_AMBIGUOUS
+```
 
-The owner must choose one of the two candidates. Whole-company market cap must pair with whole-company earnings; the specification must not mix scopes without an explicit approved adjustment.
+Production `EBIT_PROXY_VAS` is blocked until a separately approved mapping explains the mixed real-cache signs. The audit may show arithmetic for a real ticker whose four rows have one consistent sign, but that example does not create a global production rule.
+
+## 7. Settled E/P definition
+
+The owner-approved production definition is binding:
+
+```text
+E_P =
+    TTM(attributable_to_parent_company)
+    / current_parent_equity_market_cap
+```
+
+Binding earnings item ID:
+
+```text
+attributable_to_parent_company
+```
+
+The listed parent-company market capitalization represents the equity value belonging to holders of the parent company's listed ordinary shares. Its matching consolidated earnings numerator is therefore profit attributable to parent-company shareholders. `net_profit_loss_after_tax` includes profit attributable to non-controlling interests when they exist and may remain visible only as a diagnostic field; it is not the production E/P numerator. Minority interest belongs in TEV only when an explicit usable value exists and is not added to parent-equity market capitalization for E/P.
 
 ## 8. Readiness audit contract
 
@@ -122,11 +137,9 @@ The owner must choose one of the two candidates. Whole-company market cap must p
 
 ## 9. Build gate
 
-The cache-only audit concludes `FAIL` because usable market-cap coverage is `0/156`; complete TEV-input coverage is therefore `0/156`. Production is also blocked by the two owner decisions above.
+The cache-only audit concludes `FAIL` because usable market-cap coverage is `0/156`; complete TEV-input coverage is therefore `0/156`. Production `EBIT_PROXY_VAS` is additionally blocked by the mixed-sign evidence above.
 
 No Sprint 5 production build may start until:
 
-1. the owner approves the EBIT construction;
-2. the owner approves the E/P earnings numerator; and
-3. a documented cache source provides either valid direct market cap or raw price plus shares, without live fetching in this task.
-
+1. an approved mapping resolves `INTEREST_EXPENSE_SIGN_AMBIGUOUS` without a blind absolute-value rule; and
+2. a documented cache source provides either valid direct market cap or raw price plus shares, without live fetching in this task.
