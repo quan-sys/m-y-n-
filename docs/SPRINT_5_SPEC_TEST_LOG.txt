@@ -1,0 +1,40 @@
+Command:
+python -m py_compile scripts/audit_sprint5_readiness.py tests/test_sprint5_readiness.py
+
+stdout:
+
+stderr:
+
+exit code:
+0
+
+Command:
+python scripts/audit_sprint5_readiness.py
+
+stdout:
+input=data/screener/step1_survivors.csv; rows=156
+output=data/screener/sprint5_readiness_audit.csv; rows=156
+four_consecutive=154
+direct_market_cap=0
+proxy_eligible=0
+interest_sign=positive=3; negative=568; zero=51; mixed_tickers=3; rule=BLOCKED_SIGN_AMBIGUOUS
+network_calls=0; valuation_values=0; rankings=0
+
+stderr:
+
+exit code:
+0
+
+Command:
+python -m pytest -q
+
+stdout:
+........................................................................ [ 32%]
+........................................................................ [ 64%]
+........................................................................ [ 96%]
+.........                                                                [100%]
+
+stderr:
+
+exit code:
+0

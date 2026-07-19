@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-19
+
+- Correct the Sprint 5 valuation spec and cache-only audit to freeze parent-attributable E/P, bind the VAS EBIT proxy, and block production EBIT on mixed real-cache interest-expense signs; no valuation or refetch.
+- Specify Sprint 5 Step 2 valuation bindings and add a reproducible cache-only readiness audit; no valuation, ranking, candidate list, live API call, or config change.
+
 ## 2026-07-18
 
 - Complete Sprint 4 Step 1 cleaning from the reviewed annual cache: run the five fixed-order filters, write survivor/reject and sector-diagnostic outputs, additively extend reject history with audit fields, and record test and review evidence; no live API call or merge.
