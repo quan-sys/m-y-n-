@@ -8,12 +8,25 @@ This file is the local source of truth for Sprint 4. It is derived verbatim from
 Sprint 4 is limited to the following work:
 
 - Add `src/screener/step1_cleaning.py` and `config/screener.yaml` cleaning thresholds (all cutoffs live in config, never hard-coded).
-- Consume the Sprint 3 point-in-time normalized fundamentals and the 378-ticker ACCEPTED universe. Do NOT re-fetch or change any Sprint 3 data-layer, dedup, or threshold code.
+- Consume the Sprint 3 point-in-time normalized fundamentals and the 378-ticker ACCEPTED universe. Do NOT change the Sprint 3 data-layer, dedup, parser, normalization, or threshold code. EXCEPTION (see Step 0): Sprint 3 cached only QUARTERLY statements; the ANNUAL statements that STA/SNOA/M-Score require were never fetched, so Sprint 4 begins by fetching the annual period type through the UNCHANGED existing client. "No re-fetch" forbids re-pulling or altering the quarterly layer — it does NOT forbid fetching the annual period Sprint 4 needs.
 - Apply five cleaning filters in a fixed order, each producing a labelled reject reason.
 - Emit `data/screener/step1_survivors.csv` and extend `universe_rejects.csv` with the new labels.
 - Every formula ships with a unit test whose expected numbers were computed by hand.
 
 Sprint 4 does NOT: compute EBIT/TEV or E/P (Sprint 5), compute F-Score or Franchise Power (Sprint 6), rank or weight anything, or change any Sprint 3 config value.
+
+## Step 0 — Annual fundamentals fetch (prerequisite, do this FIRST)
+
+STA, SNOA, and all eight Beneish M-Score indices are ANNUAL constructs requiring two consecutive annual periods (N and N−1). The Sprint 3 coverage run cached quarterly statements only — annual was never fetched — so without this step every accrual and M-Score value would be INSUFFICIENT_DATA. Before any filter code:
+
+- Fetch annual balance sheet, income statement, and cash flow for the non-financial ACCEPTED universe (~315 tickers) using the EXISTING `finance_client` with `period='year'`. Do NOT modify the client, parser, dedup, normalization, or any Sprint-3 threshold. A thin new run script that only CALLS the unchanged client is allowed; changing the client is not.
+- The API returns the 4 most recent annual periods (~2022–2025). Cache them in the same layout Sprint 3 uses, with the same point-in-time stamp `available_from = period_end + LAG_ANNUAL (90 days)`.
+- Point-in-time selection for the filters: use the two most-recent annual periods whose `available_from <= evaluation date` as N and N−1 (a mid-2026 run → N = 2025 annual, available_from 2026-03-31; N−1 = 2024).
+- Going forward, every fundamentals fetch/snapshot must cover BOTH quarterly and annual period types so this gap does not recur.
+- Restatement caveat: vnstock annual data is restated. Using the latest published annual pair for a live screen today is acceptable; it is NOT a clean basis for historical backtest (already recorded for Sprint 8).
+- Output `docs/COVERAGE_SPRINT_4_ANNUAL.md`: per non-financial ACCEPTED ticker, how many consecutive annual periods are available and whether the specific items each formula needs (STA, SNOA, each M-Score index) are present for N and N−1. List every ticker that would fall to INSUFFICIENT_DATA_FOR_<FORMULA> and the missing item. Mirror the Sprint 3 quarterly coverage report structure.
+
+Gate: STOP after Step 0 and report annual coverage. The five-filter code proceeds only after the owner reviews this coverage. If a large share of tickers lack two consecutive annual periods, flag it before writing any filter logic.
 
 ## Filter order (fixed) and labels
 
@@ -21,7 +34,14 @@ Run filters in this exact order; a ticker exits at the first filter it fails and
 
 1. `FINANCIAL_SECTOR_EXCLUDED` — ICB2 in banking, insurance, financial services / securities. EBIT/TEV, F-Score, and accruals are meaningless on bank/insurer statements. These are the 63 `FINANCIAL_RAW_FETCH_ONLY` tickers from Sprint 3 plus any other financial-ICB2 names. They stay in the sector monitor, out of the screener.
 2. `UPCOM_EXCLUDED_V1` — exchange == UPCOM. Quarterly-disclosure obligations for UPCoM firms are looser than for listed firms (⚠️ re-check TT96 detail if later relaxing), missing quarters silently corrupt TTM EBIT, and all VN E/P evidence (Huang/Liu/Shu 2023) covers only HOSE+HNX. UPCoM names stay in the sector monitor.
-3. `HIGH_ACCRUAL` — worst accruals percentile on STA and SNOA (default worst 10%, in config).
+3. `HIGH_ACCRUAL` — UNION rule: a ticker is flagged if it is in the worst
+   ACCRUAL_WORST_PCT of the whole non-financial universe by STA, OR in the
+   worst ACCRUAL_WORST_PCT by SNOA, or both. The two percentile cutoffs are
+   computed INDEPENDENTLY on their own valid-observation populations. This
+   follows Gray & Carlisle (Quantitative Value), where Sloan STA (single-year
+   accrual flow) and Hirshleifer SNOA (multi-year balance-sheet bloat) are two
+   distinct defects, each screened separately. Intersection and blended-score
+   variants are explicitly rejected.
 4. `M_SCORE_FLAG` — Beneish M-Score above threshold (default −1.78, in config).
 5. `PFD_HIGH_RISK` — financial-distress screen (simple transparent filter is primary; full Campbell optional/parallel).
 
@@ -43,14 +63,19 @@ STA      = Accruals / average Total Assets      (average of TA at N and N−1)
 
 Item map (Sprint-3 whitelist): ΔCurrent Assets=`current_assets`, ΔCash=`cash_and_cash_equivalents`, ΔCurrent Liabilities=`current_liabilities`, ΔShort-term Debt=`short_term_borrowings`, ΔTaxes Payable=`taxes_and_other_payable_to_state_budget` (⚠️ broader than Sloan's US "taxes payable" — accepted approximation, already caveated in Sprint 3), Depreciation=`depreciation_and_amortization` (cash-flow), Total Assets=`total_assets`.
 
-**SNOA — Scaled Net Operating Assets (Hirshleifer et al. 2004):**
+**SNOA — Scaled Net Operating Assets (Hirshleifer et al. 2004), VAS-adjusted:**
 
 ```
-NOA  = (Total Assets − Cash & short-term investments)
-     − (Total Assets − Short-term Debt − Long-term Debt − Minority Interest − Preferred Stock − Owners' Equity)
-SNOA = NOA / beginning Total Assets      (Total Assets at N−1)
+Operating Assets      = Total Assets − Cash & short-term investments
+Operating Liabilities = Total Assets − Short-term Debt − Long-term Debt − Owners' Equity
+NOA                   = Operating Assets − Operating Liabilities
+= Short-term Debt + Long-term Debt + Owners' Equity − Cash & short-term investments
+SNOA                  = NOA / beginning Total Assets      (Total Assets at N−1)
 ```
-Item map: Cash & short-term investments = `cash_and_cash_equivalents` + `short_term_investments`; Short-term Debt=`short_term_borrowings`; Long-term Debt=`long_term_borrowings`; Minority Interest=`minority_interests`; Preferred Stock=`preferred_shares`; Owners' Equity=`owners_equity`. Higher SNOA = balance-sheet bloat = worse.
+
+Item map: Cash & short-term investments = `cash_and_cash_equivalents` + `short_term_investments`; Short-term Debt = `short_term_borrowings`; Long-term Debt = `long_term_borrowings`; Owners' Equity = `owners_equity` (VAS balance-sheet code 400). Higher SNOA = balance-sheet bloat = worse.
+
+> ⚠️ **VAS ADJUSTMENT — do NOT re-introduce a separate Minority Interest / Preferred Stock subtraction.** Under Vietnamese VAS (Circular 200), `owners_equity` (code 400) ALREADY INCLUDES minority interest (`minority_interests`, code 429) and preferred capital, and the sheet balances as `Total Assets = Short-term Liabilities + Long-term Liabilities + owners_equity` (hand-checked VNM 2024: 18,459.55 + 415.11 + 36,174.40 = 55,049.06 = Total Assets). The original US Hirshleifer formula subtracts Minority Interest and Preferred Stock as SEPARATE financing claims because US GAAP presents common equity WITHOUT them. Subtracting them here would remove minority/preferred TWICE (double-count), inflating SNOA by ≈ (minority + preferred) / beginning Total Assets — for VNM ≈ +0.07, enough to mis-flag `HIGH_ACCRUAL`; worst for holding/conglomerate structures. `minority_interests` and `preferred_shares` MUST NOT appear anywhere in the SNOA computation.
 
 ## Beneish M-Score — verbatim (original 1999 unweighted probit)
 
@@ -121,6 +146,7 @@ Every value used in a Δ or ratio must come from a row whose `available_from` (=
 ## Required local checks
 
 - One unit test per formula (STA, SNOA, each of the 8 M-Score indices, M-Score total, distress) with hand-computed expected values, using one large liquid name (e.g. VNM) cross-checked by hand against vietstock/cafef BCTC.
+- SNOA double-count guard: the SNOA unit test MUST prove the result is INDEPENDENT of `minority_interests` and `preferred_shares`. Compute SNOA for the VNM fixture, then set BOTH fields to arbitrary large garbage values, recompute, and assert SNOA is byte-for-byte unchanged. This regression fails the moment any future edit re-subtracts minority/preferred (the VAS double-count bug). Also assert the algebraic identity NOA == short_term_borrowings + long_term_borrowings + owners_equity − (cash_and_cash_equivalents + short_term_investments).
 - A unit-consistency test (đồng vs nghìn vs tỷ): wrong units make accruals/M-Score silently meaningless.
 - A guard test: if any single filter removes > 30% of the universe, the run flags "suspected formula/unit bug — stop and hand-check 5 tickers."
 - pytest green; no Sprint-3 test modified or skipped.

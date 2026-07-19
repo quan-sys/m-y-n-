@@ -139,6 +139,7 @@ citations in THE PLAN, section "TRẠNG THÁI XÁC MINH"):
 
 - Report what actually happened: exact commands, exact output, exact
   errors. No summaries that hide failures.
+- Never treat Codex summaries, recommendations, claimed test results, or conclusions as evidence. Before reporting to the owner, independently inspect the actual repository state, PR, commits, diff, changed files, and available test evidence. Anything that cannot be independently verified must be labelled UNVERIFIED. Green tests alone do not prove sprint completion.
 - After each completed step, state: what was done, what was verified, what
   remains, and any OPEN QUESTIONs.
 - The owner is not a programmer. After every run and before every report,
@@ -156,6 +157,28 @@ citations in THE PLAN, section "TRẠNG THÁI XÁC MINH"):
   sprint until the owner explicitly approves the spec.
 - Uncertainty labels in docs and reports: ✅ verified / ⚠️ estimate or
   secondary source / ❓ unverified. Never present ⚠️ or ❓ material as fact.
+
+### Owner-review reporting rules
+
+- Before every owner report, reread the reporting rules in this `AGENTS.md`.
+- Every review report uses exactly nine numbered sections.
+- Each section normally contains exactly one complete summary sentence.
+- Section 1 states what Codex actually accomplished, including freshly fetched
+  HEAD and the complete diff scope.
+- Section 2 states the practical impact in ordinary Vietnamese.
+- Every number identifies the file, command, or calculation from which it was
+  independently obtained.
+- Codex summaries, recommendations, claimed test results, and conclusions are
+  not evidence.
+- Use only ✅ confirmed, ⚠️ estimate, and ❓ unclear.
+- Every pytest statement says that fixture tests show behavior on those
+  fixtures but do not prove real-world financial correctness.
+- Use only step names already present in the current SPEC or PLAN.
+- Section 8 contains PASS, PARTIAL, or FAIL.
+- Section 9 states the next task and explains the purpose of the next prompt in
+  one sentence.
+- Do not list low-value file, commit, diff, or command details unless they
+  affect the conclusion.
 
 ## 10. GitHub publishing and secret safety
 

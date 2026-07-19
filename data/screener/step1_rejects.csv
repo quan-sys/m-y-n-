@@ -1,0 +1,223 @@
+ticker,filter_stage,reason_label,trigger_metric,trigger_value,threshold_or_cutoff,exchange,icb2,source,as_of,data_status
+ACB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AFX,4,M_SCORE_FLAG,M_SCORE,-1.1854153623122157,>-1.78,HOSE,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
+AGR,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+APG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+APH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+ASP,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock_VCI_financial,2026-07-17,OK
+BAF,4,M_SCORE_FLAG,M_SCORE,-1.3341457862593922,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+BCG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2025-10-08,OK
+BFC,3,HIGH_ACCRUAL,STA,STA=0.29412668151452775,STA>=0.23389126844758945,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+BIC,1,FINANCIAL_SECTOR_EXCLUDED,icb2,BẢO HIỂM,financial ICB2 exclusion,HOSE,BẢO HIỂM,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BID,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BMI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,BẢO HIỂM,financial ICB2 exclusion,HOSE,BẢO HIỂM,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BSI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BSR,3,HIGH_ACCRUAL,STA,STA=0.23801006900245222,STA>=0.23389126844758945,HOSE,DẦU KHÍ,vnstock_VCI_financial,2026-07-17,OK
+BVH,1,FINANCIAL_SECTOR_EXCLUDED,icb2,BẢO HIỂM,financial ICB2 exclusion,HOSE,BẢO HIỂM,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+CDC,3,HIGH_ACCRUAL,STA,STA=0.363398145446318,STA>=0.23389126844758945,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+CIG,3,HIGH_ACCRUAL,STA,STA=0.47049808773905766,STA>=0.23389126844758945,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+CRC,3,HIGH_ACCRUAL,SNOA,SNOA=1.0585212079408506,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+CRE,3,HIGH_ACCRUAL,STA,STA=0.2984808455359243,STA>=0.23389126844758945,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+CTG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+CTS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DCM,4,M_SCORE_FLAG,M_SCORE,-0.8663029213480813,>-1.78,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+DIG,4,M_SCORE_FLAG,M_SCORE,-1.1302310241669908,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+DLG,4,M_SCORE_FLAG,M_SCORE,-1.5907195394448823,>-1.78,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+DPG,4,M_SCORE_FLAG,M_SCORE,-1.324363322303869,>-1.78,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+DPM,4,M_SCORE_FLAG,M_SCORE,-0.971560651534651,>-1.78,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+DSE,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+EIB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ELC,3,HIGH_ACCRUAL,STA,STA=0.247413608782222,STA>=0.23389126844758945,HOSE,CÔNG NGHỆ THÔNG TIN,vnstock_VCI_financial,2026-07-17,OK
+EVF,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+FTS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+GEE,3,HIGH_ACCRUAL,STA,STA=0.33327317016475694,STA>=0.23389126844758945,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+GIL,4,M_SCORE_FLAG,M_SCORE,-1.3699000465400464,>-1.78,HOSE,HÀNG CÁ NHÂN & GIA DỤNG,vnstock_VCI_financial,2026-07-17,OK
+HAX,3,HIGH_ACCRUAL,STA,STA=0.34064521830648775,STA>=0.23389126844758945,HOSE,Ô TÔ VÀ PHỤ TÙNG,vnstock_VCI_financial,2026-07-17,OK
+HCM,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+HDB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+HDC,4,M_SCORE_FLAG,M_SCORE,-0.6322404051080099,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+HHP,3,HIGH_ACCRUAL,SNOA,SNOA=1.1808787024146312,SNOA>=0.9859440018428138,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+HHS,3,HIGH_ACCRUAL,STA+SNOA,STA=0.9851453143346587;SNOA=2.4927772331033933,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HOSE,Ô TÔ VÀ PHỤ TÙNG,vnstock_VCI_financial,2026-07-17,OK
+HID,3,HIGH_ACCRUAL,SNOA,SNOA=0.990234696031504,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+HSL,4,M_SCORE_FLAG,M_SCORE,-0.4379056454557322,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+HVH,4,M_SCORE_FLAG,M_SCORE,-0.5693335737891447,>-1.78,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+HVN,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,DU LỊCH VÀ GIẢI TRÍ,vnstock_VCI_financial,2026-07-17,OK
+KBC,3,HIGH_ACCRUAL,STA+SNOA,STA=0.254060498583599;SNOA=1.0086672070652132,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+KDH,4,M_SCORE_FLAG,M_SCORE,-1.3447178100255934,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+KHG,3,HIGH_ACCRUAL,SNOA,SNOA=0.9859440018428138,SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+KLB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+LAF,3,HIGH_ACCRUAL,STA+SNOA,STA=0.2792612229651382;SNOA=1.3411019221671168,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+LDG,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+LPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+MBB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+MCH,4,M_SCORE_FLAG,M_SCORE,-1.1455843181715084,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+MIG,1,FINANCIAL_SECTOR_EXCLUDED,icb2,BẢO HIỂM,financial ICB2 exclusion,HOSE,BẢO HIỂM,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+MSB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+MWG,4,M_SCORE_FLAG,M_SCORE,-1.329044067753405,>-1.78,HOSE,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
+NAB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+NBB,3,HIGH_ACCRUAL,STA,STA=0.2585279507871215,STA>=0.23389126844758945,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+NHA,3,HIGH_ACCRUAL,SNOA,SNOA=1.0122064885942705,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+NLG,4,M_SCORE_FLAG,M_SCORE,-1.6287826656992872,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+NNC,3,HIGH_ACCRUAL,STA,STA=0.2521837627047799,STA>=0.23389126844758945,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+NT2,3,HIGH_ACCRUAL,STA,STA=0.29648942676435236,STA>=0.23389126844758945,HOSE,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock_VCI_financial,2026-07-17,OK
+NTL,4,M_SCORE_FLAG,M_SCORE,96.98547203094651,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+OCB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+OGC,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ORS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PDR,4,M_SCORE_FLAG,M_SCORE,-1.5980048163392326,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+PET,4,M_SCORE_FLAG,M_SCORE,-1.2016414327552996,>-1.78,HOSE,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
+QCG,4,M_SCORE_FLAG,M_SCORE,-1.4592091582779587,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+SAM,4,M_SCORE_FLAG,M_SCORE,-1.512721664862514,>-1.78,HOSE,CÔNG NGHỆ THÔNG TIN,vnstock_VCI_financial,2026-07-17,OK
+SBT,4,M_SCORE_FLAG,M_SCORE,-1.6943461200611076,>-1.78,HOSE,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+SCS,3,HIGH_ACCRUAL,STA,STA=0.23389126844758945,STA>=0.23389126844758945,HOSE,DU LỊCH VÀ GIẢI TRÍ,vnstock_VCI_financial,2026-07-17,OK
+SHB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SMC,4,M_SCORE_FLAG,M_SCORE,-1.7174744012684338,>-1.78,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+SSB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SSI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+STB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TAL,3,HIGH_ACCRUAL,SNOA,SNOA=0.9977930791622578,SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+TCB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TCH,4,M_SCORE_FLAG,M_SCORE,0.13635898156450632,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+TCI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TCX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TDC,4,M_SCORE_FLAG,M_SCORE,-0.5021681679661352,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+TLD,3,HIGH_ACCRUAL,SNOA,SNOA=1.123872686670078,SNOA>=0.9859440018428138,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+TLH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+TNH,3,HIGH_ACCRUAL,SNOA,SNOA=1.0781687787505156,SNOA>=0.9859440018428138,HOSE,Y TẾ,vnstock_VCI_financial,2026-07-17,OK
+TPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TSC,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+TTF,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+TVS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VAB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VCB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VCG,4,M_SCORE_FLAG,M_SCORE,-1.6665376813955386,>-1.78,HOSE,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+VCI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VCK,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VDS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VFG,4,M_SCORE_FLAG,M_SCORE,-1.5202153122923252,>-1.78,HOSE,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+VIB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VIX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VND,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VOS,4,M_SCORE_FLAG,M_SCORE,-1.308398559597698,>-1.78,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+VPB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HOSE,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VPG,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HOSE,TÀI NGUYÊN CƠ BẢN,vnstock_VCI_financial,2026-07-17,OK
+VPI,3,HIGH_ACCRUAL,SNOA,SNOA=0.9927058841695853,SNOA>=0.9859440018428138,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+VPX,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HOSE,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VRE,4,M_SCORE_FLAG,M_SCORE,-1.2233967798083614,>-1.78,HOSE,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+VSC,3,HIGH_ACCRUAL,SNOA,SNOA=1.2195884055833264,SNOA>=0.9859440018428138,HOSE,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+APS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BVS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+C69,3,HIGH_ACCRUAL,SNOA,SNOA=1.054954128816256,SNOA>=0.9859440018428138,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+CMS,4,M_SCORE_FLAG,M_SCORE,-1.5716849847085723,>-1.78,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+DST,3,HIGH_ACCRUAL,SNOA,SNOA=0.991343890129596,SNOA>=0.9859440018428138,HNX,TRUYỀN THÔNG,vnstock_VCI_financial,2026-07-17,OK
+EVS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+GKM,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+HUT,3,HIGH_ACCRUAL,STA+SNOA,STA=0.24250988187713762;SNOA=1.148633155735191,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,Ô TÔ VÀ PHỤ TÙNG,vnstock_VCI_financial,2026-07-17,OK
+IPA,3,HIGH_ACCRUAL,SNOA,SNOA=1.0551442588169566,SNOA>=0.9859440018428138,HNX,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock_VCI_financial,2026-07-17,OK
+KSF,3,HIGH_ACCRUAL,STA+SNOA,STA=0.47661331298968157;SNOA=1.7723448141770413,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+L40,3,HIGH_ACCRUAL,STA+SNOA,STA=1.6349076787605803;SNOA=3.4153880639877223,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+LAS,4,M_SCORE_FLAG,M_SCORE,-1.552812482922118,>-1.78,HNX,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+LBE,3,HIGH_ACCRUAL,SNOA,SNOA=1.046235753618735,SNOA>=0.9859440018428138,HNX,HÀNG CÁ NHÂN & GIA DỤNG,vnstock_VCI_financial,2026-07-17,OK
+LDP,3,HIGH_ACCRUAL,STA+SNOA,STA=0.2991539412936251;SNOA=1.0999178651585646,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,Y TẾ,vnstock_VCI_financial,2026-07-17,OK
+MBG,3,HIGH_ACCRUAL,SNOA,SNOA=1.008582372885157,SNOA>=0.9859440018428138,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+MBS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+MST,3,HIGH_ACCRUAL,STA,STA=0.5213728708139835,STA>=0.23389126844758945,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+NRC,4,M_SCORE_FLAG,M_SCORE,13.433727004856571,>-1.78,HNX,BẤT ĐỘNG SẢN,vnstock_VCI_financial,2026-07-17,OK
+NVB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,HNX,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+OCH,5,PFD_HIGH_RISK,DISTRESS,accumulated_loss,high_risk is True,HNX,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock_VCI_financial,2026-07-17,OK
+PCH,4,M_SCORE_FLAG,M_SCORE,-1.2825061496739163,>-1.78,HNX,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+PSD,3,HIGH_ACCRUAL,STA,STA=0.2807165353521178,STA>=0.23389126844758945,HNX,BÁN LẺ,vnstock_VCI_financial,2026-07-17,OK
+PSI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PVB,3,HIGH_ACCRUAL,STA+SNOA,STA=0.3545715488768586;SNOA=1.0697177212891327,STA>=0.23389126844758945;SNOA>=0.9859440018428138,HNX,DẦU KHÍ,vnstock_VCI_financial,2026-07-17,OK
+PVC,3,HIGH_ACCRUAL,STA,STA=0.24282047325346218,STA>=0.23389126844758945,HNX,DẦU KHÍ,vnstock_VCI_financial,2026-07-17,OK
+PVI,1,FINANCIAL_SECTOR_EXCLUDED,icb2,BẢO HIỂM,financial ICB2 exclusion,HNX,BẢO HIỂM,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SHS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SRA,3,HIGH_ACCRUAL,SNOA,SNOA=0.9867321768619418,SNOA>=0.9859440018428138,HNX,Y TẾ,vnstock_VCI_financial,2026-07-17,OK
+SVN,3,HIGH_ACCRUAL,STA,STA=0.40301404077968916,STA>=0.23389126844758945,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+TVC,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+UNI,3,HIGH_ACCRUAL,STA,STA=0.4547704438643548,STA>=0.23389126844758945,HNX,CÔNG NGHỆ THÔNG TIN,vnstock_VCI_financial,2026-07-17,OK
+VC7,4,M_SCORE_FLAG,M_SCORE,-1.5466551084868558,>-1.78,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+VFS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,HNX,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VHE,3,HIGH_ACCRUAL,SNOA,SNOA=1.2141045592440953,SNOA>=0.9859440018428138,HNX,Y TẾ,vnstock_VCI_financial,2026-07-17,OK
+VIT,4,M_SCORE_FLAG,M_SCORE,-1.246811429255925,>-1.78,HNX,XÂY DỰNG VÀ VẬT LIỆU,vnstock_VCI_financial,2026-07-17,OK
+VTZ,4,M_SCORE_FLAG,M_SCORE,-0.9535107786730009,>-1.78,HNX,HÓA CHẤT,vnstock_VCI_financial,2026-07-17,OK
+AAH,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AAS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AAV,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BẤT ĐỘNG SẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ABB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,UPCOM,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ABW,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ACM,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ACV,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AGX,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BÁN LẺ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AIG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+AMS,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+APF,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ATG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BCR,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-06-19,OK
+BDT,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BGE,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BIG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BMS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BOT,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+BVB,1,FINANCIAL_SECTOR_EXCLUDED,icb2,NGÂN HÀNG,financial ICB2 exclusion,UPCOM,NGÂN HÀNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+C4G,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+CLX,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+CQN,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+CVN,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,Y TẾ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DAG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÓA CHẤT,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2024-08-14,OK
+DDB,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DDG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DDV,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÓA CHẤT,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DFF,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DRI,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÓA CHẤT,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+DSH,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+F88,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+FOC,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TRUYỀN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+FOX,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,VIỄN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+G36,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+GCF,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+GTD,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG CÁ NHÂN & GIA DỤNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+HBC,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+HNG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+HNM,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ILS,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ITA,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BẤT ĐỘNG SẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2024-09-25,OK
+KPF,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2025-02-25,OK
+LSG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BẤT ĐỘNG SẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+LTG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-06-19,OK
+MSR,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+ODE,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TRUYỀN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+OIL,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,DẦU KHÍ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PAT,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÓA CHẤT,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PHP,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PIV,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BẤT ĐỘNG SẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+POM,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+PSH,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2025-03-11,OK
+PVX,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+QNS,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+QTP,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,"ĐIỆN, NƯỚC & XĂNG DẦU KHÍ ĐỐT",vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+RDP,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÓA CHẤT,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2024-11-27,OK
+SAS,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,BÁN LẺ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SBS,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SCL,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SGP,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+SPD,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+STH,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TRUYỀN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TAB,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-06-18,OK
+TIN,1,FINANCIAL_SECTOR_EXCLUDED,icb2,DỊCH VỤ TÀI CHÍNH,financial ICB2 exclusion,UPCOM,DỊCH VỤ TÀI CHÍNH,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TNA,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2024-09-13,OK
+TOS,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,DẦU KHÍ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TV1,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+TVN,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TÀI NGUYÊN CƠ BẢN,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VEA,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VGI,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,VIỄN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VGR,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VGT,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG CÁ NHÂN & GIA DỤNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VHG,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,HÀNG & DỊCH VỤ CÔNG NGHIỆP,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VIW,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VLB,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,XÂY DỰNG VÀ VẬT LIỆU,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VLC,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VNZ,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,TRUYỀN THÔNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VSF,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,THỰC PHẨM VÀ ĐỒ UỐNG,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VTD,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,DU LỊCH VÀ GIẢI TRÍ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
+VTR,2,UPCOM_EXCLUDED_V1,exchange,UPCOM,UPCOM,UPCOM,DU LỊCH VÀ GIẢI TRÍ,vnstock+vnstock_vci_symbols_by_industries+adtv_close_x_volume_x1000_proxy,2026-07-03,OK
