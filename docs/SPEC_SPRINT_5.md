@@ -143,3 +143,18 @@ No Sprint 5 production build may start until:
 
 1. an approved mapping resolves `INTEREST_EXPENSE_SIGN_AMBIGUOUS` without a blind absolute-value rule; and
 2. a documented cache source provides either valid direct market cap or raw price plus shares, without live fetching in this task.
+
+## 10. Current-market-cap foundation probe
+
+The current-market-cap input remains `current_parent_equity_market_cap_vnd`, with this fixed precedence:
+
+```text
+1. Valid direct current market cap in VND
+2. Otherwise: raw current price with an explicit unit × true shares outstanding
+```
+
+The public-source probe is restricted to VNM, FPT, and VCB before any 156-ticker fetch. Every accepted method must prove source, method, unit, current quote/as-of date, and—when using a proxy—the economic definition of shares outstanding. Values that merely look plausible are not evidence. `listedValue`, charter capital, adjusted history, and ambiguous `issueShare`/`listedShare` fields are not accepted substitutes.
+
+The 2026-07-19 public `vnstock==4.0.3` probe found no method satisfying that contract. The full-universe market-cap fetch is therefore blocked, no market-cap snapshot is created, and the market-cap foundation conclusion is `FAIL`.
+
+The separate HAG/IDI/DTD raw-cache investigation does not resolve the interest-expense sign gate. All three remain `SOURCE_AMBIGUOUS`, so `INTEREST_EXPENSE_SIGN_AMBIGUOUS` continues to block production `EBIT_PROXY_VAS`.

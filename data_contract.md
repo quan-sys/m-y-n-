@@ -472,6 +472,14 @@ OPEN QUESTION: The current public response does not provide a verified unique
 approved spec/API mapping; names must not be promoted to keys and values must
 not be silently aggregated.
 
+## Sprint 5 market-cap probe evidence
+
+`data/market_cap/<evaluation_date>/probe_public_methods.jsonl` stores one compact, traceable record for each ticker/public-method combination in the mandatory VNM/FPT/VCB probe. Each record contains the ticker, provider, exact public class and method, complete returned column-name list, compact relevant raw example, DataFrame metadata, error text, source-capability assessment, and `compact_example_hash`.
+
+`data/market_cap/<evaluation_date>/probe_summary.json` records probe tickers, public-method call count, evidence-record count, accepted-record count, and the deterministic contract decision. `contract_passed=false` forbids the 156-ticker fetch and therefore forbids creation of `data/screener/sprint5_market_cap_snapshot.csv`.
+
+The probe evidence is not an accepted market-cap dataset. A direct value requires an explicit VND unit and quote/as-of date. A proxy requires a current unadjusted price with explicit VND or thousand-VND unit, true shares outstanding, and quote/as-of date. Missing proof remains missing and is never converted to zero.
+
 The ≥ 90% full-universe coverage check and first real full-universe dated
 snapshot have not been completed. Sprint 3 must not be declared complete until
 those checks pass and the duplicate-ID issue is resolved or explicitly
