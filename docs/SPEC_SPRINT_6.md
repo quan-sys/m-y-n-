@@ -34,11 +34,16 @@ The nine binary criteria, one point each, F-Score = sum (0-9):
 
 `total_assets` at end of N-2 is required for criteria 3, 5, and 9. It remains subject to the same point-in-time rule and may not be filled from a later publication.
 
-### 2.1 PROPOSED — normalized VAS input map (owner approval required)
+### 2.1 SETTLED — net-income mapping; remaining normalized VAS input map stays PROPOSED
+
+- F-Score net income = normalized `net_profit_loss_after_tax` (consolidated), because the criterion 1/3/4 denominator is consolidated `total_assets`; using a parent-only numerator against a consolidated denominator understates ROA for groups with material non-controlling interests.
+- A diagnostic-only column `roa_parent_only`, computed from `attributable_to_parent_company` over the same denominator, must be written to the future output and must NEVER enter any criterion, percentile, or ranking.
+- Sprint 5 E/P correctly uses `attributable_to_parent_company` because its denominator is market capitalisation, which reflects parent shareholders only. This difference is intentional and not an inconsistency.
+
+The remaining rows in this table stay `PROPOSED` pending owner approval:
 
 | Economic input | Proposed normalized field | Proposed treatment and reason |
 |---|---|---|
-| net income | `net_profit_loss_after_tax` | Use consolidated after-tax profit because the denominator is consolidated `total_assets`. `attributable_to_parent_company` excludes non-controlling profit while the proposed asset denominator does not exclude the related assets, so it is not the proposed F-Score numerator. This differs intentionally from Sprint 5 E/P, whose numerator matches parent equity market capitalization. |
 | CFO | `net_cash_inflows_outflows_from_operating_activities` | Use the explicit annual operating-cash-flow subtotal; do not reconstruct CFO from working-capital lines. |
 | total assets | `total_assets` | Use the explicit year-end consolidated value for N, N-1, and N-2 as required. |
 | long-term debt | `long_term_borrowings` | Use interest-bearing long-term borrowings; do not substitute total long-term liabilities. |
@@ -50,14 +55,16 @@ The nine binary criteria, one point each, F-Score = sum (0-9):
 | share-issuance cash signal | `proceeds_from_issue_of_shares` | Use the explicit annual cash-flow line for year N. |
 | common-share balance signal | `common_shares` | Compare the explicit end-N and end-(N-1) values to catch non-cash/common-share increases that the proceeds line alone may miss. |
 
-### 2.2 PROPOSED — criterion 7 detection (owner approval required)
+### 2.2 SETTLED — criterion 7 detection
 
-Criterion 7 receives one point only when both local signals are explicit and usable, `proceeds_from_issue_of_shares_N == 0`, and `common_shares_N <= common_shares_N-1`.
+- `common_shares_N > common_shares_N-1` AND `proceeds_from_issue_of_shares_N > 0` -> criterion 7 scores 0.
+- `common_shares_N <= common_shares_N-1` AND `proceeds_from_issue_of_shares_N == 0` -> criterion 7 scores 1.
+- `common_shares_N > common_shares_N-1` AND `proceeds_from_issue_of_shares_N == 0` -> criterion 7 is UNSCORED with flag `SHARE_INCREASE_NO_CASH_SUSPECTED`; it is never scored 0 and never scored 1.
+- Any missing, duplicate, non-numeric, or negative input -> UNSCORED with its own specific flag, distinct from the flag above.
 
-- If issue proceeds are positive or common shares increased, the criterion receives `0`.
-- A negative issue-proceeds value, duplicate row, missing value, non-numeric value, or missing comparison-year common-shares value makes the criterion `UNSCORED` and raises a specific flag.
-- The audit also records the N-1 signal using N-1 and N-2 so the two-year input history is explicit; the settled F-Score criterion itself is evaluated only for year N.
-- Paid-in capital, charter capital, market-cap shares, and a fabricated zero are forbidden substitutes.
+The reason for the third branch is settled: a share-count increase with no cash proceeds is consistent with a stock dividend, bonus issue, or split, which raises no external capital and must not be penalised as an issuance; no corporate-action source is assumed or asserted.
+
+The audit also records the N-1 signal using N-1 and N-2 so the two-year input history is explicit; criterion 7 itself is evaluated only for year N. Paid-in capital, charter capital, market-cap shares, and a fabricated zero are forbidden substitutes.
 
 ### 2.3 PROPOSED — missing-data and score-display rule (owner approval required)
 
