@@ -2,7 +2,14 @@ from __future__ import annotations
 
 import pandas as pd
 
-from scripts.audit_sprint6_readiness import audit_ticker_from_frames
+from scripts.audit_sprint6_readiness import (
+    CRITERION7_MISSING_INPUT,
+    CRITERION7_SCORE_0,
+    CRITERION7_SCORE_1,
+    CRITERION7_SHARE_INCREASE_NO_CASH,
+    audit_ticker_from_frames,
+    classify_criterion7_branch,
+)
 
 
 def annual_rows(
@@ -111,3 +118,36 @@ def test_ticker_with_short_history_is_flagged_without_exclusion() -> None:
     assert result["annual_history_depth"] == 2
     assert result["franchise_years_used"] == 1
     assert result["franchise_history_status"] == "INSUFFICIENT_HISTORY"
+
+
+def test_criterion7_cash_share_increase_scores_zero_branch() -> None:
+    branch, outcome, flag = classify_criterion7_branch(110, 100, 5)
+    assert branch == CRITERION7_SCORE_0
+    assert outcome == "SCORES_0"
+    assert flag == ""
+
+
+def test_criterion7_no_share_increase_no_cash_scores_one_branch() -> None:
+    branch, outcome, flag = classify_criterion7_branch(100, 100, 0)
+    assert branch == CRITERION7_SCORE_1
+    assert outcome == "SCORES_1"
+    assert flag == ""
+
+
+def test_criterion7_share_increase_no_cash_is_unscored() -> None:
+    branch, outcome, flag = classify_criterion7_branch(110, 100, 0)
+    assert branch == CRITERION7_SHARE_INCREASE_NO_CASH
+    assert outcome == "UNSCORED"
+    assert flag == "SHARE_INCREASE_NO_CASH_SUSPECTED"
+
+
+def test_criterion7_missing_input_is_unscored_with_specific_flag() -> None:
+    branch, outcome, flag = classify_criterion7_branch(
+        None,
+        100,
+        0,
+        common_shares_n_status="MISSING",
+    )
+    assert branch == CRITERION7_MISSING_INPUT
+    assert outcome == "UNSCORED"
+    assert flag == "COMMON_SHARES_N_MISSING"

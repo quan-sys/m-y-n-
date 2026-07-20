@@ -58,6 +58,19 @@ The proposed CFO field `net_cash_inflows_outflows_from_operating_activities` is 
 - Sprint 4 annual pair reused without fallback: `156/156`.
 - This is availability evidence only. No criterion was evaluated and no F-Score was computed.
 
+### Criterion 7 settled-branch classification from local annual inputs
+
+| criterion7_branch | ticker count |
+|---|---:|
+| `SCORE_0` | 35 |
+| `SCORE_1` | 72 |
+| `SHARE_INCREASE_NO_CASH_SUSPECTED` | 28 |
+| `MISSING_INPUT_UNSCORED` | 21 |
+| **Total** | **156** |
+
+- `SHARE_INCREASE_NO_CASH_SUSPECTED` exact count: `28`.
+- `SHARE_INCREASE_NO_CASH_SUSPECTED` full ticker list: `C32`, `CEO`, `DBC`, `DHC`, `DRC`, `DTD`, `DVM`, `FIR`, `GAS`, `HAG`, `HAH`, `LCG`, `MCP`, `MSH`, `NAF`, `NTP`, `PAC`, `POW`, `PPT`, `PVS`, `PVT`, `TCD`, `TCM`, `THG`, `TNG`, `TTA`, `VC3`, `VGS`.
+
 ## 4. Franchise Power history depth
 
 - Proposed minimum usable years: `3`.

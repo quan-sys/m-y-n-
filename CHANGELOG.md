@@ -2,6 +2,8 @@
 
 ## 2026-07-20
 
+- Probe annual VCI/TCBS history for the five fixed tickers, settle Sprint 6 net-income and criterion-7 rules, and extend the local 156-row readiness audit with four criterion-7 branches; no production score, ranking, or recommendation.
+
 - Specify Sprint 6 quality definitions and owner-approval gate, audit all 156 survivors from local annual data, and investigate all 44 Sprint 5 interest-expense anomaly rows without computing production quality.
 
 - Build Sprint 5 Step 2 production EBIT/TEV and E/P candidates from 156 survivors with calibrated KBS market cap, point-in-time TTM guards, complete intermediate evidence, anomaly logging, and no Sprint 6 work.

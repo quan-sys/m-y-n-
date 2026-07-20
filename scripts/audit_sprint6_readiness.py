@@ -19,6 +19,17 @@ EVALUATION_DATE = "2026-07-20"
 EXPECTED_SURVIVORS = 156
 PROPOSED_FRANCHISE_MIN_YEARS = 3
 
+CRITERION7_SCORE_0 = "SCORE_0"
+CRITERION7_SCORE_1 = "SCORE_1"
+CRITERION7_SHARE_INCREASE_NO_CASH = "SHARE_INCREASE_NO_CASH_SUSPECTED"
+CRITERION7_MISSING_INPUT = "MISSING_INPUT_UNSCORED"
+CRITERION7_BRANCHES = (
+    CRITERION7_SCORE_0,
+    CRITERION7_SCORE_1,
+    CRITERION7_SHARE_INCREASE_NO_CASH,
+    CRITERION7_MISSING_INPUT,
+)
+
 NET_INCOME_ITEM = "net_profit_loss_after_tax"
 CFO_ITEM = "net_cash_inflows_outflows_from_operating_activities"
 TOTAL_ASSETS_ITEM = "total_assets"
@@ -107,6 +118,74 @@ def item_available(frame: pd.DataFrame, item_id: str, year: int) -> bool:
     if len(matches) != 1:
         return False
     return bool(pd.to_numeric(matches, errors="coerce").notna().all())
+
+
+def item_value_status(
+    frame: pd.DataFrame, item_id: str, year: int
+) -> tuple[int | float | None, str]:
+    if frame.empty:
+        return None, "MISSING"
+    matches = frame.loc[
+        frame["item_id"].astype(str).eq(item_id)
+        & frame["report_period"].astype(str).eq(str(year)),
+        "value",
+    ]
+    if matches.empty:
+        return None, "MISSING"
+    if len(matches) > 1:
+        return None, "DUPLICATE"
+    numeric = pd.to_numeric(matches, errors="coerce").iloc[0]
+    if pd.isna(numeric):
+        return None, "NON_NUMERIC"
+    value = float(numeric)
+    return (int(value), "OK") if value.is_integer() else (value, "OK")
+
+
+def classify_criterion7_branch(
+    common_shares_n: int | float | None,
+    common_shares_n_minus_1: int | float | None,
+    issue_proceeds_n: int | float | None,
+    *,
+    common_shares_n_status: str = "OK",
+    common_shares_n_minus_1_status: str = "OK",
+    issue_proceeds_n_status: str = "OK",
+) -> tuple[str, str, str]:
+    inputs = (
+        ("COMMON_SHARES_N", common_shares_n, common_shares_n_status),
+        (
+            "COMMON_SHARES_N_MINUS_1",
+            common_shares_n_minus_1,
+            common_shares_n_minus_1_status,
+        ),
+        ("ISSUE_PROCEEDS_N", issue_proceeds_n, issue_proceeds_n_status),
+    )
+    flags: list[str] = []
+    for name, value, status in inputs:
+        if status != "OK" or value is None:
+            flags.append(f"{name}_{status if status != 'OK' else 'MISSING'}")
+        elif value < 0:
+            flags.append(f"{name}_NEGATIVE")
+    if flags:
+        return CRITERION7_MISSING_INPUT, "UNSCORED", "|".join(flags)
+
+    assert common_shares_n is not None
+    assert common_shares_n_minus_1 is not None
+    assert issue_proceeds_n is not None
+    if common_shares_n > common_shares_n_minus_1 and issue_proceeds_n > 0:
+        return CRITERION7_SCORE_0, "SCORES_0", ""
+    if common_shares_n <= common_shares_n_minus_1 and issue_proceeds_n == 0:
+        return CRITERION7_SCORE_1, "SCORES_1", ""
+    if common_shares_n > common_shares_n_minus_1 and issue_proceeds_n == 0:
+        return (
+            CRITERION7_SHARE_INCREASE_NO_CASH,
+            "UNSCORED",
+            CRITERION7_SHARE_INCREASE_NO_CASH,
+        )
+    return (
+        CRITERION7_MISSING_INPUT,
+        "UNSCORED",
+        "VALID_INPUT_COMBINATION_NOT_SETTLED",
+    )
 
 
 def years_in(frame: pd.DataFrame) -> set[int]:
@@ -269,6 +348,39 @@ def audit_ticker_from_frames(
         cash_flow, balance, annual_n1
     )
 
+    common_n, common_n_status = item_value_status(
+        balance, COMMON_SHARES_ITEM, annual_n
+    )
+    common_n1, common_n1_status = item_value_status(
+        balance, COMMON_SHARES_ITEM, annual_n1
+    )
+    proceeds_n, proceeds_n_status = item_value_status(
+        cash_flow, ISSUE_PROCEEDS_ITEM, annual_n
+    )
+    criterion7_branch, criterion7_outcome, criterion7_flag = (
+        classify_criterion7_branch(
+            common_n,
+            common_n1,
+            proceeds_n,
+            common_shares_n_status=common_n_status,
+            common_shares_n_minus_1_status=common_n1_status,
+            issue_proceeds_n_status=proceeds_n_status,
+        )
+    )
+    result.update(
+        {
+            "criterion7_common_shares_n_value": common_n,
+            "criterion7_common_shares_n_status": common_n_status,
+            "criterion7_common_shares_n_minus_1_value": common_n1,
+            "criterion7_common_shares_n_minus_1_status": common_n1_status,
+            "criterion7_issue_proceeds_n_value": proceeds_n,
+            "criterion7_issue_proceeds_n_status": proceeds_n_status,
+            "criterion7_branch": criterion7_branch,
+            "criterion7_outcome": criterion7_outcome,
+            "criterion7_flag": criterion7_flag,
+        }
+    )
+
     criteria = {
         "criterion_1_inputs_available": result["net_income_n_available"]
         and result["total_assets_n_minus_1_available"],
@@ -402,6 +514,13 @@ def render_report(audited: pd.DataFrame) -> str:
     cash_rows = int(audited["cash_flow_annual_dataset_has_eligible_rows"].sum())
     complete = int(audited["complete_fscore_inputs_both_years"].sum())
     labels = Counter(int(value) for value in audited["franchise_years_used"])
+    criterion7_counts = Counter(str(value) for value in audited["criterion7_branch"])
+    criterion7_suspected = sorted(
+        audited.loc[
+            audited["criterion7_branch"].eq(CRITERION7_SHARE_INCREASE_NO_CASH),
+            "ticker",
+        ].astype(str)
+    )
     special = audited.loc[audited["ticker"].isin(["NTC", "TRC", "DBC"])].copy()
     special["_order"] = special["ticker"].map({"NTC": 0, "TRC": 1, "DBC": 2})
     special = special.sort_values("_order")
@@ -441,6 +560,25 @@ def render_report(audited: pd.DataFrame) -> str:
             f"- All nine criteria have their required inputs available: `{int(audited['fscore_criteria_inputs_available_count'].eq(9).sum())}/{len(audited)}`.",
             f"- Sprint 4 annual pair reused without fallback: `{int(audited['step1_annual_pair_reused'].sum())}/{len(audited)}`.",
             "- This is availability evidence only. No criterion was evaluated and no F-Score was computed.",
+            "",
+            "### Criterion 7 settled-branch classification from local annual inputs",
+            "",
+            "| criterion7_branch | ticker count |",
+            "|---|---:|",
+            *[
+                f"| `{branch}` | {criterion7_counts[branch]} |"
+                for branch in CRITERION7_BRANCHES
+            ],
+            f"| **Total** | **{sum(criterion7_counts[branch] for branch in CRITERION7_BRANCHES)}** |",
+            "",
+            f"- `SHARE_INCREASE_NO_CASH_SUSPECTED` exact count: `{len(criterion7_suspected)}`.",
+            "- `SHARE_INCREASE_NO_CASH_SUSPECTED` full ticker list: "
+            + (
+                ", ".join(f"`{ticker}`" for ticker in criterion7_suspected)
+                if criterion7_suspected
+                else "`NONE`"
+            )
+            + ".",
             "",
             "## 4. Franchise Power history depth",
             "",
@@ -537,6 +675,26 @@ def main() -> int:
     print(
         "all_nine_criteria_inputs="
         f"{int(audited['fscore_criteria_inputs_available_count'].eq(9).sum())}"
+    )
+    criterion7_counts = Counter(str(value) for value in audited["criterion7_branch"])
+    print(
+        "criterion7_branches="
+        + ";".join(
+            f"{branch}:{criterion7_counts[branch]}" for branch in CRITERION7_BRANCHES
+        )
+    )
+    print(
+        "share_increase_no_cash_tickers="
+        + "|".join(
+            sorted(
+                audited.loc[
+                    audited["criterion7_branch"].eq(
+                        CRITERION7_SHARE_INCREASE_NO_CASH
+                    ),
+                    "ticker",
+                ].astype(str)
+            )
+        )
     )
     print(
         "franchise_history="
