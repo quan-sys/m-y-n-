@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-20
+
+- Build Sprint 5 Step 2 production EBIT/TEV and E/P candidates from 156 survivors with calibrated KBS market cap, point-in-time TTM guards, complete intermediate evidence, anomaly logging, and no Sprint 6 work.
+
 ## 2026-07-19
 
 - Calibrate the KBS current-price/share contract in VND, resolve the VAS interest-expense sign rule, and add a resumable guarded 156-survivor market-cap fetch; no valuation, ranking, threshold, or Sprint 6 change.
