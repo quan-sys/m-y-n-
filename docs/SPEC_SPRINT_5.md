@@ -1,6 +1,6 @@
 # Sprint 5 Step 2 — Binding valuation specification
 
-Status: **SPECIFICATION AND CACHE-ONLY READINESS AUDIT ONLY.** This document does not authorize production valuation, ranking, percentile calculation, or a candidate list.
+Status: **STEP 2 PRODUCTION VALUATION BUILD AUTHORIZED FOR THIS TASK ONLY.** The audit-only restriction is lifted exactly for the production valuation build specified here; this does not authorize Sprint 6 or any later work.
 
 Evaluation date for the reproducible audit: `2026-07-18`.
 
@@ -43,16 +43,11 @@ Binding prohibitions:
 
 For each row, the later implementation must use exactly this precedence and record the selected method:
 
-1. Use an existing valid **DIRECT** market cap only when its unit and as-of date are documented.
-2. Otherwise use the deterministic proxy:
-
-```text
-market cap = raw_price_thousand_vnd × 1000 × shares_outstanding
-```
-
-3. Never use adjusted historical price for current market cap.
-4. Never multiply an already-VND value by `1000` again.
-5. Every output row must state `direct` or `proxy`; an unavailable input stays unavailable.
+1. The production market-cap input is `data/market_cap/<run-date>/universe_market_cap.csv`, built by the calibrated KBS method in section 10.
+2. The accepted KBS `Trading.price_board().close_price` is already VND and is multiplied directly by KBS `Company.overview().outstanding_shares`.
+3. A thousand-VND `×1000` conversion applies only to a source explicitly documented as thousand-VND; the accepted KBS source is not such a source, and multiplying its `close_price` by `1000` is **FORBIDDEN**.
+4. Never use adjusted historical price for current market cap.
+5. Every output row must state the selected method; an unavailable input stays unavailable.
 
 The existing data contract records the VCI historical price series as `ADJUSTED_OBSERVED`. That historical series is therefore not an eligible raw-price source for this proxy.
 
