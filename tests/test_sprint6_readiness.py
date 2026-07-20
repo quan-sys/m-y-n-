@@ -7,6 +7,7 @@ from scripts.audit_sprint6_readiness import (
     CRITERION7_SCORE_0,
     CRITERION7_SCORE_1,
     CRITERION7_SHARE_INCREASE_NO_CASH,
+    PROPOSED_FRANCHISE_MIN_YEARS,
     audit_ticker_from_frames,
     classify_criterion7_branch,
 )
@@ -85,13 +86,15 @@ def survivor() -> dict[str, object]:
     }
 
 
-def test_complete_ticker_has_all_fscore_inputs_and_three_franchise_years() -> None:
-    income, balance, cash_flow = complete_frames()
+def test_complete_ticker_has_all_fscore_inputs_at_proposed_franchise_minimum() -> None:
+    first_year = 2025 - PROPOSED_FRANCHISE_MIN_YEARS
+    years = tuple(range(first_year, 2026))
+    income, balance, cash_flow = complete_frames(years)
     result = audit_ticker_from_frames(survivor(), income, balance, cash_flow)
     assert result["step1_annual_pair_reused"] is True
     assert result["fscore_criteria_inputs_available_count"] == 9
     assert result["complete_fscore_inputs_both_years"] is True
-    assert result["franchise_years_used"] == 3
+    assert result["franchise_years_used"] == PROPOSED_FRANCHISE_MIN_YEARS
     assert result["franchise_history_status"] == "READY"
 
 

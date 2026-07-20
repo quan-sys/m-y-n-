@@ -12,16 +12,19 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 SURVIVORS_PATH = ROOT / "data" / "screener" / "step1_survivors.csv"
-FUNDAMENTALS_ROOT = ROOT / "data" / "fundamentals"
+FUNDAMENTALS_ROOT = (
+    ROOT / "data" / "fundamentals" / "sprint6_annual_history" / "2026-07-20"
+)
 OUTPUT_PATH = ROOT / "data" / "screener" / "sprint6_readiness_audit.csv"
 REPORT_PATH = ROOT / "docs" / "SPRINT_6_DATA_READINESS.md"
 EVALUATION_DATE = "2026-07-20"
 EXPECTED_SURVIVORS = 156
-PROPOSED_FRANCHISE_MIN_YEARS = 3
+PROPOSED_FRANCHISE_MIN_YEARS = 5
 
 CRITERION7_SCORE_0 = "SCORE_0"
 CRITERION7_SCORE_1 = "SCORE_1"
 CRITERION7_SHARE_INCREASE_NO_CASH = "SHARE_INCREASE_NO_CASH_SUSPECTED"
+CRITERION7_NO_SHARE_INCREASE_CASH = "NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0"
 CRITERION7_MISSING_INPUT = "MISSING_INPUT_UNSCORED"
 CRITERION7_BRANCHES = (
     CRITERION7_SCORE_0,
@@ -181,11 +184,7 @@ def classify_criterion7_branch(
             "UNSCORED",
             CRITERION7_SHARE_INCREASE_NO_CASH,
         )
-    return (
-        CRITERION7_MISSING_INPUT,
-        "UNSCORED",
-        "VALID_INPUT_COMBINATION_NOT_SETTLED",
-    )
+    return CRITERION7_SCORE_0, CRITERION7_NO_SHARE_INCREASE_CASH, ""
 
 
 def years_in(frame: pd.DataFrame) -> set[int]:
@@ -378,6 +377,13 @@ def audit_ticker_from_frames(
             "criterion7_branch": criterion7_branch,
             "criterion7_outcome": criterion7_outcome,
             "criterion7_flag": criterion7_flag,
+            "issue_proceeds_to_common_shares_ratio": (
+                proceeds_n / common_n
+                if criterion7_outcome == CRITERION7_NO_SHARE_INCREASE_CASH
+                and common_n not in (None, 0)
+                and proceeds_n is not None
+                else None
+            ),
         }
     )
 
@@ -521,6 +527,15 @@ def render_report(audited: pd.DataFrame) -> str:
             "ticker",
         ].astype(str)
     )
+    criterion7_new_fourth = sorted(
+        audited.loc[
+            audited["criterion7_outcome"].eq(CRITERION7_NO_SHARE_INCREASE_CASH),
+            "ticker",
+        ].astype(str)
+    )
+    criterion7_missing = int(
+        audited["criterion7_branch"].eq(CRITERION7_MISSING_INPUT).sum()
+    )
     special = audited.loc[audited["ticker"].isin(["NTC", "TRC", "DBC"])].copy()
     special["_order"] = special["ticker"].map({"NTC": 0, "TRC": 1, "DBC": 2})
     special = special.sort_values("_order")
@@ -571,6 +586,15 @@ def render_report(audited: pd.DataFrame) -> str:
             ],
             f"| **Total** | **{sum(criterion7_counts[branch] for branch in CRITERION7_BRANCHES)}** |",
             "",
+            f"- `MISSING_INPUT_UNSCORED` exact count: `{criterion7_missing}`.",
+            f"- `NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0` exact count: `{len(criterion7_new_fourth)}`.",
+            "- `NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0` full ticker list: "
+            + (
+                ", ".join(f"`{ticker}`" for ticker in criterion7_new_fourth)
+                if criterion7_new_fourth
+                else "`NONE`"
+            )
+            + ".",
             f"- `SHARE_INCREASE_NO_CASH_SUSPECTED` exact count: `{len(criterion7_suspected)}`.",
             "- `SHARE_INCREASE_NO_CASH_SUSPECTED` full ticker list: "
             + (
@@ -595,7 +619,7 @@ def render_report(audited: pd.DataFrame) -> str:
     lines.extend(
         [
             "",
-            "The local cache exposes at most four annual report periods per ticker. ROC needs both a current and a prior invested-capital observation, so the observed maximum usable ROC/margin overlap is three years. The proposed minimum of three uses the full locally available comparable window; rows below it remain visible with `INSUFFICIENT_HISTORY` rather than being excluded.",
+            f"The extended local cache produces a measured maximum usable ROC/margin overlap of `{max(labels) if labels else 0}` years. The PROPOSED minimum shown above is read from the single named `PROPOSED_FRANCHISE_MIN_YEARS` constant; rows below it remain visible with `INSUFFICIENT_HISTORY` rather than being excluded.",
             "",
             "## 5. NTC, TRC, and DBC explicit rows",
             "",
@@ -695,6 +719,23 @@ def main() -> int:
                 ].astype(str)
             )
         )
+    )
+    print(
+        "no_share_increase_cash_positive_tickers="
+        + "|".join(
+            sorted(
+                audited.loc[
+                    audited["criterion7_outcome"].eq(
+                        CRITERION7_NO_SHARE_INCREASE_CASH
+                    ),
+                    "ticker",
+                ].astype(str)
+            )
+        )
+    )
+    print(
+        "missing_input_unscored="
+        f"{int(audited['criterion7_branch'].eq(CRITERION7_MISSING_INPUT).sum())}"
     )
     print(
         "franchise_history="
