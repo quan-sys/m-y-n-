@@ -1,6 +1,6 @@
 # Sprint 5 Step 2 — Binding valuation specification
 
-Status: **STEP 2 PRODUCTION VALUATION BUILD AUTHORIZED FOR THIS TASK ONLY.** The audit-only restriction is lifted exactly for the production valuation build specified here; this does not authorize Sprint 6 or any later work.
+Status: **STEP 2 PRODUCTION VALUATION BUILD COMPLETED AND MERGED.** The task-specific build authorization is closed; this document does not authorize further Sprint 5 changes, Sprint 6, or any later work.
 
 Evaluation date for the reproducible audit: `2026-07-18`.
 
