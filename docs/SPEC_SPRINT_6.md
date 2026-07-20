@@ -53,16 +53,21 @@ The remaining rows in this table stay `PROPOSED` pending owner approval:
 | gross profit | `gross_profit` | Prefer the explicit normalized gross-profit subtotal. If it is missing, a later approved build may use `net_sales + cost_of_sales` only when `cost_of_sales` is an explicit usable non-positive expense and the sign contract is logged; otherwise the criterion is UNSCORED. |
 | cost of goods sold diagnostic/fallback | `cost_of_sales` | It is not silently substituted. Its presence and sign must be recorded whenever the proposed fallback is used. |
 | share-issuance cash signal | `proceeds_from_issue_of_shares` | Use the explicit annual cash-flow line for year N. |
-| common-share balance signal | `common_shares` | Compare the explicit end-N and end-(N-1) values to catch non-cash/common-share increases that the proceeds line alone may miss. |
+| common-share par-capital signal | `common_shares` | This is balance-sheet common-share par capital denominated in VND, not a share count. Compare the explicit end-N and end-(N-1) values to catch capital changes that the proceeds line alone may miss. The year-over-year comparison remains valid because par capital changes only when the share count changes, but `common_shares` must never be used as a share count anywhere. |
 
 ### 2.2 SETTLED — criterion 7 detection
 
 - `common_shares_N > common_shares_N-1` AND `proceeds_from_issue_of_shares_N > 0` -> criterion 7 scores 0.
 - `common_shares_N <= common_shares_N-1` AND `proceeds_from_issue_of_shares_N == 0` -> criterion 7 scores 1.
 - `common_shares_N > common_shares_N-1` AND `proceeds_from_issue_of_shares_N == 0` -> criterion 7 is UNSCORED with flag `SHARE_INCREASE_NO_CASH_SUSPECTED`; it is never scored 0 and never scored 1.
+- `common_shares_N <= common_shares_N-1` AND `proceeds_from_issue_of_shares_N > 0` -> criterion 7 scores 0, because cash was received from share issuance or owner capital contribution at group level even when parent par capital did not change. Recognised possible reasons include non-controlling contributions into subsidiaries and timing differences; none is asserted as fact for any specific ticker.
 - Any missing, duplicate, non-numeric, or negative input -> UNSCORED with its own specific flag, distinct from the flag above.
 
-The reason for the third branch is settled: a share-count increase with no cash proceeds is consistent with a stock dividend, bonus issue, or split, which raises no external capital and must not be penalised as an issuance; no corporate-action source is assumed or asserted.
+The catch-all label `VALID_INPUT_COMBINATION_NOT_SETTLED` is removed. `MISSING_INPUT_UNSCORED` now means only genuinely missing, duplicate, non-numeric, or negative inputs.
+
+The reason for the third branch is settled: an increase in common-share par capital with no cash proceeds is consistent with a stock dividend, bonus issue, or split, which raises no external capital and must not be penalised as an issuance; no corporate-action source is assumed or asserted. `common_shares` is balance-sheet common-share par capital denominated in VND, not a share count. Its year-over-year comparison remains valid because par capital changes only when the share count changes, and it must never be used as a share count anywhere.
+
+For every ticker scored 0 by the fourth branch, write the diagnostic-only column `issue_proceeds_to_common_shares_ratio = proceeds_from_issue_of_shares_N / common_shares_N`. This column must NEVER gate, threshold, or alter any score.
 
 The audit also records the N-1 signal using N-1 and N-2 so the two-year input history is explicit; criterion 7 itself is evaluated only for year N. Paid-in capital, charter capital, market-cap shares, and a fabricated zero are forbidden substitutes.
 
@@ -77,6 +82,8 @@ The audit also records the N-1 signal using N-1 and N-2 so the two-year input hi
 ## 3. PROPOSED — Franchise Power definition (owner approval required)
 
 Franchise Power has two equal components: long-term average ROC and margin stability. It uses the maximum locally available point-in-time annual history per ticker and records `years_used` and the exact year labels.
+
+Extended history is restated data usable for ranking today, not evidence of what was published at the time. See `docs/SPRINT_6_RESTATEMENT_DIFF.md`. It does not make Sprint 8 backtests point-in-time clean.
 
 ### 3.1 Proposed ROC
 
@@ -112,9 +119,11 @@ Margin instability is the population standard deviation of the usable annual gro
 
 ### 3.3 Proposed minimum history, justified by the local audit
 
-The proposed minimum is `3` usable common ROC/margin years. `docs/SPRINT_6_DATA_READINESS.md` finds four annual report periods in the local comparable cache and, because ROC needs a prior invested-capital observation, an observed maximum of three usable common years. The audit result is exactly `156/156` tickers with `years_used=3`.
+The PROPOSED minimum is defined in exactly one place: the named `PROPOSED_FRANCHISE_MIN_YEARS` constant in `scripts/audit_sprint6_readiness.py`. `docs/SPRINT_6_DATA_READINESS.md` records the measured extended-history distribution and the READY/INSUFFICIENT_HISTORY result produced from that constant. The measured result supports the new minimum while keeping short-history rows visible rather than excluding them.
 
-A ticker below `3` years remains in the all-survivor quality output with `INSUFFICIENT_HISTORY`. This is a low-confidence flag, not an exclusion; `years_used` and the available year labels remain visible.
+Pandemic years 2020 and 2021 are retained and must not be excluded, because the franchise measure exists to test resilience through a shock and dropping stress years biases the measure upward.
+
+A ticker below `PROPOSED_FRANCHISE_MIN_YEARS` remains in the all-survivor quality output with `INSUFFICIENT_HISTORY`. This is a low-confidence flag, not an exclusion; `years_used` and the available year labels remain visible.
 
 ## 4. PROPOSED — composite quality and percentiles (owner approval required)
 
@@ -142,15 +151,15 @@ Any future formula consuming `financial_expenses` is blocked for a ticker-quarte
 
 ### 6.1 PROPOSED — NTC
 
-NTC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and `franchise_years_used=3`. Its incomplete Sprint 5 TTM value window is unrelated to annual F-Score availability. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag; NTC cannot enter a Sprint 6 candidate-list rank unless it is already present in that unchanged Sprint 5 candidate list.
+NTC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Its incomplete Sprint 5 TTM value window is unrelated to annual F-Score availability. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag; NTC cannot enter a Sprint 6 candidate-list rank unless it is already present in that unchanged Sprint 5 candidate list.
 
 ### 6.2 PROPOSED — TRC
 
-TRC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and `franchise_years_used=3`. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag. Its annual quality evidence does not repair or replace the missing Sprint 5 TTM value evidence.
+TRC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag. Its annual quality evidence does not repair or replace the missing Sprint 5 TTM value evidence.
 
 ### 6.3 PROPOSED — DBC
 
-DBC may receive an F-Score because its annual balance-sheet, income-statement, and cash-flow datasets are locally present for the required years; the audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and `franchise_years_used=3`. Carry `SPRINT5_QUARTERLY_BALANCE_MISSING_TEV_MISSING` as a visible cross-step flag. Annual quality availability must not fabricate the missing quarterly TEV or add DBC to the EBIT/TEV candidate list.
+DBC may receive an F-Score because its annual balance-sheet, income-statement, and cash-flow datasets are locally present for the required years; the audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Carry `SPRINT5_QUARTERLY_BALANCE_MISSING_TEV_MISSING` as a visible cross-step flag. Annual quality availability must not fabricate the missing quarterly TEV or add DBC to the EBIT/TEV candidate list.
 
 ## 7. Readiness-audit contract
 

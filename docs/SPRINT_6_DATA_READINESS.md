@@ -62,34 +62,41 @@ The proposed CFO field `net_cash_inflows_outflows_from_operating_activities` is 
 
 | criterion7_branch | ticker count |
 |---|---:|
-| `SCORE_0` | 35 |
+| `SCORE_0` | 55 |
 | `SCORE_1` | 72 |
 | `SHARE_INCREASE_NO_CASH_SUSPECTED` | 28 |
-| `MISSING_INPUT_UNSCORED` | 21 |
+| `MISSING_INPUT_UNSCORED` | 1 |
 | **Total** | **156** |
 
+- `MISSING_INPUT_UNSCORED` exact count: `1`.
+- `NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0` exact count: `20`.
+- `NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0` full ticker list: `AGG`, `API`, `BNA`, `BWE`, `CTD`, `CTI`, `DHA`, `DXP`, `DXS`, `FCN`, `FIT`, `GVR`, `KSV`, `PVD`, `SBG`, `TCO`, `TRC`, `TV2`, `VGC`, `VNM`.
 - `SHARE_INCREASE_NO_CASH_SUSPECTED` exact count: `28`.
 - `SHARE_INCREASE_NO_CASH_SUSPECTED` full ticker list: `C32`, `CEO`, `DBC`, `DHC`, `DRC`, `DTD`, `DVM`, `FIR`, `GAS`, `HAG`, `HAH`, `LCG`, `MCP`, `MSH`, `NAF`, `NTP`, `PAC`, `POW`, `PPT`, `PVS`, `PVT`, `TCD`, `TCM`, `THG`, `TNG`, `TTA`, `VC3`, `VGS`.
 
 ## 4. Franchise Power history depth
 
-- Proposed minimum usable years: `3`.
-- READY: `156/156`.
-- INSUFFICIENT_HISTORY: `0/156`.
+- Proposed minimum usable years: `5`.
+- READY: `149/156`.
+- INSUFFICIENT_HISTORY: `7/156`.
 
 | franchise_years_used | ticker count |
 |---:|---:|
-| 3 | 156 |
+| 3 | 3 |
+| 4 | 4 |
+| 5 | 2 |
+| 6 | 1 |
+| 7 | 146 |
 
-The local cache exposes at most four annual report periods per ticker. ROC needs both a current and a prior invested-capital observation, so the observed maximum usable ROC/margin overlap is three years. The proposed minimum of three uses the full locally available comparable window; rows below it remain visible with `INSUFFICIENT_HISTORY` rather than being excluded.
+The extended local cache produces a measured maximum usable ROC/margin overlap of `7` years. The PROPOSED minimum shown above is read from the single named `PROPOSED_FRANCHISE_MIN_YEARS` constant; rows below it remain visible with `INSUFFICIENT_HISTORY` rather than being excluded.
 
 ## 5. NTC, TRC, and DBC explicit rows
 
 | ticker | annual_n | annual_n_minus_1 | cash_flow annual file | nine criteria inputs available | complete F-Score inputs both years | franchise_years_used | franchise_history_status |
 |---|---:|---:|---|---:|---|---:|---|
-| NTC | 2025 | 2024 | True | 9 | True | 3 | READY |
-| TRC | 2025 | 2024 | True | 9 | True | 3 | READY |
-| DBC | 2025 | 2024 | True | 9 | True | 3 | READY |
+| NTC | 2025 | 2024 | True | 9 | True | 7 | READY |
+| TRC | 2025 | 2024 | True | 9 | True | 7 | READY |
+| DBC | 2025 | 2024 | True | 9 | True | 7 | READY |
 
 ## 6. Build-phase prerequisites
 

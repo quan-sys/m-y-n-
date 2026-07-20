@@ -27,6 +27,7 @@ SCREENER_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "screene
 LAG_QUARTER = 30
 LAG_SEMIANNUAL = 60
 LAG_ANNUAL = 90
+ANNUAL_HISTORY_LIMIT = 100
 
 STATEMENT_BALANCE_SHEET = "BALANCE_SHEET"
 STATEMENT_INCOME_STATEMENT = "INCOME_STATEMENT"
@@ -413,8 +414,20 @@ class FinanceClient:
             get_all=True,
             show_log=False,
         )
-        method = getattr(finance, _STATEMENT_METHODS[statement_type])
-        raw = _quiet_call(method, period=period, lang="en", dropna=False, show_log=False)
+        if period == "year":
+            raw = _quiet_call(
+                finance.provider._get_financial_report,
+                _STATEMENT_METHODS[statement_type],
+                period=period,
+                lang="en",
+                get_all=True,
+                dropna=False,
+                show_log=False,
+                limit=ANNUAL_HISTORY_LIMIT,
+            )
+        else:
+            method = getattr(finance, _STATEMENT_METHODS[statement_type])
+            raw = _quiet_call(method, period=period, lang="en", dropna=False, show_log=False)
         return _to_frame(raw)
 
     def _latest_cached(self, ticker: str, statement_type: str, period: str) -> CachedObservation | None:
