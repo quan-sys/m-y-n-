@@ -34,15 +34,15 @@ The nine binary criteria, one point each, F-Score = sum (0-9):
 
 `total_assets` at end of N-2 is required for criteria 3, 5, and 9. It remains subject to the same point-in-time rule and may not be filled from a later publication.
 
-### 2.1 SETTLED — net-income mapping; remaining normalized VAS input map stays PROPOSED
+### 2.1 SETTLED — net-income mapping and normalized VAS input map
 
 - F-Score net income = normalized `net_profit_loss_after_tax` (consolidated), because the criterion 1/3/4 denominator is consolidated `total_assets`; using a parent-only numerator against a consolidated denominator understates ROA for groups with material non-controlling interests.
 - A diagnostic-only column `roa_parent_only`, computed from `attributable_to_parent_company` over the same denominator, must be written to the future output and must NEVER enter any criterion, percentile, or ranking.
 - Sprint 5 E/P correctly uses `attributable_to_parent_company` because its denominator is market capitalisation, which reflects parent shareholders only. This difference is intentional and not an inconsistency.
 
-The remaining rows in this table stay `PROPOSED` pending owner approval:
+The remaining rows in this table are SETTLED, approved by the owner on 2026-07-20:
 
-| Economic input | Proposed normalized field | Proposed treatment and reason |
+| Economic input | Normalized field | Treatment and reason |
 |---|---|---|
 | CFO | `net_cash_inflows_outflows_from_operating_activities` | Use the explicit annual operating-cash-flow subtotal; do not reconstruct CFO from working-capital lines. |
 | total assets | `total_assets` | Use the explicit year-end consolidated value for N, N-1, and N-2 as required. |
@@ -71,21 +71,22 @@ For every ticker scored 0 by the fourth branch, write the diagnostic-only column
 
 The audit also records the N-1 signal using N-1 and N-2 so the two-year input history is explicit; criterion 7 itself is evaluated only for year N. Paid-in capital, charter capital, market-cap shares, and a fabricated zero are forbidden substitutes.
 
-### 2.3 PROPOSED — missing-data and score-display rule (owner approval required)
+### 2.3 SETTLED — missing-data and score-display rule
 
 - A missing input makes only the affected criterion `UNSCORED`, with the exact missing/duplicate/non-numeric/invalid-denominator flag.
 - `UNSCORED` is never silently scored `0`; no value or zero may be fabricated.
 - Report `F_SCORE_POINTS`, `F_SCORE_CRITERIA_SCORED`, and `F_SCORE_CRITERIA_UNSCORED` together, for example `6 points / 8 criteria scored / 1 UNSCORED`.
 - The raw points remain the sum of scored binary criteria and are never rescaled to `0-9`.
-- **PROPOSED for ranking:** use `F_SCORE_POINTS / F_SCORE_CRITERIA_SCORED` only to form the F-Score component percentile, while preserving the raw points and denominator next to it. A zero scored denominator produces no percentile.
+- **SETTLED for ranking:** use `F_SCORE_POINTS / F_SCORE_CRITERIA_SCORED` only to form the F-Score component percentile, while preserving the raw points and denominator next to it. A zero scored denominator produces no percentile.
+- A named constant `MIN_SCORED_CRITERIA = 7` is defined in exactly one place in the F-Score build script. A row whose `F_SCORE_CRITERIA_SCORED` is below that constant keeps its raw points and its ratio visible but is marked `LOW_CONFIDENCE_SCORED_DENOMINATOR` and is not eligible for the later quality ranking. It is a confidence flag, never an exclusion from the output.
 
-## 3. PROPOSED — Franchise Power definition (owner approval required)
+## 3. SETTLED — Franchise Power definition
 
 Franchise Power has two equal components: long-term average ROC and margin stability. It uses the maximum locally available point-in-time annual history per ticker and records `years_used` and the exact year labels.
 
 Extended history is restated data usable for ranking today, not evidence of what was published at the time. See `docs/SPRINT_6_RESTATEMENT_DIFF.md`. It does not make Sprint 8 backtests point-in-time clean.
 
-### 3.1 Proposed ROC
+### 3.1 Settled ROC
 
 For each usable year t:
 
@@ -107,7 +108,7 @@ ROC_t =
 
 All normalized inputs must be explicit and usable. A non-positive average invested-capital denominator makes that year unavailable. The long-term ROC component is the plain arithmetic mean of usable `ROC_t` observations; no winsorization or custom time weight is authorized in this spec.
 
-### 3.2 Proposed margin stability
+### 3.2 Settled margin stability
 
 For each usable year:
 
@@ -117,15 +118,15 @@ gross_margin_t = gross_profit_t / net_sales_t
 
 Margin instability is the population standard deviation of the usable annual gross margins; lower standard deviation ranks as higher stability. The explicit `gross_profit` field is preferred, with only the controlled proposed COGS fallback in section 2.1. No missing year is filled.
 
-### 3.3 Proposed minimum history, justified by the local audit
+### 3.3 Settled minimum history, justified by the local audit
 
-The PROPOSED minimum is defined in exactly one place: the named `PROPOSED_FRANCHISE_MIN_YEARS` constant in `scripts/audit_sprint6_readiness.py`. `docs/SPRINT_6_DATA_READINESS.md` records the measured extended-history distribution and the READY/INSUFFICIENT_HISTORY result produced from that constant. The measured result supports the new minimum while keeping short-history rows visible rather than excluding them.
+The approved minimum is defined in exactly one place: the named `PROPOSED_FRANCHISE_MIN_YEARS` constant in `scripts/audit_sprint6_readiness.py`. `docs/SPRINT_6_DATA_READINESS.md` records the measured extended-history distribution and the READY/INSUFFICIENT_HISTORY result produced from that constant. The measured result supports the new minimum while keeping short-history rows visible rather than excluding them.
 
 Pandemic years 2020 and 2021 are retained and must not be excluded, because the franchise measure exists to test resilience through a shock and dropping stress years biases the measure upward.
 
 A ticker below `PROPOSED_FRANCHISE_MIN_YEARS` remains in the all-survivor quality output with `INSUFFICIENT_HISTORY`. This is a low-confidence flag, not an exclusion; `years_used` and the available year labels remain visible.
 
-## 4. PROPOSED — composite quality and percentiles (owner approval required)
+## 4. SETTLED — composite quality and percentiles
 
 The production composite, if approved, is the plain arithmetic mean of these component percentiles:
 
@@ -147,17 +148,17 @@ The four `UNEXPLAINED` rows are `GMD 2025Q4`, `SAB 2025Q4`, `DTD 2025Q2`, and `L
 
 Any future formula consuming `financial_expenses` is blocked for a ticker-quarter still labelled `UNEXPLAINED`. The proposed Franchise Power ROC does not consume `financial_expenses`; it uses the settled Sprint 5 `abs(interest_expenses)` definition.
 
-## 6. PROPOSED — explicit dispositions (owner approval required)
+## 6. SETTLED — explicit dispositions
 
-### 6.1 PROPOSED — NTC
+### 6.1 SETTLED — NTC
 
 NTC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Its incomplete Sprint 5 TTM value window is unrelated to annual F-Score availability. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag; NTC cannot enter a Sprint 6 candidate-list rank unless it is already present in that unchanged Sprint 5 candidate list.
 
-### 6.2 PROPOSED — TRC
+### 6.2 SETTLED — TRC
 
 TRC may receive an F-Score because the local annual audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Carry `SPRINT5_TTM_INCOMPLETE` as a visible cross-step flag. Its annual quality evidence does not repair or replace the missing Sprint 5 TTM value evidence.
 
-### 6.3 PROPOSED — DBC
+### 6.3 SETTLED — DBC
 
 DBC may receive an F-Score because its annual balance-sheet, income-statement, and cash-flow datasets are locally present for the required years; the audit has all nine criterion input sets available, `complete_fscore_inputs_both_years=True`, and records its measured extended `franchise_years_used`. Carry `SPRINT5_QUARTERLY_BALANCE_MISSING_TEV_MISSING` as a visible cross-step flag. Annual quality availability must not fabricate the missing quarterly TEV or add DBC to the EBIT/TEV candidate list.
 
@@ -180,6 +181,6 @@ The audit answers the cash-flow existence question first: a local annual normali
 
 ## 8. Build gate
 
-Production F-Score, Franchise Power, component percentile, composite quality, and candidate-list quality ranking are **FORBIDDEN** until the owner explicitly approves this specification, including every subsection marked `PROPOSED`.
+The owner approved sections 2.1, 2.3, 3, 4, and 6 on 2026-07-20. Production F-Score is authorized from that date. Franchise Power, ROC, margin stability, component percentiles, composite quality, and candidate-list quality ranking are approved in principle but deliberately deferred to a separate later build task and must not be computed here.
 
 This PR is restricted to specification text, the local readiness audit, the local anomaly investigation, their fixture tests, the Sprint 5 status closure, and one changelog entry. It authorizes no Sprint 7+ work, no momentum, no portfolio construction, no sector cap, no threshold/configuration change, no new dependency, no external fetch, and no modification of any Sprint 4 or Sprint 5 output.
