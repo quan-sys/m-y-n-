@@ -2,6 +2,7 @@
 
 ## 2026-07-19
 
+- Calibrate the KBS current-price/share contract in VND, resolve the VAS interest-expense sign rule, and add a resumable guarded 156-survivor market-cap fetch; no valuation, ranking, threshold, or Sprint 6 change.
 - Probe public current-market-cap sources for VNM/FPT/VCB, stop before the 156-ticker fetch because unit/share/as-of proof is insufficient, and classify the HAG/IDI/DTD cached interest-sign anomalies as source-ambiguous; no valuation or ranking.
 - Correct the Sprint 5 valuation spec and cache-only audit to freeze parent-attributable E/P, bind the VAS EBIT proxy, and block production EBIT on mixed real-cache interest-expense signs; no valuation or refetch.
 - Specify Sprint 5 Step 2 valuation bindings and add a reproducible cache-only readiness audit; no valuation, ranking, candidate list, live API call, or config change.
