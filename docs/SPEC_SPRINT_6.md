@@ -106,7 +106,7 @@ ROC_t =
     / average(INVESTED_CAPITAL_t, INVESTED_CAPITAL_t-1)
 ```
 
-All normalized inputs must be explicit and usable. A non-positive average invested-capital denominator makes that year unavailable. The long-term ROC component is the plain arithmetic mean of usable `ROC_t` observations; no winsorization or custom time weight is authorized in this spec.
+All normalized inputs must be explicit and usable. A non-positive average invested-capital denominator makes that year unavailable. The long-term ROC component is the plain arithmetic mean of usable `ROC_t` observations; no winsorization or custom time weight is authorized in this spec. A diagnostic-only column `roc_geometric_mean` is additionally recorded, computed as the geometric mean of usable `ROC_t` only for tickers whose every usable `ROC_t` is strictly positive, and left empty otherwise with the reason `NON_POSITIVE_ROC_YEAR_PRESENT`. It exists so Sprint 8 can compare the two rankings; it must NEVER enter any percentile, composite or rank in Sprint 6.
 
 ### 3.2 Settled margin stability
 
@@ -116,7 +116,7 @@ For each usable year:
 gross_margin_t = gross_profit_t / net_sales_t
 ```
 
-Margin instability is the population standard deviation of the usable annual gross margins; lower standard deviation ranks as higher stability. The explicit `gross_profit` field is preferred, with only the controlled proposed COGS fallback in section 2.1. No missing year is filled.
+Margin stability is `mean(gross_margin) / population_standard_deviation(gross_margin)` over the usable annual gross margins; a HIGHER ratio ranks as higher stability. Dividing by the mean margin is deliberate: a raw standard deviation systematically favours thin-margin businesses, whose margins vary little in absolute terms, which is the opposite of the pricing power this measure exists to detect. The raw `population standard deviation` is retained beside it as a diagnostic-only column and must never enter any percentile, composite or rank. If the population standard deviation is exactly 0 across at least two usable years, the ticker is assigned the maximum stability rank with the flag `ZERO_MARGIN_VARIANCE` rather than an infinite value. If the mean gross margin is not strictly positive, the stability component is MISSING with the flag `NON_POSITIVE_MEAN_GROSS_MARGIN`, never zero and never negative. The explicit `gross_profit` field is preferred, with only the controlled proposed COGS fallback in section 2.1. No missing year is filled.
 
 ### 3.3 Settled minimum history, justified by the local audit
 
@@ -132,9 +132,9 @@ The production composite, if approved, is the plain arithmetic mean of these com
 
 1. F-Score completion-ratio percentile from section 2.3;
 2. long-term average ROC percentile, higher ROC better;
-3. margin-stability percentile, lower population standard deviation better.
+3. margin-stability percentile, higher `mean / population standard deviation` ratio better.
 
-There are no custom weights. Each component has weight `1 / number_of_available_component_percentiles`. A missing component is not zero; it shrinks the reported denominator and raises a low-confidence flag. Every percentile is formed across all eligible Sprint 4 survivors. The resulting composite is then ranked separately within the EBIT/TEV candidate list and within the E/P candidate list. No value metric enters this mean.
+There are no custom weights. Each component has weight `1 / number_of_available_component_percentiles`. A missing component is not zero; it shrinks the reported denominator and raises a low-confidence flag. Every percentile is formed across all eligible Sprint 4 survivors. Every component percentile is a rank-based percentile computed with the average rank for tied values, so that tied tickers receive an identical percentile; it is scaled to [0, 1] and formed only over tickers that have a usable value for that component. Tickers missing that component are excluded from that ranking population rather than being placed at the bottom. The resulting composite is then ranked separately within the EBIT/TEV candidate list and within the E/P candidate list. No value metric enters this mean.
 
 ## 5. Settled interest-anomaly gate
 
