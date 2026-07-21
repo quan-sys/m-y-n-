@@ -2,6 +2,8 @@
 
 ## 2026-07-20
 
+- Build the nine settled Sprint 6 F-Score criteria for all 156 survivors from the existing local annual cache, with explicit UNSCORED handling and no Franchise Power, composite quality, or financial-data network call.
+
 - Extend the VCI annual production fetch to eight-period history, preserve the prior cache, measure restatements and coverage for all 156 survivors, and settle the fourth criterion-7 branch without computing production quality.
 
 - Probe annual VCI/TCBS history for the five fixed tickers, settle Sprint 6 net-income and criterion-7 rules, and extend the local 156-row readiness audit with four criterion-7 branches; no production score, ranking, or recommendation.
