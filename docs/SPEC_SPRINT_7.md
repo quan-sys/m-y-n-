@@ -1,6 +1,6 @@
 # Sprint 7 Step 4 — signal + portfolio construction specification
 
-Status: **SPECIFICATION AND READ-ONLY READINESS AUDIT ONLY. PRODUCING AN ACTUAL PORTFOLIO IS FORBIDDEN PENDING SEPARATE OWNER APPROVAL.**
+Status: **THE OWNER APPROVED THE PRODUCTION BUILD ON 2026-07-21 FOR EXACTLY THE TWO SNAPSHOT PORTFOLIOS NAMED IN S13. ANY FURTHER AUTOMATION, WEEKLY WIRING, BACKTEST, OR WINNER SELECTION REMAINS FORBIDDEN.**
 
 Readiness-audit evaluation date: `2026-07-20`.
 
@@ -22,7 +22,7 @@ INSUFFICIENT_HISTORY is a hard portfolio block. Any ticker whose `franchise_hist
 
 ### S3. SETTLED — Sector cap
 
-Sector cap = 25 percent of holdings, measured on `icb2`, applied to each of the two portfolios independently. When adding the next-ranked eligible ticker would push its `icb2` group above 25 percent of the target holding count, that ticker is SKIPPED and the next eligible ticker is considered; the skipped ticker is recorded with reason `SECTOR_CAP_SKIPPED` and is not silently dropped from the report. The spec must state explicitly that on current data the cap is NOT binding at 20-25 holdings (deepest sector is 4 names), and that its purpose is future periods where one sector becomes cheap simultaneously.
+Sector cap = 25 percent of holdings, measured on `icb2`, applied to each of the two portfolios independently. When adding the next-ranked eligible ticker would push its `icb2` group above 25 percent of the target holding count, that ticker is SKIPPED and the next eligible ticker is considered; the skipped ticker is recorded with reason `SECTOR_CAP_SKIPPED` and is not silently dropped from the report. On the 2026-07-20 data the 25 percent cap is not binding at 20 or 25 holdings because the deepest `icb2` group holds 4 names; the cap exists for future periods in which one sector becomes cheap simultaneously.
 
 ### S4. SETTLED — Momentum default
 
@@ -40,31 +40,31 @@ Sequential contract, not a blended score. Value selects the candidate pool (Spri
 
 Sector cycle overlay from the existing weekly sector report is REPORTING ONLY. It is printed as a column next to each holding and must never veto, reweight, or reorder anything.
 
-## 3. Owner approval pending
+## 3. SETTLED — owner decisions of 2026-07-21 (round 2)
 
-### P1. PROPOSED — Exact holding count
+### S8. SETTLED — holding count
 
-Recommendation: use a fixed target of 20 holdings in each independent portfolio, with all tickers tied at the twentieth boundary ordered by the P2 rule. Trade-off: 20 names keep the portfolio understandable and diversified while accepting more single-name concentration than a 25-name portfolio.
+Each of the two portfolios holds exactly 20 names. The pool is 44 and 43 eligible tickers respectively, so 20 names keeps the selection meaningfully tighter than half the pool while remaining inside the 20-25 range in `PLAN.md`.
 
-### P2. PROPOSED — Deterministic quality tie-break
+### S9. SETTLED — tie-break
 
-Recommendation: when eligible tickers have identical `composite_quality` to full float precision, order them by ticker in ascending Unicode code-point order. Trade-off: this is fully reproducible but intentionally economically neutral and therefore gives no preference to liquidity or market capitalisation.
+When eligible tickers have identical `composite_quality` to full float precision, order them by ticker in ascending Unicode code-point order. This is reproducible and intentionally economically neutral.
 
-### P3. PROPOSED — Liquidity rule
+### S10. SETTLED — liquidity rule, PLAN wins over the earlier proposal
 
-Recommendation: make position value configurable and cap it at `0.10 × adtv_20d` by default, while a missing, non-numeric, or zero `adtv_20d` makes the ticker ineligible with reason `MISSING_OR_ZERO_ADTV_20D`. Trade-off: a 10-percent one-day-volume cap limits market impact but may block otherwise attractive small and illiquid companies.
+The value of one position must not exceed `LIQUIDITY_ADTV_DAYS` days of that ticker's `adtv_20d`, with `LIQUIDITY_ADTV_DAYS = 5` per `PLAN.md`; the earlier proposal of `0.10 x adtv_20d` is REJECTED and must not appear anywhere in the repo. Position value is computed as `PORTFOLIO_CAPITAL_VND / 20` under equal weight, with `PORTFOLIO_CAPITAL_VND = 1000000000` as the default. Both constants live in `config/screener.yaml` and neither may be hard-coded in a script. A ticker whose position value would exceed `LIQUIDITY_ADTV_DAYS x adtv_20d` is skipped with reason `LIQUIDITY_CAP_SKIPPED` and the next eligible ticker is considered. A missing, non-numeric, or zero `adtv_20d` makes the ticker ineligible with reason `MISSING_OR_ZERO_ADTV_20D`. `adtv_20d` is a VND trading-value figure sourced from `universe.csv` (`adtv_close_x_volume_x1000_proxy`); do not rescale it and do not multiply it by 1000 again.
 
-### P4. PROPOSED — Rebalance cadence and as-of convention
+### S11. SETTLED — rebalance cadence and as-of convention
 
-Recommendation: rebalance quarterly on the final exchange trading day of March, June, September, and December, using only records available on or before that date; the first specification/readiness snapshot remains as of `2026-07-20`. Trade-off: quarterly rebalancing reduces turnover and data noise but reacts more slowly to new value or quality information.
+Rebalance quarterly on the final exchange trading day of March, June, September, and December, using only records available on or before that date. This first production snapshot uses the Sprint 6 evaluation date `2026-07-20` and is an off-cycle snapshot, not a rebalance.
 
-### P5. PROPOSED — Cross-flagged tickers
+### S12. SETTLED — cross-flagged tickers
 
-Recommendation: add no new portfolio-stage block for NTC, TRC, or DBC beyond the unchanged candidate-list membership, so NTC/TRC retain visible `SPRINT5_TTM_INCOMPLETE` flags and DBC remains blocked from any list whose valuation evidence is missing but may remain eligible in an independent list where Sprint 5 already admitted it. Trade-off: this preserves the rule that quality never fills a valuation hole without unnecessarily blocking a ticker from a different valuation list whose evidence is complete.
+No new portfolio-stage block is added for NTC, TRC, or DBC. Their candidate-list membership from Sprint 5 is unchanged and decides everything: NTC and TRC are in neither candidate list and therefore cannot appear; DBC is in the E/P list only and remains eligible there while remaining absent from the EBIT/TEV list. Quality never fills a valuation hole, and a ticker is never imported into a list it did not qualify for.
 
-### P6. PROPOSED — Future output schema
+### S13. SETTLED — output schema and file names
 
-Recommendation: future `reports/<date>/PORTFOLIO.md` and `portfolio.csv` outputs should contain `portfolio_id`, `as_of`, `ticker`, `exchange`, `icb2`, candidate-list membership and value metric/rank, `composite_quality` and its three component percentiles, `franchise_history_status`, quality rank, target weight, sector count/share and cap status, `adtv_20d`, liquidity cap/status, momentum-enabled and veto-status fields without making momentum a score, sector-cycle reporting label, every carried cross-step flag, source snapshot paths, prior-period membership, and explicit `ENTER`, `HOLD`, or `EXIT` reason. Trade-off: the wide schema costs storage and reading effort but makes every future holding traceable through universe, value, quality, and portfolio construction.
+Each portfolio row carries: `portfolio_id`, `as_of`, `ticker`, `exchange`, `icb2`, candidate-list membership with its value metric and value rank, `composite_quality` with its three component percentiles, `franchise_history_status`, quality rank, `target_weight`, sector count and sector share with cap status, `adtv_20d`, liquidity headroom and liquidity status, `momentum_enabled` and `momentum_veto_status`, sector-cycle reporting label, every carried cross-step flag, source snapshot paths, and an `ENTER` / `HOLD` / `EXIT` reason column. Because Sprint 7 keeps two parallel portfolios, the single `PORTFOLIO.md` / `portfolio.csv` naming in `PLAN.md` is extended to `reports/2026-07-20/PORTFOLIO_EBIT_TEV.md`, `reports/2026-07-20/PORTFOLIO_EP.md`, `reports/2026-07-20/portfolio_ebit_tev.csv`, and `reports/2026-07-20/portfolio_ep.csv`. No other new step or file name may be invented.
 
 ## 4. Carry-forward flags — OUT OF SCOPE for Sprint 7
 
