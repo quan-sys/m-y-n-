@@ -10,6 +10,8 @@ The forward test records portfolio snapshots and assumed fill prices going forwa
 
 Each snapshot lives under `data/forward_test/snapshots/<snapshot_date>/` and is append-only. Once committed, no file in a past snapshot directory may be edited, deleted, recomputed, or reordered for any reason, including a discovered bug; a correction is added as a new dated file with an explicit `correction_of` field. Every snapshot carries a `MANIFEST.csv` listing the sha256 of every OTHER file in that snapshot directory, the `main` commit SHA it was produced from, and the UTC timestamp of creation. `MANIFEST.csv` EXCLUDES ITSELF by definition: a file cannot contain its own hash. Integrity of `MANIFEST.csv` itself is provided by the git commit that introduces it. Do NOT stop over this; do NOT attempt a self-hash; do NOT add a second manifest to hash the first.
 
+FT2 immutability binds from the moment the snapshot branch is merged into `main`, so correcting snapshot files in place on the unmerged working branch is permitted.
+
 ## FT3. Fill-price convention, no look-ahead
 
 The two portfolios were computed from data as of `2026-07-20` but were only decided on `2026-07-21`. The assumed fill price is therefore the closing price of the FIRST exchange trading session on or after `2026-07-21`; the `2026-07-20` close must never be used as a fill price. The actual session date used is recorded per ticker in a `fill_session_date` column and is fetched, never assumed. If a ticker has no traded session in the seven calendar days from 2026-07-21, it is recorded with `fill_status = NO_SESSION_IN_WINDOW` and no price is fabricated.
@@ -25,6 +27,8 @@ Because the provider re-adjusts the WHOLE history after every corporate action, 
 ## FT5. Benchmark and cadence
 
 The benchmark is VN-Index, stored with the identical fill-session convention and the identical price-type rules. Measurement cadence follows Sprint 7 S11: quarterly, on the final exchange trading day of March, June, September, and December. This first snapshot is an off-cycle opening entry, not a rebalance.
+
+The benchmark is stored in index points, carries no currency unit, and must never be multiplied by 1000 or compared to a VND figure.
 
 ## FT6. Two portfolios stay separate forever
 

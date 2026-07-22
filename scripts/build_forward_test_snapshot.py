@@ -31,9 +31,12 @@ PORTFOLIO_LABELS = {
 BENCHMARK_SYMBOLS = ("VNINDEX",)
 SANITY_SYMBOLS = ("FPT", "VNM", "VIC")
 RAW_STATUS = "NOT_AVAILABLE_SINGLE_ADJUSTED_SERIES"
+INDEX_RAW_STATUS = "NOT_APPLICABLE_INDEX"
 PRICE_UNIT = "THOUSAND_VND"
+INDEX_UNIT = "INDEX_POINTS"
 PRICE_SOURCE = "vnstock.Quote.history"
 PRICE_PROVIDER = "VCI"
+HASH_CONVENTION = "SHA256_OF_LF_ONLY_BYTES"
 OUTPUT_COLUMNS = (
     "portfolio_id",
     "ticker",
@@ -169,11 +172,28 @@ def _filled_row(portfolio_id: str, ticker: str, target_weight: object, fill: Fil
     }
 
 
+def _benchmark_row(ticker: str, fill: FillObservation) -> dict[str, object]:
+    row = _filled_row("VN_INDEX", ticker, "", fill)
+    row["close_raw_status"] = INDEX_RAW_STATUS
+    row["close_adjusted_unit"] = INDEX_UNIT
+    return row
+
+
+def _normalise_lf(path: Path) -> bool:
+    original = path.read_bytes()
+    normalised = original.replace(b"\r\n", b"\n")
+    if normalised == original:
+        return False
+    path.write_bytes(normalised)
+    return True
+
+
 def _sha256(path: Path) -> str:
+    content = path.read_bytes()
+    if b"\r\n" in content:
+        raise RuntimeError(f"refusing to hash non-LF-only file: {path}")
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
+    digest.update(content)
     return digest.hexdigest()
 
 
@@ -190,6 +210,60 @@ def _main_sha(repo_root: Path) -> str:
         capture_output=True,
         text=True,
     ).stdout.strip()
+
+
+def _write_manifest(target_dir: Path, commit_sha: str, created: datetime) -> pd.DataFrame:
+    if created.tzinfo is None:
+        created = created.replace(tzinfo=timezone.utc)
+    created_text = created.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    payload_files = (*PORTFOLIO_FILES, "fills.csv", "benchmark.csv")
+    for filename in payload_files:
+        _normalise_lf(target_dir / filename)
+    manifest = pd.DataFrame(
+        [
+            {
+                "file": filename,
+                "sha256": _sha256(target_dir / filename),
+                "hash_convention": HASH_CONVENTION,
+                "main_commit_sha": commit_sha,
+                "created_at_utc": created_text,
+            }
+            for filename in payload_files
+        ]
+    )
+    manifest_path = target_dir / "MANIFEST.csv"
+    manifest.to_csv(manifest_path, index=False, lineterminator="\n")
+    if b"\r\n" in manifest_path.read_bytes():
+        raise RuntimeError(f"manifest is not LF-only: {manifest_path}")
+    return manifest
+
+
+def apply_precommit_fix(
+    repo_root: Path,
+    *,
+    created_at_utc: datetime | None = None,
+    main_sha: str | None = None,
+) -> pd.DataFrame:
+    """Correct the unmerged snapshot seal without fetching or deleting data."""
+    target_dir = repo_root / "data" / "forward_test" / "snapshots" / SNAPSHOT_DATE.isoformat()
+    if not target_dir.is_dir():
+        raise FileNotFoundError(f"snapshot directory does not exist: {target_dir}")
+
+    for filename in PORTFOLIO_FILES:
+        _normalise_lf(target_dir / filename)
+
+    benchmark_path = target_dir / "benchmark.csv"
+    benchmark = pd.read_csv(benchmark_path, keep_default_na=False)
+    if len(benchmark) != 1 or str(benchmark.iloc[0]["ticker"]) != "VNINDEX":
+        raise RuntimeError("unexpected benchmark content; refusing pre-merge correction")
+    if float(benchmark.iloc[0]["close_adjusted"]) != 1730.56:
+        raise RuntimeError("benchmark price changed; refusing pre-merge correction")
+    benchmark.loc[:, "close_adjusted_unit"] = INDEX_UNIT
+    benchmark.loc[:, "close_raw_status"] = INDEX_RAW_STATUS
+    benchmark.to_csv(benchmark_path, index=False, lineterminator="\n")
+
+    created = created_at_utc or datetime.now(timezone.utc)
+    return _write_manifest(target_dir, main_sha or _main_sha(repo_root), created)
 
 
 def build_snapshot(
@@ -246,7 +320,7 @@ def build_snapshot(
             fill_rows.append(_filled_row(PORTFOLIO_LABELS[filename], ticker, row.target_weight, observations[ticker]))
     fills = pd.DataFrame(fill_rows, columns=OUTPUT_COLUMNS)
     benchmark = pd.DataFrame(
-        [_filled_row("VN_INDEX", benchmark_symbol, "", observations[benchmark_symbol])],
+        [_benchmark_row(benchmark_symbol, observations[benchmark_symbol])],
         columns=OUTPUT_COLUMNS,
     )
 
@@ -262,30 +336,23 @@ def build_snapshot(
     benchmark.to_csv(target_dir / "benchmark.csv", index=False, lineterminator="\n")
 
     created = created_at_utc or datetime.now(timezone.utc)
-    if created.tzinfo is None:
-        created = created.replace(tzinfo=timezone.utc)
-    created_text = created.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
-    commit_sha = main_sha or _main_sha(repo_root)
-    payload_files = (*PORTFOLIO_FILES, "fills.csv", "benchmark.csv")
-    manifest = pd.DataFrame(
-        [
-            {
-                "file": filename,
-                "sha256": _sha256(target_dir / filename),
-                "main_commit_sha": commit_sha,
-                "created_at_utc": created_text,
-            }
-            for filename in payload_files
-        ]
-    )
-    manifest.to_csv(target_dir / "MANIFEST.csv", index=False, lineterminator="\n")
+    _write_manifest(target_dir, main_sha or _main_sha(repo_root), created)
     return fills, benchmark, observations
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Open the immutable 2026-07-21 forward-test snapshot.")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
+    parser.add_argument(
+        "--allow-precommit-fix",
+        action="store_true",
+        help="correct the existing unmerged snapshot seal without fetching prices",
+    )
     args = parser.parse_args()
+    if args.allow_precommit_fix:
+        manifest = apply_precommit_fix(args.repo_root.resolve())
+        print(manifest.to_csv(index=False), end="")
+        return 0
     fills, benchmark, observations = build_snapshot(args.repo_root.resolve(), LiveVciPriceClient())
     print(pd.concat([fills, benchmark], ignore_index=True).to_csv(index=False), end="")
     print("MAGNITUDE_SANITY")

@@ -7,6 +7,9 @@ import pandas as pd
 import pytest
 
 from scripts.build_forward_test_snapshot import (
+    HASH_CONVENTION,
+    INDEX_RAW_STATUS,
+    INDEX_UNIT,
     PORTFOLIO_FILES,
     MissingCloseError,
     SnapshotExistsError,
@@ -97,3 +100,43 @@ def test_portfolio_copies_are_byte_identical(tmp_path: Path) -> None:
     target = tmp_path / "data" / "forward_test" / "snapshots" / "2026-07-21"
     for filename, expected_bytes in originals.items():
         assert (target / filename).read_bytes() == expected_bytes
+
+
+def test_snapshot_files_are_lf_only_and_manifest_declares_convention(tmp_path: Path) -> None:
+    _write_portfolios(tmp_path)
+
+    build_snapshot(
+        tmp_path,
+        FixturePriceClient(),
+        created_at_utc=datetime(2026, 7, 21, 8, 0, tzinfo=timezone.utc),
+        main_sha="a" * 40,
+    )
+
+    target = tmp_path / "data" / "forward_test" / "snapshots" / "2026-07-21"
+    assert all(b"\r\n" not in path.read_bytes() for path in target.iterdir() if path.is_file())
+    manifest = pd.read_csv(target / "MANIFEST.csv")
+    assert set(manifest["hash_convention"]) == {HASH_CONVENTION}
+    assert "MANIFEST.csv" not in set(manifest["file"])
+
+
+def test_index_row_uses_points_not_currency(tmp_path: Path) -> None:
+    _write_portfolios(tmp_path)
+
+    _, benchmark, _ = build_snapshot(
+        tmp_path,
+        FixturePriceClient(),
+        created_at_utc=datetime(2026, 7, 21, 8, 0, tzinfo=timezone.utc),
+        main_sha="a" * 40,
+    )
+
+    assert benchmark.loc[0, "close_adjusted_unit"] == INDEX_UNIT
+    assert benchmark.loc[0, "close_raw_status"] == INDEX_RAW_STATUS
+    assert "VND" not in benchmark.loc[0, "close_adjusted_unit"]
+
+
+def test_repository_snapshot_files_are_lf_only() -> None:
+    snapshot_root = Path(__file__).resolve().parents[1] / "data" / "forward_test" / "snapshots"
+    snapshot_files = [path for path in snapshot_root.rglob("*") if path.is_file()]
+
+    assert snapshot_files
+    assert all(b"\r\n" not in path.read_bytes() for path in snapshot_files)
