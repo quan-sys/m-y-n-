@@ -2,6 +2,8 @@
 
 ## 2026-07-22
 
+- Correct the Sprint 8A-2 acceptance rule by separating below-par split/bonus signatures from above-par treasury-share limitations, and emit annual shares issued without inferring shares outstanding.
+- Probe whether the existing annual VCI balance-sheet path exposes point-in-time share capital across the 378-ticker universe, measuring the 10,000 VND par-value assumption without computing historical valuation.
 - Stop reporting target-list length as a measured candidate-pool size when no pool input was supplied, and route engine window flags through the single Sprint 8C threshold implementation.
 - An `assert` is removed by the interpreter when Python runs with `-O`, so the only look-ahead guard in the engine would silently disappear in an optimised run. A `raise` cannot be stripped.
 - Add the Sprint 8C runtime start-window and selectivity thresholds for economic meaning before any performance run: a 1.5x candidate pool still discards one third when selecting 20 of 30 names, while selection ratios above 0.70 are reported as low selectivity.
