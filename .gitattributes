@@ -1,2 +1,6 @@
 data/forward_test/** -text
 data/forward_test/** binary
+data/price_history/** -text
+data/price_history/** binary
+data/price_history/**/*.gz -text
+data/price_history/**/*.gz binary
