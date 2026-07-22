@@ -1,2 +1,4 @@
 data/forward_test/** -text
 data/forward_test/** binary
+data/price_history/** -text
+data/price_history/** binary
