@@ -32,7 +32,9 @@ EARLY_START_DATE = "1900-01-01"
 PRICE_ADJUSTMENT_STATUS = "ADJUSTED_OBSERVED"
 PRICE_UNIT = "THOUSAND_VND"
 HASH_CONVENTION = "SHA256_OF_LF_ONLY_BYTES"
+RAW_HASH_CONVENTION = "SHA256_OF_RAW_BYTES"
 LAST_FULL_REPORT_YEAR = 2025
+FETCH_STATUSES = ("OK", "EMPTY_RESPONSE", "FETCH_ERROR", "NOT_ATTEMPTED")
 DAILY_COLUMNS = ("ticker", "date", "close_adjusted", "close_adjusted_unit", "volume")
 COVERAGE_COLUMNS = (
     "ticker",
@@ -44,6 +46,7 @@ COVERAGE_COLUMNS = (
     "has_internal_gap",
     "largest_gap_days",
     "fetch_status",
+    "fetch_error_class",
 )
 SUMMARY_COLUMNS = ("year", "n_tickers_usable", "n_tickers_present_but_short", "n_tickers_absent")
 
@@ -101,9 +104,8 @@ def normalise_api_history(ticker: str, history: pd.DataFrame) -> pd.DataFrame:
             "volume": pd.to_numeric(history["volume"], errors="coerce"),
         }
     )
-    frame = frame[frame["date"].notna()].copy()
-    frame["date"] = frame["date"].map(lambda value: value.isoformat())
-    return frame.sort_values("date").drop_duplicates(["ticker", "date"], keep="last").reset_index(drop=True)
+    frame["date"] = frame["date"].map(lambda value: value.isoformat() if pd.notna(value) else "")
+    return frame.reset_index(drop=True)
 
 
 def usable_years(history: pd.DataFrame) -> list[int]:
@@ -111,7 +113,7 @@ def usable_years(history: pd.DataFrame) -> list[int]:
         return []
     dates = pd.to_datetime(history["date"], errors="coerce")
     closes = pd.to_numeric(history["close_adjusted"], errors="coerce")
-    valid = pd.DataFrame({"date": dates, "close": closes}).dropna().drop_duplicates("date")
+    valid = pd.DataFrame({"date": dates, "close": closes}).dropna()
     if valid.empty:
         return []
     counts = valid.assign(year=valid["date"].dt.year).groupby("year")["date"].nunique()
@@ -130,8 +132,15 @@ def internal_gap_metrics(ticker_dates: Iterable[object], market_dates: Iterable[
 
 
 def build_coverage(
-    tickers: list[str], daily: pd.DataFrame, statuses: dict[str, str]
+    tickers: list[str],
+    daily: pd.DataFrame,
+    statuses: dict[str, str],
+    error_classes: dict[str, str] | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    error_classes = error_classes or {}
+    unknown_statuses = sorted(set(statuses.values()).difference(FETCH_STATUSES))
+    if unknown_statuses:
+        raise ValueError("unknown fetch status: " + ", ".join(unknown_statuses))
     valid_dates = pd.to_datetime(daily.get("date", pd.Series(dtype=str)), errors="coerce").dropna()
     market_dates = valid_dates.unique()
     rows: list[dict[str, object]] = []
@@ -151,7 +160,8 @@ def build_coverage(
                 "first_usable_year": min(years) if years else "",
                 "has_internal_gap": has_gap,
                 "largest_gap_days": largest_gap,
-                "fetch_status": statuses.get(ticker, "PARTIAL_RUN"),
+                "fetch_status": statuses.get(ticker, "NOT_ATTEMPTED"),
+                "fetch_error_class": error_classes.get(ticker, ""),
             }
         )
     coverage = pd.DataFrame(rows, columns=COVERAGE_COLUMNS)
@@ -195,18 +205,34 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(content).hexdigest()
 
 
+def _sha256_raw(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def write_daily_gzip(daily: pd.DataFrame, path: Path) -> str:
+    ordered = daily[list(DAILY_COLUMNS)].sort_values(["ticker", "date"], kind="stable")
+    ordered.to_csv(
+        path,
+        index=False,
+        lineterminator="\n",
+        compression={"method": "gzip", "compresslevel": 6, "mtime": 0},
+    )
+    return _sha256_raw(path)
+
+
 def write_manifest(output_dir: Path, main_sha: str, fetch_date: str, created_at: datetime) -> pd.DataFrame:
     manifest_path = output_dir / "MANIFEST.csv"
     files = sorted(path for path in output_dir.iterdir() if path.is_file() and path.name != manifest_path.name)
     for path in files:
-        _normalise_lf(path)
+        if path.suffix != ".gz":
+            _normalise_lf(path)
     created_text = created_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     manifest = pd.DataFrame(
         [
             {
                 "file": path.name,
-                "sha256": _sha256(path),
-                "hash_convention": HASH_CONVENTION,
+                "sha256": _sha256_raw(path) if path.suffix == ".gz" else _sha256(path),
+                "hash_convention": RAW_HASH_CONVENTION if path.suffix == ".gz" else HASH_CONVENTION,
                 "main_commit_sha": main_sha,
                 "created_at_utc": created_text,
                 "fetch_date": fetch_date,
@@ -220,21 +246,34 @@ def write_manifest(output_dir: Path, main_sha: str, fetch_date: str, created_at:
     return manifest
 
 
-def _read_existing(output_dir: Path, tickers: list[str]) -> tuple[pd.DataFrame, dict[str, str]]:
+def _read_existing(
+    output_dir: Path, tickers: list[str]
+) -> tuple[pd.DataFrame, dict[str, str], dict[str, str]]:
     daily_path = output_dir / "daily_close.csv"
+    daily_gzip_path = output_dir / "daily_close.csv.gz"
     coverage_path = output_dir / "coverage_by_ticker.csv"
-    daily = pd.read_csv(daily_path) if daily_path.exists() else pd.DataFrame(columns=DAILY_COLUMNS)
-    statuses = {ticker: "PARTIAL_RUN" for ticker in tickers}
+    if daily_gzip_path.exists():
+        daily = pd.read_csv(daily_gzip_path, compression="gzip")
+    elif daily_path.exists():
+        daily = pd.read_csv(daily_path)
+    else:
+        daily = pd.DataFrame(columns=DAILY_COLUMNS)
+    statuses = {ticker: "NOT_ATTEMPTED" for ticker in tickers}
+    error_classes = {ticker: "" for ticker in tickers}
     if coverage_path.exists():
         existing = pd.read_csv(coverage_path, keep_default_na=False)
-        statuses.update(
-            {
-                str(row.ticker).strip().upper(): str(row.fetch_status)
-                for row in existing.itertuples(index=False)
-                if str(row.ticker).strip().upper() in statuses
-            }
-        )
-    return daily, statuses
+        legacy_map = {
+            "PARTIAL_RUN": "NOT_ATTEMPTED",
+            "NO_DATA": "EMPTY_RESPONSE",
+            "API_ERROR": "FETCH_ERROR",
+        }
+        for row in existing.itertuples(index=False):
+            ticker = str(row.ticker).strip().upper()
+            if ticker not in statuses:
+                continue
+            statuses[ticker] = legacy_map.get(str(row.fetch_status), str(row.fetch_status))
+            error_classes[ticker] = str(getattr(row, "fetch_error_class", ""))
+    return daily, statuses, error_classes
 
 
 def _write_artifacts(
@@ -242,13 +281,18 @@ def _write_artifacts(
     tickers: list[str],
     daily: pd.DataFrame,
     statuses: dict[str, str],
+    error_classes: dict[str, str],
     main_sha: str,
     fetch_date: str,
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
-    daily = daily[list(DAILY_COLUMNS)].sort_values(["ticker", "date"]).drop_duplicates(["ticker", "date"], keep="last")
-    coverage, summary = build_coverage(tickers, daily, statuses)
-    daily.to_csv(output_dir / "daily_close.csv", index=False, lineterminator="\n")
+    daily = daily[list(DAILY_COLUMNS)]
+    coverage, summary = build_coverage(tickers, daily, statuses, error_classes)
+    gzip_path = output_dir / "daily_close.csv.gz"
+    write_daily_gzip(daily, gzip_path)
+    uncompressed_path = output_dir / "daily_close.csv"
+    if uncompressed_path.exists():
+        uncompressed_path.unlink()
     coverage.to_csv(output_dir / "coverage_by_ticker.csv", index=False, lineterminator="\n")
     summary.to_csv(output_dir / "coverage_summary.csv", index=False, lineterminator="\n")
     write_manifest(output_dir, main_sha, fetch_date, datetime.now(timezone.utc))
@@ -291,8 +335,8 @@ def main(argv: list[str] | None = None) -> int:
     fetch_day = date.fromisoformat(args.fetch_date)
     tickers = read_universe(repo_root / "data" / "universe.csv")
     output_dir = repo_root / "data" / "price_history" / fetch_day.isoformat()
-    daily, statuses = _read_existing(output_dir, tickers)
-    remaining = [ticker for ticker in tickers if statuses.get(ticker) == "PARTIAL_RUN"]
+    daily, statuses, error_classes = _read_existing(output_dir, tickers)
+    remaining = [ticker for ticker in tickers if statuses.get(ticker) == "NOT_ATTEMPTED"]
     if args.tickers:
         unknown = sorted(set(args.tickers).difference(tickers))
         if unknown:
@@ -305,23 +349,43 @@ def main(argv: list[str] | None = None) -> int:
     client = LiveVciHistoryClient()
     main_sha = _main_sha(repo_root)
 
-    _write_artifacts(output_dir, tickers, daily, statuses, main_sha, fetch_day.isoformat())
-    for index, ticker in enumerate(selected, start=1):
-        try:
-            raw = client.fetch_history(ticker, fetch_day)
-            normalised = normalise_api_history(ticker, raw)
-            if normalised.empty:
-                statuses[ticker] = "NO_DATA"
-            else:
-                daily = normalised.copy() if daily.empty else pd.concat([daily, normalised], ignore_index=True)
-                statuses[ticker] = "OK"
-            print(f"FETCHED {index}/{len(selected)} {ticker} rows={len(normalised)} status={statuses[ticker]}")
-        except BaseException as exc:  # noqa: BLE001 - preserve provider failures as explicit status.
-            if isinstance(exc, KeyboardInterrupt):
-                raise
-            statuses[ticker] = "API_ERROR"
-            print(f"API_ERROR {ticker}: {type(exc).__name__}: {exc}", file=sys.stderr)
-        _write_artifacts(output_dir, tickers, daily, statuses, main_sha, fetch_day.isoformat())
+    try:
+        for index, ticker in enumerate(selected, start=1):
+            try:
+                raw = client.fetch_history(ticker, fetch_day)
+                if raw.empty:
+                    normalised = pd.DataFrame(columns=DAILY_COLUMNS)
+                    statuses[ticker] = "EMPTY_RESPONSE"
+                else:
+                    normalised = normalise_api_history(ticker, raw)
+                    usable = pd.to_datetime(normalised["date"], errors="coerce").notna() & pd.to_numeric(
+                        normalised["close_adjusted"], errors="coerce"
+                    ).notna()
+                    if not usable.any():
+                        raise ValueError("provider returned rows but none had a usable date and close")
+                    daily = normalised.copy() if daily.empty else pd.concat([daily, normalised], ignore_index=True)
+                    statuses[ticker] = "OK"
+                error_classes[ticker] = ""
+                print(
+                    f"FETCHED {index}/{len(selected)} {ticker} rows={len(normalised)} status={statuses[ticker]}",
+                    flush=True,
+                )
+            except BaseException as exc:  # noqa: BLE001 - preserve provider failures as explicit status.
+                if isinstance(exc, KeyboardInterrupt):
+                    raise
+                statuses[ticker] = "FETCH_ERROR"
+                error_classes[ticker] = type(exc).__name__
+                print(f"FETCH_ERROR {ticker}: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+    finally:
+        _write_artifacts(
+            output_dir,
+            tickers,
+            daily,
+            statuses,
+            error_classes,
+            main_sha,
+            fetch_day.isoformat(),
+        )
 
     counts = pd.Series(statuses).value_counts().sort_index()
     for status, count in counts.items():

@@ -9,3 +9,5 @@ P3. Adjustment status carries forward. The cached series is the retroactively ad
 P4. Refetch drift is expected. Because the provider re-adjusts the whole history after every corporate action, a refetch of the same date range at a later time will return different numbers for the same past dates. The cache is therefore a DATED artifact, not an immutable one: it is stored under a fetch-dated directory and superseded by later fetches rather than corrected in place. This differs deliberately from the forward-test snapshot rule in `docs/SPEC_FORWARD_TEST.md` FT2, and the two must not be conflated.
 
 P5. What counts as usable history. A ticker-year is usable when the ticker has at least 200 distinct trading days with a non-null close in that calendar year. A ticker is usable for a walk-forward window when every calendar year fully inside that window is usable.
+
+A successful provider call returning no rows and a provider call that never happened are different facts and must never share a status value.
