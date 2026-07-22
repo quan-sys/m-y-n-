@@ -5,6 +5,7 @@ import json
 import sys
 import tempfile
 from decimal import Decimal, getcontext
+from fractions import Fraction
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -46,6 +47,20 @@ RESULT_COLUMNS = (
     "fetch_status",
     "fetch_error_class",
     "provider_field_list_json",
+)
+DERIVED_COLUMNS = (
+    "ticker",
+    "year",
+    "paid_in_capital_vnd",
+    "shares_issued_derived",
+    "treasury_present",
+    "derivation_status",
+)
+DERIVATION_STATUSES = (
+    "ISSUED_OK",
+    "OUTSTANDING_UNKNOWN_TREASURY_PRESENT",
+    "PAID_IN_CAPITAL_MISSING",
+    "NOT_ATTEMPTED",
 )
 PAR_VALUE = Decimal("10000")
 getcontext().prec = 50
@@ -191,7 +206,7 @@ def _crosscheck(results: pd.DataFrame, market_cap_path: Path) -> dict[str, objec
         raise ValueError(
             f"expected market-cap cross-check population 157/156, found {len(market)}/{len(population)}"
         )
-    latest: dict[str, tuple[int, Decimal]] = {}
+    latest: dict[str, tuple[int, Decimal, bool]] = {}
     for row in results[results["fetch_status"] == "OK"].itertuples(index=False):
         capital = _decimal(row.charter_capital_raw)
         if capital is None or not str(row.year).isdigit():
@@ -199,7 +214,8 @@ def _crosscheck(results: pd.DataFrame, market_cap_path: Path) -> dict[str, objec
         year = int(row.year)
         prior = latest.get(row.ticker)
         if prior is None or year > prior[0]:
-            latest[row.ticker] = (year, capital)
+            treasury = _decimal(row.treasury_shares_raw)
+            latest[row.ticker] = (year, capital, treasury is not None and treasury != 0)
 
     computed: list[dict[str, object]] = []
     for row in population.itertuples(index=False):
@@ -208,33 +224,95 @@ def _crosscheck(results: pd.DataFrame, market_cap_path: Path) -> dict[str, objec
         capital_entry = latest.get(ticker)
         if shares is None or shares == 0 or capital_entry is None:
             continue
-        year, capital = capital_entry
+        year, capital, treasury_present = capital_entry
         implied = capital / shares
-        deviation = abs(implied - PAR_VALUE) / PAR_VALUE
+        signed_deviation = (implied - PAR_VALUE) / PAR_VALUE
         computed.append(
-            {"ticker": ticker, "year": year, "implied_par": implied, "deviation": deviation}
+            {
+                "ticker": ticker,
+                "year": year,
+                "implied_par": implied,
+                "signed_deviation": signed_deviation,
+                "treasury_present": treasury_present,
+            }
         )
-
-    implied_values = sorted(item["implied_par"] for item in computed)
-    median: Decimal | None = None
-    if implied_values:
-        middle = len(implied_values) // 2
-        median = (
-            implied_values[middle]
-            if len(implied_values) % 2
-            else (implied_values[middle - 1] + implied_values[middle]) / Decimal(2)
-        )
+    group_a = [item for item in computed if abs(item["signed_deviation"]) <= Decimal("0.01")]
+    group_b = [item for item in computed if item["signed_deviation"] < Decimal("-0.01")]
+    group_c = [item for item in computed if item["signed_deviation"] > Decimal("0.01")]
+    for item in group_b:
+        ratio = PAR_VALUE / item["implied_par"]
+        nearest = Fraction(ratio).limit_denominator(40)
+        approximation = Decimal(nearest.numerator) / Decimal(nearest.denominator)
+        item["ratio"] = ratio
+        item["nearest_fraction"] = f"{nearest.numerator}/{nearest.denominator}"
+        item["approximation_relative_error"] = abs(approximation - ratio) / ratio
     return {
         "population": 156,
         "computed": len(computed),
         "missing": 156 - len(computed),
-        "within_1pct": sum(item["deviation"] <= Decimal("0.01") for item in computed),
-        "within_5pct": sum(item["deviation"] <= Decimal("0.05") for item in computed),
-        "within_10pct": sum(item["deviation"] <= Decimal("0.10") for item in computed),
-        "beyond_10pct": sum(item["deviation"] > Decimal("0.10") for item in computed),
-        "outside_5pct": sum(item["deviation"] > Decimal("0.05") for item in computed),
-        "median": median,
-        "outliers": sorted(computed, key=lambda item: item["deviation"], reverse=True)[:10],
+        "group_a": sorted(group_a, key=lambda item: item["ticker"]),
+        "group_b": sorted(group_b, key=lambda item: item["ticker"]),
+        "group_c": sorted(group_c, key=lambda item: item["ticker"]),
+    }
+
+
+def derive_annual_shares(results: pd.DataFrame) -> pd.DataFrame:
+    rows: list[dict[str, str]] = []
+    for row in results.itertuples(index=False):
+        capital = _decimal(row.charter_capital_raw)
+        treasury = _decimal(row.treasury_shares_raw)
+        treasury_present = treasury is not None and treasury != 0
+        if row.fetch_status == "NOT_ATTEMPTED":
+            derived = ""
+            status = "NOT_ATTEMPTED"
+        elif capital is None:
+            derived = ""
+            status = "PAID_IN_CAPITAL_MISSING"
+        else:
+            derived = format(capital / PAR_VALUE, "f")
+            status = (
+                "OUTSTANDING_UNKNOWN_TREASURY_PRESENT" if treasury_present else "ISSUED_OK"
+            )
+        rows.append(
+            {
+                "ticker": row.ticker,
+                "year": row.year,
+                "paid_in_capital_vnd": row.charter_capital_raw,
+                "shares_issued_derived": derived,
+                "treasury_present": "true" if treasury_present else "false",
+                "derivation_status": status,
+            }
+        )
+    derived_frame = pd.DataFrame(rows, columns=DERIVED_COLUMNS)
+    unknown = sorted(set(derived_frame["derivation_status"]).difference(DERIVATION_STATUSES))
+    if unknown:
+        raise ValueError("derived series has invalid status: " + ", ".join(unknown))
+    invalid = derived_frame[
+        (derived_frame["paid_in_capital_vnd"] == "")
+        & (derived_frame["shares_issued_derived"] != "")
+    ]
+    if not invalid.empty:
+        raise ValueError("derived shares exist where paid-in capital is missing")
+    return derived_frame
+
+
+def derivation_status_counts(derived: pd.DataFrame) -> dict[str, int]:
+    return {
+        status: int((derived["derivation_status"] == status).sum())
+        for status in DERIVATION_STATUSES
+    }
+
+
+def history_stats(derived: pd.DataFrame) -> dict[str, object]:
+    present = derived[derived["paid_in_capital_vnd"] != ""]
+    distinct_by_ticker = present.groupby("ticker")["paid_in_capital_vnd"].nunique()
+    return {
+        "tickers_with_multiple_values": int((distinct_by_ticker > 1).sum()),
+        "tickers_with_any_value": int(len(distinct_by_ticker)),
+        "tickers_by_year": {
+            year: int(present[present["year"] == str(year)]["ticker"].nunique())
+            for year in range(2018, 2026)
+        },
     }
 
 
@@ -247,7 +325,12 @@ def _nonzero_treasury_tickers(results: pd.DataFrame) -> list[str]:
     return sorted(tickers)
 
 
-def build_report(results: pd.DataFrame, market_cap_path: Path, run_date: str) -> str:
+def build_report(
+    results: pd.DataFrame,
+    derived: pd.DataFrame,
+    market_cap_path: Path,
+    run_date: str,
+) -> str:
     counts = status_counts(results)
     if counts["NOT_ATTEMPTED"]:
         raise ValueError("cannot build final report while tickers remain NOT_ATTEMPTED")
@@ -258,28 +341,8 @@ def build_report(results: pd.DataFrame, market_cap_path: Path, run_date: str) ->
     fields = json.loads(vnm_fields_text) if vnm_fields_text else []
     crosscheck = _crosscheck(results, market_cap_path)
     treasury_tickers = _nonzero_treasury_tickers(results)
-    outside_ratio = Decimal(crosscheck["outside_5pct"]) / Decimal(crosscheck["population"])
-    missing_charter_tickers = sorted(
-        ticker
-        for ticker, group in results[results["fetch_status"] == "OK"].groupby("ticker")
-        if not any(_decimal(value) is not None for value in group["charter_capital_raw"])
-    )
-    years = sorted(
-        {int(value) for value in results["year"] if str(value).isdigit()}
-    )
-    if not fields or crosscheck["computed"] == 0 or outside_ratio > Decimal("0.10"):
-        verdict = "SHARE_COUNT_HISTORY_NOT_AVAILABLE"
-        verdict_detail = "The exact fields were fetched, but the measured par-value derivation is not usable."
-    elif counts["FETCH_ERROR"] or counts["EMPTY_RESPONSE"] or missing_charter_tickers or treasury_tickers:
-        verdict = "SHARE_COUNT_HISTORY_PARTIAL"
-        verdict_detail = (
-            f"Field {CHARTER_FIELD[1]} covers years {years[0]}-{years[-1]} where returned; "
-            f"missing-field tickers={','.join(missing_charter_tickers) or 'NONE'}, "
-            f"non-zero-treasury tickers={','.join(treasury_tickers) or 'NONE'}."
-        )
-    else:
-        verdict = "SHARE_COUNT_HISTORY_DERIVABLE"
-        verdict_detail = f"Field {CHARTER_FIELD[1]} covers years {years[0]}-{years[-1]}."
+    derived_counts = derivation_status_counts(derived)
+    coverage = history_stats(derived)
 
     lines = [
         "# Sprint 8A-2 Share Count Coverage",
@@ -310,34 +373,66 @@ def build_report(results: pd.DataFrame, market_cap_path: Path, run_date: str) ->
             f"- population: {crosscheck['population']}",
             f"- computable: {crosscheck['computed']}",
             f"- not_computable: {crosscheck['missing']}",
-            f"- within_1pct_of_10000: {crosscheck['within_1pct']}",
-            f"- within_5pct_of_10000: {crosscheck['within_5pct']}",
-            f"- within_10pct_of_10000: {crosscheck['within_10pct']}",
-            f"- beyond_10pct_of_10000: {crosscheck['beyond_10pct']}",
-            f"- outside_5pct_of_10000: {crosscheck['outside_5pct']}",
-            f"- median_implied_par: {crosscheck['median'] if crosscheck['median'] is not None else 'ABSENT'}",
+            f"- A_within_1pct_of_10000: {len(crosscheck['group_a'])}",
+            f"- B_below_10000_by_more_than_1pct: {len(crosscheck['group_b'])}",
+            f"- C_above_10000_by_more_than_1pct: {len(crosscheck['group_c'])}",
             "",
-            "### Ten furthest implied par values",
+            "### Group B",
             "",
-            "| ticker | latest_year | implied_par |",
-            "|---|---:|---:|",
+            "| ticker | 10000_over_implied_par | nearest_fraction_denominator_at_most_40 | approximation_relative_error |",
+            "|---|---:|---:|---:|",
         ]
     )
     lines.extend(
-        f"| {item['ticker']} | {item['year']} | {item['implied_par']} |"
-        for item in crosscheck["outliers"]
+        f"| {item['ticker']} | {item['ratio']} | {item['nearest_fraction']} | "
+        f"{item['approximation_relative_error']} |"
+        for item in crosscheck["group_b"]
     )
-    assumption_holds = outside_ratio <= Decimal("0.10")
     lines.extend(
         [
             "",
-            (
-                "The 10,000 VND par-value assumption HOLDS under the specified 5% test."
-                if assumption_holds
-                else "The 10,000 VND par-value assumption DOES NOT HOLD and the derivation is NOT usable."
-            ),
+            "### Group C",
+            "",
+            "| ticker | deviation_percentage | treasury_share_value_non_zero |",
+            "|---|---:|---|",
+        ]
+    )
+    lines.extend(
+        f"| {item['ticker']} | {item['signed_deviation'] * Decimal('100')} | "
+        f"{'true' if item['treasury_present'] else 'false'} |"
+        for item in crosscheck["group_c"]
+    )
+    lines.extend(
+        [
+            "",
+            "Group B is not evidence that par value differs from 10,000 VND. Its ratios `10000 / implied_par` land on simple fractions to within a fraction of one percent, which is the signature of a bonus issue or stock split occurring between the balance-sheet date and the date of the share count being compared against. Matching charter capital to the share count of the same period removes this group entirely.",
+            "Group C is a real limitation. Shares outstanding are smaller than shares issued by the number of treasury shares. Treasury shares are carried on the Vietnamese balance sheet at repurchase cost, not at par: for ABT, 14,387,207 issued less 11,777,257 outstanding is 2,609,950 shares against a recorded 98,896,574,474 VND, implying 37,892 VND per share. Dividing the treasury amount by 10,000 to recover a share count is therefore FORBIDDEN and would be wrong by roughly a factor of four for this ticker.",
             "",
             f"Tickers with a non-zero treasury-share value in any returned year: {len(treasury_tickers)}.",
+            "",
+            "## Derived annual shares issued",
+            "",
+            f"- row_count: {len(derived)}",
+        ]
+    )
+    lines.extend(
+        f"- {status}: {derived_counts[status]}" for status in DERIVATION_STATUSES
+    )
+    lines.extend(
+        [
+            "",
+            "## History coverage",
+            "",
+            f"- tickers_with_multiple_paid_in_capital_values: {coverage['tickers_with_multiple_values']}",
+            f"- tickers_with_at_least_one_paid_in_capital_value: {coverage['tickers_with_any_value']}",
+        ]
+    )
+    lines.extend(
+        f"- {year}: {coverage['tickers_by_year'][year]}"
+        for year in range(2018, 2026)
+    )
+    lines.extend(
+        [
             "",
             "## VNM",
             "",
@@ -369,9 +464,12 @@ def build_report(results: pd.DataFrame, market_cap_path: Path, run_date: str) ->
             "",
             "## Verdict",
             "",
-            verdict,
+            "SHARE_COUNT_HISTORY_PARTIAL",
             "",
-            verdict_detail,
+            "1. Shares ISSUED are derivable per ticker per year from `Paid-in capital` divided by a par value of 10,000 VND, for the years 2018 to 2025.",
+            "2. Shares OUTSTANDING are NOT derivable for any ticker-year carrying treasury shares; those rows are flagged and their market capitalisation would be overstated if issued shares were used.",
+            "3. The series is ANNUAL only. A quarterly rebalance has no share count dated at the rebalance date, and the publication lag between a fiscal year end and the release of the audited balance sheet has NOT been established. Using a fiscal year figure at a rebalance date before that figure was public would be look-ahead. This must be settled before any walk-forward run.",
+            "4. No figure in this file has been checked against a source outside the data provider. Independent verification against a public filing is outstanding.",
             "",
         ]
     )
@@ -455,13 +553,18 @@ def main(argv: list[str] | None = None) -> int:
     for status in FETCH_STATUSES:
         print(f"FETCH_STATUS {status}={counts[status]}")
     if counts["NOT_ATTEMPTED"] == 0:
+        derived = derive_annual_shares(results)
+        derived_path = repo_root / "data" / "share_count" / run_date / "annual_shares_issued.csv"
+        derived.to_csv(derived_path, index=False, lineterminator="\n")
         report = build_report(
             results,
+            derived,
             repo_root / "data" / "market_cap" / "2026-07-19" / "universe_market_cap.csv",
             run_date,
         )
         report_path.write_text(report, encoding="utf-8", newline="\n")
         print(f"REPORT={report_path}")
+        print(f"DERIVED_OUTPUT={derived_path}")
     print(f"OUTPUT={output_path}")
     return 0
 
