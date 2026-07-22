@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-22
+
+- Add Sprint 8B point-in-time eligibility and mechanical portfolio-engine configuration; the 0.3% per-side brokerage fee, 0.1% sell tax, and T+2 settlement lag are explicit owner-supplied estimates that remain unverified against a published fee schedule, while no existing screener value changes.
+
 ## 2026-07-20
 
 - Build Sprint 6 Franchise Power and composite quality from the existing local annual cache, with arithmetic ROC scoring, diagnostic geometric ROC, population margin stability, tied percentiles, and separate unchanged candidate-list ranks.
