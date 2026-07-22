@@ -117,3 +117,78 @@ def test_engine_rebalance_log_carries_pool_ratio_and_period_flags() -> None:
         "",
         "THIN_CANDIDATE_POOL|LOW_SELECTIVITY",
     ]
+
+
+def test_engine_does_not_invent_pool_size_when_none_was_supplied() -> None:
+    from src.backtest.engine import load_engine_config
+
+    prices = pd.DataFrame(
+        [
+            {"ticker": "AAA", "date": "2020-01-02", "close_adjusted": 10.0, "volume": 100},
+            {"ticker": "BBB", "date": "2020-01-02", "close_adjusted": 20.0, "volume": 100},
+        ]
+    )
+    eligibility = pd.DataFrame(
+        [
+            {"ticker": ticker, "eligible": True, "traded_sessions_12m": 200, "reason": "", "segment_flag": ""}
+            for ticker in ("AAA", "BBB")
+        ]
+    )
+    config = load_engine_config(Path(__file__).resolve().parents[1] / "config" / "screener.yaml")
+
+    result = run_engine(
+        prices,
+        {"2020-01-02": ["AAA", "BBB"]},
+        {"2020-01-02": eligibility},
+        config=config,
+        initial_value=1000.0,
+    )
+
+    row = result.rebalance_log.iloc[0]
+    assert row["candidate_pool_size"] == ""
+    assert row["selection_ratio"] == ""
+    assert row["period_flags"] == "POOL_SIZE_NOT_SUPPLIED"
+
+
+def test_engine_and_window_thresholds_agree_at_required_portfolio_sizes() -> None:
+    from src.backtest.engine import load_engine_config
+
+    prices = pd.DataFrame(
+        [
+            {"ticker": "AAA", "date": "2020-01-02", "close_adjusted": 10.0, "volume": 100},
+            {"ticker": "AAA", "date": "2020-01-06", "close_adjusted": 10.0, "volume": 100},
+        ]
+    )
+    eligibility = pd.DataFrame(
+        [{"ticker": "AAA", "eligible": True, "traded_sessions_12m": 200, "reason": "", "segment_flag": ""}]
+    )
+    config = load_engine_config(Path(__file__).resolve().parents[1] / "config" / "screener.yaml")
+
+    for portfolio_size in (1, 2, 19, 20, 21):
+        _, boundary = compute_backtest_window(
+            [("2020-01-02", 1000)],
+            portfolio_size=portfolio_size,
+            multiple=1.5,
+        )
+        threshold = int(boundary.loc[0, "threshold"])
+        _, window_frame = compute_backtest_window(
+            [("2020-01-02", threshold), ("2020-01-06", threshold - 1)],
+            portfolio_size=portfolio_size,
+            multiple=1.5,
+        )
+        result = run_engine(
+            prices,
+            {"2020-01-02": ["AAA"], "2020-01-06": ["AAA"]},
+            {"2020-01-02": eligibility, "2020-01-06": eligibility},
+            config=config,
+            initial_value=1000.0,
+            candidate_pool_sizes_by_rebalance={
+                "2020-01-02": threshold,
+                "2020-01-06": threshold - 1,
+            },
+            portfolio_size=portfolio_size,
+        )
+
+        assert window_frame["threshold"].tolist() == [threshold, threshold]
+        assert "THIN_CANDIDATE_POOL" not in result.rebalance_log.loc[0, "period_flags"]
+        assert "THIN_CANDIDATE_POOL" in result.rebalance_log.loc[1, "period_flags"]

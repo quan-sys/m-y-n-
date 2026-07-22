@@ -2,6 +2,7 @@
 
 ## 2026-07-22
 
+- Stop reporting target-list length as a measured candidate-pool size when no pool input was supplied, and route engine window flags through the single Sprint 8C threshold implementation.
 - An `assert` is removed by the interpreter when Python runs with `-O`, so the only look-ahead guard in the engine would silently disappear in an optimised run. A `raise` cannot be stripped.
 - Add the Sprint 8C runtime start-window and selectivity thresholds for economic meaning before any performance run: a 1.5x candidate pool still discards one third when selecting 20 of 30 names, while selection ratios above 0.70 are reported as low selectivity.
 - Add Sprint 8B point-in-time eligibility and mechanical portfolio-engine configuration; the 0.3% per-side brokerage fee, 0.1% sell tax, and T+2 settlement lag are explicit owner-supplied estimates that remain unverified against a published fee schedule, while no existing screener value changes.

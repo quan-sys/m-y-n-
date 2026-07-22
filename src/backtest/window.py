@@ -16,6 +16,19 @@ WINDOW_COLUMNS = (
 )
 
 
+def _evaluate_window_period(
+    candidate_pool_size: int,
+    portfolio_size: int,
+    multiple: float,
+    window_started: bool,
+) -> tuple[int, bool, bool, bool]:
+    threshold = ceil(multiple * portfolio_size)
+    meets_threshold = candidate_pool_size >= threshold
+    window_started = window_started or meets_threshold
+    thin_candidate_pool = window_started and not meets_threshold
+    return threshold, meets_threshold, window_started, thin_candidate_pool
+
+
 def compute_backtest_window(
     periods: Sequence[tuple[str | date | pd.Timestamp, int]],
     portfolio_size: int,
@@ -27,7 +40,6 @@ def compute_backtest_window(
     if multiple <= 0:
         raise ValueError("multiple must be positive")
 
-    threshold = ceil(multiple * portfolio_size)
     start_date: pd.Timestamp | None = None
     prior_date: pd.Timestamp | None = None
     rows: list[dict[str, object]] = []
@@ -40,7 +52,12 @@ def compute_backtest_window(
         if candidate_pool_size < 0:
             raise ValueError("candidate_pool_size cannot be negative")
 
-        meets_threshold = candidate_pool_size >= threshold
+        threshold, meets_threshold, window_started, thin_candidate_pool = _evaluate_window_period(
+            candidate_pool_size,
+            portfolio_size,
+            multiple,
+            start_date is not None,
+        )
         if start_date is None and meets_threshold:
             start_date = rebalance_date
         rows.append(
@@ -49,7 +66,7 @@ def compute_backtest_window(
                 "candidate_pool_size": candidate_pool_size,
                 "threshold": threshold,
                 "meets_threshold": meets_threshold,
-                "THIN_CANDIDATE_POOL": start_date is not None and not meets_threshold,
+                "THIN_CANDIDATE_POOL": thin_candidate_pool,
             }
         )
 

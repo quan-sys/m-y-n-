@@ -3,11 +3,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
-from math import ceil
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
+from src.backtest.window import _evaluate_window_period
 
 
 PRICE_UNAVAILABLE = "PRICE_UNAVAILABLE"
@@ -133,9 +134,7 @@ def run_engine(
         config.min_candidate_pool_multiple is not None
         and config.selection_ratio_report_threshold is not None
     )
-    if (candidate_pool_sizes_by_rebalance is not None or portfolio_size is not None) and not (
-        window_rules_configured
-    ):
+    if candidate_pool_sizes_by_rebalance is not None and not window_rules_configured:
         raise ValueError("candidate pool rules require configured thresholds")
     required = {"ticker", "date", "close_adjusted", "volume"}
     missing = sorted(required.difference(price_rows.columns))
@@ -192,38 +191,35 @@ def run_engine(
             else:
                 eligible_weights[ticker] = weight
 
-        if candidate_pool_lookup is not None:
+        if candidate_pool_lookup is None:
+            candidate_pool_size: int | str = ""
+            selection_ratio: float | str = ""
+            period_flags = ["POOL_SIZE_NOT_SUPPLIED"]
+        else:
             if rebalance_day not in candidate_pool_lookup:
                 raise ValueError(
                     f"missing candidate pool size for {rebalance_day.date().isoformat()}"
                 )
             candidate_pool_size = candidate_pool_lookup[rebalance_day]
-        else:
-            candidate_pool_size = len(weights)
-        if candidate_pool_size < 0:
-            raise ValueError("candidate_pool_size cannot be negative")
-        if candidate_pool_size < len(eligible_weights):
-            raise ValueError("candidate_pool_size cannot be smaller than selected_count")
-        effective_portfolio_size = portfolio_size if portfolio_size is not None else len(weights)
-        threshold = (
-            ceil(config.min_candidate_pool_multiple * effective_portfolio_size)
-            if config.min_candidate_pool_multiple is not None
-            else 0
-        )
-        meets_threshold = candidate_pool_size >= threshold
-        if not window_started and meets_threshold:
-            window_started = True
-        selection_ratio = (
-            len(eligible_weights) / candidate_pool_size if candidate_pool_size else 0.0
-        )
-        period_flags: list[str] = []
-        if window_started and not meets_threshold:
-            period_flags.append("THIN_CANDIDATE_POOL")
-        if (
-            config.selection_ratio_report_threshold is not None
-            and selection_ratio > config.selection_ratio_report_threshold
-        ):
-            period_flags.append("LOW_SELECTIVITY")
+            if candidate_pool_size < 0:
+                raise ValueError("candidate_pool_size cannot be negative")
+            if candidate_pool_size < len(eligible_weights):
+                raise ValueError("candidate_pool_size cannot be smaller than selected_count")
+            effective_portfolio_size = portfolio_size if portfolio_size is not None else len(weights)
+            _, _, window_started, thin_candidate_pool = _evaluate_window_period(
+                candidate_pool_size,
+                effective_portfolio_size,
+                config.min_candidate_pool_multiple,
+                window_started,
+            )
+            selection_ratio = (
+                len(eligible_weights) / candidate_pool_size if candidate_pool_size else 0.0
+            )
+            period_flags = []
+            if thin_candidate_pool:
+                period_flags.append("THIN_CANDIDATE_POOL")
+            if selection_ratio > config.selection_ratio_report_threshold:
+                period_flags.append("LOW_SELECTIVITY")
 
         price_map: dict[str, float] = {}
         unavailable: list[str] = []
