@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import inspect
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
+import scripts.build_forward_test_snapshot as snapshot_builder
 from scripts.build_forward_test_snapshot import (
     HASH_CONVENTION,
     INDEX_RAW_STATUS,
@@ -140,3 +142,24 @@ def test_repository_snapshot_files_are_lf_only() -> None:
 
     assert snapshot_files
     assert all(b"\r\n" not in path.read_bytes() for path in snapshot_files)
+
+
+def test_removed_correction_marker_is_absent_from_code() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    needle = "pre" + "commit"
+    source_files = [
+        path
+        for source_root in (repo_root / "scripts", repo_root / "tests")
+        for path in source_root.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+    ]
+
+    assert source_files
+    assert all(needle not in path.read_text(encoding="utf-8").lower() for path in source_files)
+
+
+def test_snapshot_builder_exposes_no_correction_callable() -> None:
+    forbidden_name_parts = ("fix", "overwrite")
+    callable_names = [name.lower() for name, value in inspect.getmembers(snapshot_builder) if callable(value)]
+
+    assert all(part not in name for name in callable_names for part in forbidden_name_parts)

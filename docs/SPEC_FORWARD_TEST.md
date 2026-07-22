@@ -12,6 +12,8 @@ Each snapshot lives under `data/forward_test/snapshots/<snapshot_date>/` and is 
 
 FT2 immutability binds from the moment the snapshot branch is merged into `main`, so correcting snapshot files in place on the unmerged working branch is permitted.
 
+The one-time pre-merge corrective path used on 2026-07-21 was removed before merge by owner decision on 2026-07-22, and any future correction must follow the `correction_of` new-dated-file rule already stated in FT2 rather than any overwrite mechanism.
+
 ## FT3. Fill-price convention, no look-ahead
 
 The two portfolios were computed from data as of `2026-07-20` but were only decided on `2026-07-21`. The assumed fill price is therefore the closing price of the FIRST exchange trading session on or after `2026-07-21`; the `2026-07-20` close must never be used as a fill price. The actual session date used is recorded per ticker in a `fill_session_date` column and is fetched, never assumed. If a ticker has no traded session in the seven calendar days from 2026-07-21, it is recorded with `fill_status = NO_SESSION_IN_WINDOW` and no price is fabricated.

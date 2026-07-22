@@ -238,34 +238,6 @@ def _write_manifest(target_dir: Path, commit_sha: str, created: datetime) -> pd.
     return manifest
 
 
-def apply_precommit_fix(
-    repo_root: Path,
-    *,
-    created_at_utc: datetime | None = None,
-    main_sha: str | None = None,
-) -> pd.DataFrame:
-    """Correct the unmerged snapshot seal without fetching or deleting data."""
-    target_dir = repo_root / "data" / "forward_test" / "snapshots" / SNAPSHOT_DATE.isoformat()
-    if not target_dir.is_dir():
-        raise FileNotFoundError(f"snapshot directory does not exist: {target_dir}")
-
-    for filename in PORTFOLIO_FILES:
-        _normalise_lf(target_dir / filename)
-
-    benchmark_path = target_dir / "benchmark.csv"
-    benchmark = pd.read_csv(benchmark_path, keep_default_na=False)
-    if len(benchmark) != 1 or str(benchmark.iloc[0]["ticker"]) != "VNINDEX":
-        raise RuntimeError("unexpected benchmark content; refusing pre-merge correction")
-    if float(benchmark.iloc[0]["close_adjusted"]) != 1730.56:
-        raise RuntimeError("benchmark price changed; refusing pre-merge correction")
-    benchmark.loc[:, "close_adjusted_unit"] = INDEX_UNIT
-    benchmark.loc[:, "close_raw_status"] = INDEX_RAW_STATUS
-    benchmark.to_csv(benchmark_path, index=False, lineterminator="\n")
-
-    created = created_at_utc or datetime.now(timezone.utc)
-    return _write_manifest(target_dir, main_sha or _main_sha(repo_root), created)
-
-
 def build_snapshot(
     repo_root: Path,
     client: PriceClient,
@@ -343,16 +315,7 @@ def build_snapshot(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Open the immutable 2026-07-21 forward-test snapshot.")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
-    parser.add_argument(
-        "--allow-precommit-fix",
-        action="store_true",
-        help="correct the existing unmerged snapshot seal without fetching prices",
-    )
     args = parser.parse_args()
-    if args.allow_precommit_fix:
-        manifest = apply_precommit_fix(args.repo_root.resolve())
-        print(manifest.to_csv(index=False), end="")
-        return 0
     fills, benchmark, observations = build_snapshot(args.repo_root.resolve(), LiveVciPriceClient())
     print(pd.concat([fills, benchmark], ignore_index=True).to_csv(index=False), end="")
     print("MAGNITUDE_SANITY")
