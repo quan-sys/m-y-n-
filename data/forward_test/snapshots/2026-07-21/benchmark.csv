@@ -1,0 +1,2 @@
+portfolio_id,ticker,fill_session_date,close_raw,close_raw_status,close_adjusted,close_adjusted_unit,price_source,price_provider,price_as_of,fill_status,target_weight
+VN_INDEX,VNINDEX,2026-07-21,,NOT_APPLICABLE_INDEX,1730.56,INDEX_POINTS,vnstock.Quote.history,VCI,2026-07-21,FILLED,
