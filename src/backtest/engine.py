@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
+from math import ceil
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,8 @@ class EngineConfig:
     brokerage_fee_pct_per_side: float
     sell_tax_pct: float
     settlement_lag_days: int
+    min_candidate_pool_multiple: float | None = None
+    selection_ratio_report_threshold: float | None = None
 
 
 @dataclass(frozen=True)
@@ -52,6 +55,8 @@ def load_engine_config(path: str | Path) -> EngineConfig:
         "BROKERAGE_FEE_PCT_PER_SIDE",
         "SELL_TAX_PCT",
         "SETTLEMENT_LAG_DAYS",
+        "MIN_CANDIDATE_POOL_MULTIPLE",
+        "SELECTION_RATIO_REPORT_THRESHOLD",
     )
     missing = [key for key in required if key not in values]
     if missing:
@@ -62,11 +67,19 @@ def load_engine_config(path: str | Path) -> EngineConfig:
         brokerage_fee_pct_per_side=float(values["BROKERAGE_FEE_PCT_PER_SIDE"]),
         sell_tax_pct=float(values["SELL_TAX_PCT"]),
         settlement_lag_days=int(values["SETTLEMENT_LAG_DAYS"]),
+        min_candidate_pool_multiple=float(values["MIN_CANDIDATE_POOL_MULTIPLE"]),
+        selection_ratio_report_threshold=float(values["SELECTION_RATIO_REPORT_THRESHOLD"]),
     )
     if config.brokerage_fee_pct_per_side < 0 or config.sell_tax_pct < 0:
         raise ValueError("cost assumptions cannot be negative")
     if config.settlement_lag_days < 0:
         raise ValueError("settlement lag cannot be negative")
+    if config.min_candidate_pool_multiple is None or config.min_candidate_pool_multiple <= 0:
+        raise ValueError("candidate pool multiple must be positive")
+    if config.selection_ratio_report_threshold is None or not (
+        0 <= config.selection_ratio_report_threshold <= 1
+    ):
+        raise ValueError("selection ratio threshold must be between zero and one")
     return config
 
 
@@ -107,11 +120,23 @@ def run_engine(
     *,
     config: EngineConfig,
     initial_value: float,
+    candidate_pool_sizes_by_rebalance: Mapping[str | date | pd.Timestamp, int] | None = None,
+    portfolio_size: int | None = None,
     valuation_date: str | date | pd.Timestamp | None = None,
 ) -> EngineResult:
     """Run mechanical long-only rebalances without computing performance metrics."""
     if initial_value <= 0:
         raise ValueError("initial_value must be positive")
+    if portfolio_size is not None and portfolio_size < 1:
+        raise ValueError("portfolio_size must be positive")
+    window_rules_configured = (
+        config.min_candidate_pool_multiple is not None
+        and config.selection_ratio_report_threshold is not None
+    )
+    if (candidate_pool_sizes_by_rebalance is not None or portfolio_size is not None) and not (
+        window_rules_configured
+    ):
+        raise ValueError("candidate pool rules require configured thresholds")
     required = {"ticker", "date", "close_adjusted", "volume"}
     missing = sorted(required.difference(price_rows.columns))
     if missing:
@@ -128,6 +153,14 @@ def run_engine(
     eligibility_lookup = {
         pd.Timestamp(day).normalize(): frame.copy() for day, frame in eligibility_by_rebalance.items()
     }
+    candidate_pool_lookup = (
+        {
+            pd.Timestamp(day).normalize(): int(pool_size)
+            for day, pool_size in candidate_pool_sizes_by_rebalance.items()
+        }
+        if candidate_pool_sizes_by_rebalance is not None
+        else None
+    )
     rebalances = sorted(
         (pd.Timestamp(day).normalize(), targets) for day, targets in targets_by_rebalance.items()
     )
@@ -136,6 +169,7 @@ def run_engine(
     trade_rows: list[dict[str, Any]] = []
     rebalance_rows: list[dict[str, Any]] = []
     value_rows: list[dict[str, Any]] = []
+    window_started = False
 
     for rebalance_day, raw_targets in rebalances:
         cash_before = cash
@@ -157,6 +191,39 @@ def run_engine(
                 excluded.append(f"{ticker}:{reason}")
             else:
                 eligible_weights[ticker] = weight
+
+        if candidate_pool_lookup is not None:
+            if rebalance_day not in candidate_pool_lookup:
+                raise ValueError(
+                    f"missing candidate pool size for {rebalance_day.date().isoformat()}"
+                )
+            candidate_pool_size = candidate_pool_lookup[rebalance_day]
+        else:
+            candidate_pool_size = len(weights)
+        if candidate_pool_size < 0:
+            raise ValueError("candidate_pool_size cannot be negative")
+        if candidate_pool_size < len(eligible_weights):
+            raise ValueError("candidate_pool_size cannot be smaller than selected_count")
+        effective_portfolio_size = portfolio_size if portfolio_size is not None else len(weights)
+        threshold = (
+            ceil(config.min_candidate_pool_multiple * effective_portfolio_size)
+            if config.min_candidate_pool_multiple is not None
+            else 0
+        )
+        meets_threshold = candidate_pool_size >= threshold
+        if not window_started and meets_threshold:
+            window_started = True
+        selection_ratio = (
+            len(eligible_weights) / candidate_pool_size if candidate_pool_size else 0.0
+        )
+        period_flags: list[str] = []
+        if window_started and not meets_threshold:
+            period_flags.append("THIN_CANDIDATE_POOL")
+        if (
+            config.selection_ratio_report_threshold is not None
+            and selection_ratio > config.selection_ratio_report_threshold
+        ):
+            period_flags.append("LOW_SELECTIVITY")
 
         price_map: dict[str, float] = {}
         unavailable: list[str] = []
@@ -275,6 +342,9 @@ def run_engine(
                 "date": rebalance_day.date().isoformat(),
                 "eligible_count": int(eligibility["eligible"].astype(bool).sum()),
                 "selected_count": len(eligible_weights),
+                "candidate_pool_size": candidate_pool_size,
+                "selection_ratio": selection_ratio,
+                "period_flags": "|".join(period_flags),
                 "excluded_tickers": "|".join(sorted(set(excluded))),
                 "cost_paid": cost_paid,
                 "status": status,
@@ -325,6 +395,16 @@ def run_engine(
         "BROKERAGE_FEE_PCT_PER_SIDE": config.brokerage_fee_pct_per_side,
         "SELL_TAX_PCT": config.sell_tax_pct,
         "SETTLEMENT_LAG_DAYS": config.settlement_lag_days,
+        "MIN_CANDIDATE_POOL_MULTIPLE": (
+            config.min_candidate_pool_multiple
+            if config.min_candidate_pool_multiple is not None
+            else "UNCONFIGURED"
+        ),
+        "SELECTION_RATIO_REPORT_THRESHOLD": (
+            config.selection_ratio_report_threshold
+            if config.selection_ratio_report_threshold is not None
+            else "UNCONFIGURED"
+        ),
         "assumption_status": "ESTIMATE_UNVERIFIED_PUBLISHED_FEE_SCHEDULE",
     }
     return EngineResult(
@@ -338,6 +418,9 @@ def run_engine(
                 "date",
                 "eligible_count",
                 "selected_count",
+                "candidate_pool_size",
+                "selection_ratio",
+                "period_flags",
                 "excluded_tickers",
                 "cost_paid",
                 "status",

@@ -6,12 +6,14 @@ from src.backtest.engine import (
     load_engine_config,
     run_engine,
 )
+from src.backtest.window import compute_backtest_window
 
 __all__ = [
     "KNOWN_BIASES",
     "EngineConfig",
     "EngineResult",
     "compute_eligibility",
+    "compute_backtest_window",
     "load_engine_config",
     "run_engine",
 ]

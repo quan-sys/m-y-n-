@@ -38,7 +38,8 @@ def compute_eligibility(
     t = pd.Timestamp(rebalance_date).normalize()
     frame = price_rows.copy()
     frame["_date"] = pd.to_datetime(frame["date"], errors="raise").dt.normalize()
-    assert bool((frame["_date"] < t).all()), "eligibility input contains date >= rebalance date"
+    if bool((frame["_date"] >= t).any()):
+        raise ValueError("eligibility input contains date >= rebalance date")
     frame["_volume"] = pd.to_numeric(frame["volume"], errors="coerce")
     frame["ticker"] = frame["ticker"].astype(str).str.strip().str.upper()
 

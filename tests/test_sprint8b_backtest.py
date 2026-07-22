@@ -19,7 +19,7 @@ CONFIG = EngineConfig(
 def test_eligibility_rejects_rows_on_or_after_rebalance_date() -> None:
     rows = pd.DataFrame([{"ticker": "AAA", "date": "2020-01-02", "volume": 100}])
 
-    with pytest.raises(AssertionError, match="date >= rebalance"):
+    with pytest.raises(ValueError, match="date >= rebalance"):
         compute_eligibility(
             rows,
             "2020-01-02",
