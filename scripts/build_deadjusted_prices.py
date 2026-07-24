@@ -33,6 +33,7 @@ OUTPUT_COLUMNS = (
 @dataclass(frozen=True)
 class BuildDiagnostics:
     unplaceable_tickers: tuple[str, ...]
+    moved_out_of_unplaceable: tuple[str, ...]
     excluded_non_price_events: int
     future_events_ignored: int
     rights_sensitivity_percent: tuple[float, ...]
@@ -105,26 +106,43 @@ def _resolve_event_dates(
 ) -> tuple[pd.DataFrame, bool]:
     ticker_events = ticker_events.copy()
     ticker_events["_date_fallback"] = False
+    ticker_events["_future_event"] = False
     resolved: list[pd.Timestamp | pd.NaT] = []
     unplaceable = False
+    max_price_date = trading_dates.max()
     for _, event in ticker_events.iterrows():
-        ex_date = pd.to_datetime(event.get("exright_date"), errors="coerce")
-        used_fallback = False
-        if pd.isna(ex_date):
-            record_date = pd.to_datetime(event.get("record_date"), errors="coerce")
-            if pd.isna(record_date):
-                resolved.append(pd.NaT)
-                unplaceable = True
-                continue
-            candidates = trading_dates[trading_dates >= record_date]
+        exright_date = pd.to_datetime(event.get("exright_date"), errors="coerce")
+        record_date = pd.to_datetime(event.get("record_date"), errors="coerce")
+        public_date = pd.to_datetime(event.get("public_date"), errors="coerce")
+        if pd.notna(exright_date):
+            placement_date = exright_date
+            placement_source = "exright_date"
+        elif pd.notna(record_date):
+            placement_date = record_date
+            placement_source = "record_date"
+        elif pd.notna(public_date):
+            placement_date = public_date
+            placement_source = "public_date"
+        else:
+            resolved.append(pd.NaT)
+            unplaceable = True
+            continue
+
+        if placement_date > max_price_date:
+            resolved.append(placement_date)
+            ticker_events.loc[event.name, "_future_event"] = True
+            continue
+
+        if placement_source == "record_date":
+            candidates = trading_dates[trading_dates >= placement_date]
             if len(candidates) == 0:
-                resolved.append(record_date)
+                resolved.append(placement_date)
                 ticker_events.loc[event.name, "_date_fallback"] = True
                 continue
-            ex_date = candidates[0]
-            used_fallback = True
-        resolved.append(ex_date)
-        ticker_events.loc[event.name, "_date_fallback"] = used_fallback
+            placement_date = candidates[0]
+
+        resolved.append(placement_date)
+        ticker_events.loc[event.name, "_date_fallback"] = placement_source != "exright_date"
     ticker_events["_resolved_exdate"] = pd.to_datetime(
         pd.Series(resolved, index=ticker_events.index), errors="coerce"
     )
@@ -148,10 +166,9 @@ def reconstruct_ticker(
         raise ValueError("ticker price frame is empty")
     trading_dates = pd.DatetimeIndex(price_dates)
     events, unplaceable = _resolve_event_dates(ticker_events.copy(), trading_dates)
-    max_price_date = trading_dates.max()
-    future_count = int((events["_resolved_exdate"] > max_price_date).fillna(False).sum())
+    future_count = int(events["_future_event"].sum())
     events = events[
-        events["_resolved_exdate"].notna() & (events["_resolved_exdate"] <= max_price_date)
+        events["_resolved_exdate"].notna() & ~events["_future_event"]
     ].copy()
 
     cumulative = np.ones(len(prices), dtype=float)
@@ -228,7 +245,7 @@ def build_deadjusted(prices: pd.DataFrame, events: pd.DataFrame) -> tuple[pd.Dat
     required_price = {"ticker", "date", "close_adjusted"}
     required_event = {
         "ticker", "event_code", "event_title_en", "event_title_vi", "event_class",
-        "exright_date", "record_date", "exercise_ratio", "value_per_share",
+        "exright_date", "record_date", "public_date", "exercise_ratio", "value_per_share",
     }
     if missing := sorted(required_price.difference(prices.columns)):
         raise ValueError("price cache missing columns: " + ", ".join(missing))
@@ -238,6 +255,13 @@ def build_deadjusted(prices: pd.DataFrame, events: pd.DataFrame) -> tuple[pd.Dat
         raise ValueError("input price cache has duplicate ticker-date rows")
 
     selected, excluded = select_price_events(events)
+    legacy_unplaceable = set(
+        selected.loc[
+            pd.to_datetime(selected["exright_date"], errors="coerce").isna()
+            & pd.to_datetime(selected["record_date"], errors="coerce").isna(),
+            "ticker",
+        ].astype(str)
+    )
     events_by_ticker = {ticker: frame for ticker, frame in selected.groupby("ticker", sort=False)}
     outputs: list[pd.DataFrame] = []
     unplaceable: list[str] = []
@@ -260,6 +284,7 @@ def build_deadjusted(prices: pd.DataFrame, events: pd.DataFrame) -> tuple[pd.Dat
         raise ValueError("invalid adjustment_confidence value")
     diagnostics = BuildDiagnostics(
         tuple(sorted(unplaceable)),
+        tuple(sorted(legacy_unplaceable.difference(unplaceable))),
         excluded,
         future_count,
         tuple(sensitivity),
@@ -347,6 +372,8 @@ def build_report(
         f"- distinct tickers with any LOW date: {low_tickers}",
         f"- UNPLACEABLE_EVENT tickers: {len(diagnostics.unplaceable_tickers)}",
         f"- UNPLACEABLE_EVENT list: {', '.join(diagnostics.unplaceable_tickers) if diagnostics.unplaceable_tickers else 'none'}",
+        f"- tickers moved OUT of UNPLACEABLE: {len(diagnostics.moved_out_of_unplaceable)}",
+        f"- moved-out list: {', '.join(diagnostics.moved_out_of_unplaceable) if diagnostics.moved_out_of_unplaceable else 'none'}",
         "",
         "## N4. Rights sensitivity",
         "",

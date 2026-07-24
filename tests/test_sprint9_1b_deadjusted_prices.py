@@ -40,6 +40,8 @@ def _event(
     event_class: str,
     title: str,
     exright_date: str,
+    record_date: str = "",
+    public_date: str = "",
     ratio: object = "",
     value: object = "",
 ) -> pd.DataFrame:
@@ -52,7 +54,8 @@ def _event(
                 "event_title_vi": "",
                 "event_class": event_class,
                 "exright_date": exright_date,
-                "record_date": "",
+                "record_date": record_date,
+                "public_date": public_date,
                 "exercise_ratio": ratio,
                 "value_per_share": value,
             }
@@ -103,3 +106,40 @@ def test_non_price_events_do_not_change_factors() -> None:
     assert with_esop["cumulative_factor"].tolist() == pytest.approx(
         without["cumulative_factor"].tolist()
     )
+
+
+def test_future_public_date_event_does_not_change_factor_or_confidence() -> None:
+    prices = pd.DataFrame(
+        {
+            "ticker": ["AAA", "AAA"],
+            "date": ["2026-07-21", "2026-07-22"],
+            "close_adjusted": [100.0, 101.0],
+        }
+    )
+    future = _event(
+        event_class="MISSING_EXRIGHT_DATE",
+        title="Share Issue - Bonus Issue ratio 20.0%",
+        exright_date="",
+        public_date="2026-07-23",
+        ratio=0.2,
+    )
+    result, diagnostics = build_deadjusted(prices, future)
+    assert result["cumulative_factor"].tolist() == pytest.approx([1.0, 1.0])
+    assert result["adjustment_confidence"].tolist() == ["OK", "OK"]
+    assert diagnostics.future_events_ignored == 1
+
+
+def test_historical_public_date_fallback_is_placed_and_low_before_only() -> None:
+    historical = _event(
+        event_class="MISSING_EXRIGHT_DATE",
+        title="Share Issue - Bonus Issue ratio 20.0%",
+        exright_date="",
+        public_date="2020-01-06",
+        ratio=0.2,
+    )
+    result, diagnostics = build_deadjusted(_prices(), historical)
+    assert result["cumulative_factor"].tolist() == pytest.approx(
+        [1 / 1.2, 1 / 1.2, 1.0, 1.0]
+    )
+    assert result["adjustment_confidence"].tolist() == ["LOW", "LOW", "OK", "OK"]
+    assert diagnostics.unplaceable_tickers == ()
