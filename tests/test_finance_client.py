@@ -545,12 +545,18 @@ def test_stale_cache_is_used_after_source_failure(long_shape, tmp_path):
 def test_public_vnstock_api_module_and_no_ratio_endpoint_are_used(monkeypatch, long_shape, tmp_path):
     calls: list[tuple[str, str]] = []
 
+    class FakeProvider:
+        def _get_financial_report(self, report_type, **kwargs):
+            calls.append((report_type, str(kwargs)))
+            return long_shape
+
     class FakeFinance:
         def __init__(self, source, symbol, period, get_all, show_log):
             calls.append(("init", f"{source}:{symbol}:{period}:{get_all}:{show_log}"))
+            self.provider = FakeProvider()
 
         def balance_sheet(self, **kwargs):
-            calls.append(("balance_sheet", str(kwargs)))
+            calls.append(("public_balance_sheet", str(kwargs)))
             return long_shape
 
     def fake_import(name: str):
@@ -566,6 +572,7 @@ def test_public_vnstock_api_module_and_no_ratio_endpoint_are_used(monkeypatch, l
     assert ("import", "vnstock.api.financial") in calls
     assert any(call[0] == "balance_sheet" for call in calls)
     assert all(call[0] != "ratio" for call in calls)
+    assert all(call[0] != "public_balance_sheet" for call in calls)
 
 
 def test_fixture_normalization_does_not_import_real_vnstock(monkeypatch, long_shape):

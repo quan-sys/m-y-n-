@@ -1,5 +1,21 @@
 # Sprint 9-2A Fundamentals Coverage Probe
 
+## SUPERSEDED MEASUREMENTS — read before using any number below
+
+Every number in sections N2 through N5 and in the unit-sanity section was measured through the
+old fetch path, which truncated each ticker to the 4 most recent quarters. That truncation was a
+client-side limit in vnstock 4.0.3, not a provider limitation. Specifically:
+
+- N3 quarterly depth (min/median/max = 4/4/4, earliest 2024Q1) is WRONG and must not be cited.
+  The corrected path returns 33 quarterly periods for VNM across all three statements.
+- N2 fetch outcomes and N5 key-item availability percentages were computed over that 4-quarter
+  window only; they say nothing about item availability in older quarters.
+- The unit-sanity count of 1076 covers the same 4-quarter window and is not split between
+  values below 1e9 VND (small-cap, informational) and above 1e15 VND (genuine anomaly).
+
+Universe-wide quarterly depth and item availability over the full history are NOT measured in this
+document. They will be measured during the Sprint 9-2b build, which refetches every ticker.
+
 ## N1 — Universe classification
 
 - Total tickers: `378`

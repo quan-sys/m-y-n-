@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-25
+
+- Route quarterly financial statements through the provider's extended-history gateway to avoid the vnstock 4.0.3 client-side four-period truncation.
+
 ## 2026-07-22
 
 - Correct the Sprint 8A-2 acceptance rule by separating below-par split/bonus signatures from above-par treasury-share limitations, and emit annual shares issued without inferring shares outstanding.

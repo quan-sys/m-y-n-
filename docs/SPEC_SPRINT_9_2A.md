@@ -9,3 +9,5 @@
 9-2A-5 KEY ITEM IDS (downstream inputs, measured for presence only). The Sprint 5 valuation (`scripts/build_sprint5_valuation.py`) depends on these exact item_id strings: income statement = `net_accounting_profit_loss_before_tax`, `interest_expenses`, `financial_expenses`, `attributable_to_parent_company`; balance sheet = `short_term_borrowings`, `long_term_borrowings`, `cash_and_cash_equivalents`, `minority_interests`. The probe MEASURES their presence per ticker-quarter but computes NO ratio from them.
 
 9-2A-6 UNIT SANITY. Statement currency is VND; large-company values fall in ~1e9..1e15. Flag any key-item value outside this band as a unit anomaly; do NOT rescale anything.
+
+9-2A-7 QUARTERLY HISTORY GATEWAY. Quarterly fetches go through the provider's `_get_financial_report` gateway with `limit=QUARTER_HISTORY_LIMIT` because the public VCI statement methods truncate to 4 periods client-side; the measured quarterly depth for VNM is 33 periods across all three statements, and universe-wide quarterly depth has NOT yet been measured.
