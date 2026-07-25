@@ -1,0 +1,9 @@
+item_id,statement_type,n_ticker_quarters_present,n_ticker_quarters_total,pct_present
+net_accounting_profit_loss_before_tax,income_statement,972,972,100.0
+interest_expenses,income_statement,972,972,100.0
+financial_expenses,income_statement,972,972,100.0
+attributable_to_parent_company,income_statement,972,972,100.0
+short_term_borrowings,balance_sheet,960,960,100.0
+long_term_borrowings,balance_sheet,960,960,100.0
+cash_and_cash_equivalents,balance_sheet,960,960,100.0
+minority_interests,balance_sheet,960,960,100.0
