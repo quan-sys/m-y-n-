@@ -537,3 +537,59 @@ The resumable per-ticker normalized cache is stored under
 `data/fundamentals/run_state/<RUN_DATE>/normalized/<TICKER>/<statement>.parquet`.
 Git ignores the entire `data/fundamentals/run_state/` tree; only the dated
 gzip output is committed.
+
+## Sprint 9-3 historical valuation diagnostics
+
+`data/valuation/<RUN_DATE>/historical_valuation_point_in_time.csv.gz` contains
+one row for each `(ticker, quarter)` present in both the Sprint 9-2B quarterly
+fundamentals table and the Sprint 9-1C historical market-cap table.
+
+The exact column order is:
+
+```text
+ticker
+quarter
+evaluation_date
+ttm_quarters
+stock_quarter
+ttm_pbt
+ttm_interest_magnitude
+ebit_proxy_vas
+ttm_attributable_to_parent_company
+market_cap_thousand_vnd
+market_cap_vnd
+short_term_borrowings
+long_term_borrowings
+cash_and_cash_equivalents
+minority_interests
+minority_interest_status
+tev
+ebit_tev
+e_p
+ebit_tev_eligible
+e_p_eligible
+price_confidence
+market_cap_status
+valuation_status
+source
+as_of
+data_status
+```
+
+The unique key is `ticker | quarter`, and rows are sorted by that key.
+`evaluation_date` is the market-cap `measurement_date`; `ttm_quarters` lists
+the four consecutive available flow quarters, while `stock_quarter` is the
+single latest quarter used for balance-sheet stocks.
+
+`market_cap_thousand_vnd` retains the input unit. `market_cap_vnd` is raw VND
+and equals `market_cap_thousand_vnd * 1000` exactly once. `ttm_pbt`,
+`ttm_interest_magnitude`, `ebit_proxy_vas`,
+`ttm_attributable_to_parent_company`, all borrowings, cash,
+`minority_interests`, and `tev` are raw VND. `ebit_tev` and `e_p` are
+dimensionless ratios.
+
+Missing minority interest remains blank and is marked `UNAVAILABLE`; it is
+never filled with zero. The table carries `price_confidence` and
+`market_cap_status` separately and is diagnostic only: it is quasi
+point-in-time, uses restated fundamentals and a survivorship-affected
+universe, and is not a recommendation.
