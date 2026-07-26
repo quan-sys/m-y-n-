@@ -245,8 +245,10 @@ A separate public `KBS` probe for VNM quarterly balance sheet returned an
 empty response with shape `[0, 0]`, 0 periods, and `MISSING_DATA`. It did not
 provide an alternative unique identifier or a longer-history path.
 
-OPEN QUESTION: A supported public method for retrieving more than 4 periods
-has not been confirmed. Account-entitlement behavior also remains unverified.
+The earlier four-period depth limitation was confirmed to be client-side in
+vnstock 4.0.3. Quarterly production fetches now use the provider's
+`_get_financial_report` gateway with `QUARTER_HISTORY_LIMIT=200`; the
+2026-07-24 VNM probe measured 33 quarterly periods for all three statements.
 
 ## Financial Cache Layout
 
@@ -490,3 +492,48 @@ The ≥ 90% full-universe coverage check and first real full-universe dated
 snapshot have not been completed. Sprint 3 must not be declared complete until
 those checks pass and the duplicate-ID issue is resolved or explicitly
 re-specified by the owner.
+
+## Sprint 9-2B quarterly quasi point-in-time fundamentals
+
+`data/fundamentals/quarterly_pit/<RUN_DATE>/quarterly_items_point_in_time.csv.gz`
+contains one row for each provider-returned `(ticker, quarter, item_id)` among
+the eight raw downstream items specified by Sprint 9-2B. Absent items produce
+no row and are never filled with zero.
+
+The exact column order is:
+
+```text
+ticker
+quarter
+period_end
+available_from
+statement_type
+item_id
+value
+currency
+source
+as_of
+data_status
+```
+
+The unique key is:
+
+```text
+ticker | quarter | item_id
+```
+
+Rows are sorted by `ticker`, then ascending `quarter`, then `item_id`.
+Statement values and `value` are raw VND and are never rescaled.
+`available_from = period_end + LAG_QUARTER`, where `LAG_QUARTER` is imported
+from `src.data.finance_client`; the provider supplies no publication date.
+
+The table is quasi point-in-time, not true historical point-in-time evidence:
+the availability date is modelled conservatively, but historical values are
+today's as-restated values. It is valid only for relative walk-forward
+comparison and does not repair restatement, survivorship, or historical
+universe bias.
+
+The resumable per-ticker normalized cache is stored under
+`data/fundamentals/run_state/<RUN_DATE>/normalized/<TICKER>/<statement>.parquet`.
+Git ignores the entire `data/fundamentals/run_state/` tree; only the dated
+gzip output is committed.

@@ -11,6 +11,7 @@ venv/
 data/fundamentals/**/*.parquet
 data/fundamentals/**/*.csv
 data/fundamentals/**/*.json
+data/fundamentals/run_state/
 smoke_output/
 src/data/cache/**/*.parquet
 src/data/cache/**/*.csv

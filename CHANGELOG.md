@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-26
+
+- Build the 243-ticker Sprint 9-2B quarterly quasi point-in-time table for the eight raw downstream financial-statement items, with resumable per-ticker cache, deterministic gzip output, calendar-year coverage, gap diagnostics, and no derived valuation figures.
+
 ## 2026-07-25
 
 - Route quarterly financial statements through the provider's extended-history gateway to avoid the vnstock 4.0.3 client-side four-period truncation.
