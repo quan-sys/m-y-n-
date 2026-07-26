@@ -2,6 +2,7 @@
 
 ## 2026-07-26
 
+- Build the Sprint 9-3 historical valuation diagnostic table from the two committed point-in-time inputs, with an auditable thousand-VND-to-VND bridge, availability-safe TTM windows, EBIT_PROXY_VAS, TEV, E/P, quality flags, and no ranking or backtest.
 - Build the 243-ticker Sprint 9-2B quarterly quasi point-in-time table for the eight raw downstream financial-statement items, with resumable per-ticker cache, deterministic gzip output, calendar-year coverage, gap diagnostics, and no derived valuation figures.
 
 ## 2026-07-25
