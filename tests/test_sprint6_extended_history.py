@@ -16,12 +16,13 @@ from scripts.audit_sprint6_readiness import (
 )
 from src.data.finance_client import (
     ANNUAL_HISTORY_LIMIT,
+    QUARTER_HISTORY_LIMIT,
     FinanceClient,
     STATEMENT_BALANCE_SHEET,
 )
 
 
-def test_annual_fetch_uses_extended_limit_and_quarterly_path_is_unchanged(monkeypatch, tmp_path):
+def test_annual_and_quarterly_fetch_both_use_extended_limit_gateway(monkeypatch, tmp_path):
     calls: list[tuple[str, dict]] = []
 
     class Provider:
@@ -62,8 +63,18 @@ def test_annual_fetch_uses_extended_limit_and_quarterly_path_is_unchanged(monkey
             "limit": ANNUAL_HISTORY_LIMIT,
         },
     )
-    assert calls[1][0] == "public_balance_sheet"
-    assert "limit" not in calls[1][1]
+    assert calls[1] == (
+        "balance_sheet",
+        {
+            "period": "quarter",
+            "lang": "en",
+            "get_all": True,
+            "dropna": False,
+            "show_log": False,
+            "limit": QUARTER_HISTORY_LIMIT,
+        },
+    )
+    assert not any(name == "public_balance_sheet" for name, _ in calls)
 
 
 def test_fourth_criterion7_branch_scores_zero_and_records_no_missing_label():
