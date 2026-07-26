@@ -593,3 +593,48 @@ never filled with zero. The table carries `price_confidence` and
 `market_cap_status` separately and is diagnostic only: it is quasi
 point-in-time, uses restated fundamentals and a survivorship-affected
 universe, and is not a recommendation.
+
+## Sprint 9-4A value-only candidate rankings
+
+`data/screener/candidates_pit/<RUN_DATE>/value_candidates_point_in_time.csv.gz`
+contains the complete eligible ranking for each evaluation date, metric, and
+data-quality population produced from the committed Sprint 9-3 historical
+valuation table.
+
+The exact column order is:
+
+```text
+evaluation_date
+quarter
+ticker
+metric
+population_id
+metric_value
+rank_in_population
+population_size
+percentile
+in_cheap_set
+price_confidence
+market_cap_status
+basket_label
+source
+as_of
+data_status
+```
+
+The unique key is `evaluation_date | metric | population_id | ticker`.
+`metric` is `ebit_tev` or `e_p`; both are dimensionless yields for which a
+higher value is cheaper. `rank_in_population` is therefore ascending from
+rank 1 at the highest yield. `percentile` is dimensionless on `[0, 1]`, uses
+average rank for ties, and places the cheapest end at 1.
+
+`population_id` is `ALL`, `ALL_EX_UPPER_BOUND`, `PRICE_OK`, or
+`PRICE_OK_EX_UPPER_BOUND`. `in_cheap_set` is derived from
+`VALUE_CHEAPEST_PCT` in `config/screener.yaml`; the full eligible ranking is
+retained regardless of that flag. `price_confidence` and `market_cap_status`
+remain separate input quality fields.
+
+Every row carries the label `VALUE-ONLY BASKET — no fraud, distress or
+quality gate has been applied; this is NOT the final screener basket.` No
+portfolio, return, trading-cost, cleaning, quality, distress, or momentum
+result is represented by this table.
