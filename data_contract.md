@@ -721,6 +721,7 @@ distress_accumulated_loss
 distress_negative_equity
 distress_high_risk
 distress_status
+distress_confidence
 fscore_total
 fscore_scored_count
 fscore_status
@@ -743,6 +744,7 @@ data_status
 | `annual_n`, `annual_n_minus_1`, `annual_n_minus_2` | Fiscal-year integer; blank when unavailable. |
 | `sta`, `snoa`, `dsri`, `gmi`, `aqi`, `sgi`, `depi`, `sgai`, `lvgi`, `tata` | Dimensionless ratios or indices returned by the imported formula functions; blank when unscored. |
 | `sta_status`, `snoa_status`, `m_score_status`, `distress_status`, `fscore_status`, `franchise_status` | Status/reason text; no numerical unit. |
+| `distress_confidence` | `FULL` when the supplied HoSE warning is a boolean; `NO_WARNING_DATA` when the supplied warning is `None`. |
 | `sta_percentile`, `snoa_percentile`, `m_score_percentile` | Dimensionless tied rank percentile on `[0, 1]`, computed only within `evaluation_date`; blank when the raw gate is unavailable. |
 | `high_accrual_flag`, `m_score_flag`, `distress_accumulated_loss`, `distress_negative_equity`, `distress_high_risk`, `tev_collapse_flag` | Boolean flag; blank only where the underlying signal is insufficient. |
 | `m_score` | Dimensionless Beneish score returned by the imported function; blank when unscored. |

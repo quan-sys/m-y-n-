@@ -276,6 +276,43 @@ def test_missing_warning_list_stays_unavailable() -> None:
     assert result.invalid_inputs == ("hose_warning",)
 
 
+def test_distress_relaxes_missing_warning_when_financial_signals_are_clear() -> None:
+    result = calculate_simple_distress(1, 100, None, require_hose_warning=False)
+    assert result.high_risk is False
+    assert result.reason is None
+    assert result.invalid_inputs == ()
+
+
+def test_distress_relaxation_keeps_accumulated_loss_as_conviction() -> None:
+    result = calculate_simple_distress(-1, 100, None, require_hose_warning=False)
+    assert result.high_risk is True
+    assert result.reason is None
+
+
+def test_distress_relaxation_keeps_warning_as_conviction() -> None:
+    result = calculate_simple_distress(1, 100, True, require_hose_warning=False)
+    assert result.high_risk is True
+
+
+def test_distress_relaxation_still_requires_both_financial_inputs() -> None:
+    result = calculate_simple_distress(1, None, None, require_hose_warning=False)
+    assert result.reason == "INSUFFICIENT_DATA_FOR_DISTRESS"
+    assert result.invalid_inputs == ("owners_equity_n",)
+
+
+def test_distress_relaxation_keeps_malformed_warning_invalid() -> None:
+    result = calculate_simple_distress(1, 100, "YES", require_hose_warning=False)
+    assert result.reason == "INSUFFICIENT_DATA_FOR_DISTRESS"
+    assert result.invalid_inputs == ("hose_warning",)
+
+
+def test_distress_default_requirement_remains_three_signal() -> None:
+    result = calculate_simple_distress(1, 100, None)
+    assert result.high_risk is None
+    assert result.reason == "INSUFFICIENT_DATA_FOR_DISTRESS"
+    assert result.invalid_inputs == ("hose_warning",)
+
+
 @pytest.mark.parametrize(
     ("function", "kwargs", "reason", "invalid_name"),
     [

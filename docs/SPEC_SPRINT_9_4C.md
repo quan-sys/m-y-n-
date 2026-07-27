@@ -67,3 +67,16 @@ The flag NEVER removes a row and NEVER changes any existing metric.
 9-4C-9 OUT OF SCOPE. No portfolio, no weights, no holdings, no returns, no trading costs, no
 rebalance simulation, no momentum, no composite score combining value with quality, no change to any
 Sprint 9-4a ranking. Those belong to Sprint 9-5.
+
+9-4C-10 DISTRESS SCORES FROM TWO FINANCIAL-STATEMENT SIGNALS. The distress gate is scored from
+accumulated loss and negative equity alone. The HoSE warning list remains a recognised third
+signal that can convict a ticker whenever its value is supplied, but its absence no longer
+blocks a verdict. Reason: the warning list is a manual input, `manual_inputs/` has never held
+data, and no reconstruction exists for the 2019-2025 history, so requiring it left the gate
+permanently unscored. Every row scored without warning data carries
+`distress_confidence = NO_WARNING_DATA` and must be read as a weaker acquittal than a row
+carrying `FULL`: a company already on the HoSE warning list for a reason not visible in
+retained earnings or equity will be acquitted by this gate. This is a change to the gate
+DEFINITION, approved by the repository owner on 2026-07-27, and it is confined to the
+point-in-time path; the Step 1 production pipeline keeps the three-signal requirement through
+the `require_hose_warning=True` default.

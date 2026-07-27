@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pandas as pd
+import pytest
 
 import scripts.build_sprint9_4c_gates_as_of as builder
 
@@ -225,3 +226,57 @@ def test_calculate_step1_gates_calls_the_imported_formula_symbol(monkeypatch):
 
     assert len(calls) == 1
     assert results["STA"].value is not None
+
+
+def test_build_rows_emits_no_warning_data_confidence(monkeypatch):
+    config = builder.load_config()
+    evaluation_date = "2025-12-31"
+    valuation = pd.DataFrame(
+        [
+            {
+                "ticker": "AAA",
+                "evaluation_date": evaluation_date,
+                "tev": "1",
+                "market_cap_vnd": "1",
+            }
+        ]
+    )
+    monkeypatch.setattr(
+        builder,
+        "evaluation_grid",
+        lambda: [(evaluation_date, builder.WALK_FORWARD_ROLE)],
+    )
+
+    output, _ = builder.build_rows(
+        formula_input_rows(), valuation, config, run_date="fixture-run"
+    )
+
+    assert output.columns.get_loc("distress_confidence") == (
+        output.columns.get_loc("distress_status") + 1
+    )
+    assert output.loc[0, "distress_confidence"] == "NO_WARNING_DATA"
+    assert output.loc[0, "distress_status"] == "SCORED"
+
+
+def test_load_config_parses_distress_warning_requirement_case_insensitively(tmp_path):
+    config_path = tmp_path / "screener.yaml"
+    config_text = builder.CONFIG_PATH.read_text(encoding="utf-8")
+    config_path.write_text(
+        config_text.replace(
+            "DISTRESS_REQUIRE_HOSE_WARNING: false",
+            "DISTRESS_REQUIRE_HOSE_WARNING: TRUE",
+        ),
+        encoding="utf-8",
+    )
+
+    assert builder.load_config(config_path).distress_require_hose_warning is True
+
+    config_path.write_text(
+        config_text.replace(
+            "DISTRESS_REQUIRE_HOSE_WARNING: false",
+            "DISTRESS_REQUIRE_HOSE_WARNING: unknown",
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="DISTRESS_REQUIRE_HOSE_WARNING"):
+        builder.load_config(config_path)

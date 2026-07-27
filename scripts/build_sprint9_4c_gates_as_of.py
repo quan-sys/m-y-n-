@@ -6,6 +6,7 @@ from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal, InvalidOperation
+from functools import partial
 import gzip
 import hashlib
 import io
@@ -133,6 +134,7 @@ OUTPUT_COLUMNS = (
     "distress_negative_equity",
     "distress_high_risk",
     "distress_status",
+    "distress_confidence",
     "fscore_total",
     "fscore_scored_count",
     "fscore_status",
@@ -179,6 +181,7 @@ class GateConfig:
     accrual_worst_pct: Decimal
     mscore_threshold: Decimal
     tev_min_fraction_of_market_cap: Decimal
+    distress_require_hose_warning: bool = True
 
 
 @dataclass(frozen=True)
@@ -209,16 +212,21 @@ def load_config(path: Path = CONFIG_PATH) -> GateConfig:
         "ACCRUAL_WORST_PCT",
         "MSCORE_THRESHOLD",
         "TEV_MIN_FRACTION_OF_MARKET_CAP",
+        "DISTRESS_REQUIRE_HOSE_WARNING",
     )
     missing = [name for name in names if name not in values]
     if missing:
         raise ValueError("config missing values: " + ", ".join(missing))
+    raw_distress_warning_requirement = values["DISTRESS_REQUIRE_HOSE_WARNING"].casefold()
+    if raw_distress_warning_requirement not in {"true", "false"}:
+        raise ValueError("DISTRESS_REQUIRE_HOSE_WARNING must be true or false")
     config = GateConfig(
         accrual_worst_pct=Decimal(values["ACCRUAL_WORST_PCT"]),
         mscore_threshold=Decimal(values["MSCORE_THRESHOLD"]),
         tev_min_fraction_of_market_cap=Decimal(
             values["TEV_MIN_FRACTION_OF_MARKET_CAP"]
         ),
+        distress_require_hose_warning=raw_distress_warning_requirement == "true",
     )
     if not Decimal("0") < config.accrual_worst_pct <= Decimal("1"):
         raise ValueError("ACCRUAL_WORST_PCT must be in (0, 1]")
@@ -460,8 +468,14 @@ def _result_status(result: Any, selection_reason: str = "") -> str:
 
 
 def calculate_step1_gates(
-    rows: pd.DataFrame, selection: AnnualSelection
+    rows: pd.DataFrame,
+    selection: AnnualSelection,
+    *,
+    config: GateConfig | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+    require_hose_warning = (
+        True if config is None else config.distress_require_hose_warning
+    )
     inputs = _formula_inputs(rows, selection)
     result = {
         "STA": calculate_sta(**inputs["STA"]),
@@ -481,7 +495,10 @@ def calculate_step1_gates(
             for name in M_SCORE_INPUTS
         }
     )
-    result["DISTRESS"] = calculate_simple_distress(**inputs["DISTRESS"])
+    result["DISTRESS"] = calculate_simple_distress(
+        **inputs["DISTRESS"],
+        require_hose_warning=require_hose_warning,
+    )
     return result, inputs
 
 
@@ -606,6 +623,8 @@ def _rows_for_years(rows: pd.DataFrame, *years: int | None) -> pd.DataFrame:
 
 def _calculate_selection(
     selection: AnnualSelection,
+    *,
+    config: GateConfig,
 ) -> tuple[Any, Any, Any, str, int, float | None, float | None, str]:
     pair_rows = _rows_for_years(
         selection.eligible_rows,
@@ -618,7 +637,7 @@ def _calculate_selection(
         selection.annual_n_minus_1,
         selection.annual_n_minus_2,
     )
-    step1, inputs = calculate_step1_gates(pair_rows, selection)
+    step1, inputs = calculate_step1_gates(pair_rows, selection, config=config)
     fscore, _, fscore_status = calculate_fscore(triple_rows, selection)
     franchise = calculate_franchise(selection.eligible_rows)
     return step1, inputs, fscore, fscore_status, *franchise
@@ -651,11 +670,12 @@ def build_rows(
                 _selection_cache_key(ticker, selection), selection
             )
     worker_count = min(os.cpu_count() or 1, len(state_selections))
+    calculate_selection = partial(_calculate_selection, config=config)
     if worker_count > 1:
         with ProcessPoolExecutor(max_workers=worker_count) as executor:
-            state_results = list(executor.map(_calculate_selection, state_selections.values()))
+            state_results = list(executor.map(calculate_selection, state_selections.values()))
     else:
-        state_results = [_calculate_selection(selection) for selection in state_selections.values()]
+        state_results = [calculate_selection(selection) for selection in state_selections.values()]
     calculation_cache = dict(zip(state_selections, state_results))
     for evaluation_date, grid_role in evaluation_grid():
         for ticker in tickers:
@@ -709,6 +729,11 @@ def build_rows(
                 "distress_high_risk": distress.high_risk,
                 "distress_status": (
                     "SCORED" if distress.is_sufficient else "UNSCORED_" + str(distress.reason)
+                ),
+                "distress_confidence": (
+                    "FULL"
+                    if isinstance(inputs["DISTRESS"]["hose_warning"], bool)
+                    else "NO_WARNING_DATA"
                 ),
                 "fscore_total": None if fscore is None else fscore["F_SCORE_POINTS"],
                 "fscore_scored_count": None if fscore is None else fscore["F_SCORE_CRITERIA_SCORED"],
@@ -814,7 +839,10 @@ def validate_config_diff() -> None:
         for key in set(base_values) & set(current_values)
         if base_values[key] != current_values[key]
     }
-    if extra != {"TEV_MIN_FRACTION_OF_MARKET_CAP"} or missing or changed:
+    if extra != {
+        "DISTRESS_REQUIRE_HOSE_WARNING",
+        "TEV_MIN_FRACTION_OF_MARKET_CAP",
+    } or missing or changed:
         raise RuntimeError("STOP: config differs beyond permitted key")
 
 
@@ -1105,7 +1133,7 @@ def _committed_vnm_values() -> tuple[dict[str, Any], dict[str, Any]]:
     return record, inputs
 
 
-def _vnm_rendered_calculations(annual: pd.DataFrame) -> str:
+def _vnm_rendered_calculations(annual: pd.DataFrame, config: GateConfig) -> str:
     rows = annual.loc[annual["ticker"].eq("VNM")].copy()
     selection = select_as_of_annuals(rows, RECONCILIATION_DATE)
     if selection.annual_n is None or selection.annual_n_minus_1 is None:
@@ -1115,7 +1143,7 @@ def _vnm_rendered_calculations(annual: pd.DataFrame) -> str:
         selection.annual_n,
         selection.annual_n_minus_1,
     )
-    results, inputs = calculate_step1_gates(pair_rows, selection)
+    results, inputs = calculate_step1_gates(pair_rows, selection, config=config)
     evidence_rows = pair_rows.copy()
     evidence_rows["report_period"] = evidence_rows["fiscal_year"].astype(str)
     prepared = PreparedTicker(
@@ -1169,11 +1197,43 @@ def _vnm_worked_rows(
     return rows
 
 
+def _distress_relaxation_rows(
+    before: pd.DataFrame, after: pd.DataFrame
+) -> list[list[Any]]:
+    key_columns = ["evaluation_date", "ticker"]
+    before_keyed = before.set_index(key_columns).sort_index()
+    after_keyed = after.set_index(key_columns).sort_index()
+    if before_keyed.index.has_duplicates or after_keyed.index.has_duplicates:
+        raise ValueError("distress comparison requires unique evaluation_date and ticker")
+    if not before_keyed.index.equals(after_keyed.index):
+        raise ValueError("distress comparison keys changed during rebuild")
+    before_high_risk = before_keyed["distress_high_risk"].astype(str).eq("True")
+    after_high_risk = after_keyed["distress_high_risk"].astype(str).eq("True")
+    lost = before_high_risk & ~after_high_risk
+    if lost.any():
+        locations = [
+            f"{evaluation_date}/{ticker}"
+            for evaluation_date, ticker in lost.loc[lost].index.tolist()
+        ]
+        raise RuntimeError(
+            "STOP: old distress high risk became false or blank: "
+            + ", ".join(locations)
+        )
+    return [
+        [
+            int(before_high_risk.sum()),
+            int(after_high_risk.sum()),
+            int((before_high_risk & after_high_risk).sum()),
+        ]
+    ]
+
+
 def write_report(
     *,
     run_date: str,
     output_path: Path,
     output: pd.DataFrame,
+    previous_output: pd.DataFrame,
     sha256: str,
     reconciliation: dict[str, dict[str, Any]],
     formula_inputs: dict[tuple[str, str], dict[str, dict[str, Any]]],
@@ -1196,6 +1256,7 @@ def write_report(
     tev_counts, tev_flagged = _tev_rows(output)
     all_six_year_rows = _all_six_year_rows(output)
     all_six_date_rows = _all_six_rows(output)
+    distress_relaxation_rows = _distress_relaxation_rows(previous_output, output)
     all_six_shortfall = all(row[1] < 20 for row in all_six_year_rows)
     mismatch_tickers = sorted(
         {
@@ -1212,7 +1273,7 @@ def write_report(
         if mismatch_tickers == ["TCD"]
         else "No additional reconciliation explanation is inferred beyond the full mismatch tables."
     )
-    vnm_calculations = _vnm_rendered_calculations(annual)
+    vnm_calculations = _vnm_rendered_calculations(annual, config)
     lines = [
         "# Sprint 9-4C Gates As-Of",
         "",
@@ -1313,6 +1374,22 @@ def write_report(
             f"- STOP-gate violations: `{json.dumps(stop_results, sort_keys=True)}`.",
             f"- Within-date percentile population proof at `{population_date}`: STA=`{int(pd.to_numeric(population['sta'], errors='coerce').notna().sum())}`, SNOA=`{int(pd.to_numeric(population['snoa'], errors='coerce').notna().sum())}`, M_SCORE=`{int(pd.to_numeric(population['m_score'], errors='coerce').notna().sum())}`.",
             "",
+            "## G10. Distress gate relaxation",
+            "",
+            "### T2. Preserved high-risk rows",
+            "",
+            _markdown_table(
+                ["old distress_high_risk=True", "new distress_high_risk=True", "old AND new True"],
+                distress_relaxation_rows,
+            ),
+            "",
+            "### T7. Tickers passing all six gates at each WALK_FORWARD date",
+            "",
+            _markdown_table(
+                ["calendar_year", "evaluation_date", "tickers passing all six"],
+                all_six_date_rows,
+            ),
+            "",
         ]
     )
     REPORT_PATH.write_text("\n".join(lines), encoding="utf-8")
@@ -1331,16 +1408,23 @@ def main(argv: list[str] | None = None) -> int:
     config = load_config()
     validate_config_diff()
     annual, valuation = load_inputs()
+    output_path = OUTPUT_ROOT / run_date / "gate_values_point_in_time.csv.gz"
+    if not output_path.exists():
+        raise FileNotFoundError(
+            "previous Sprint 9-4C artifact is required for distress comparison: "
+            + str(output_path)
+        )
+    previous_output = _read_csv(output_path)
     output, formula_inputs = build_rows(annual, valuation, config, run_date=run_date)
     stop_results = validate_stop_gates(output, annual)
     reconciliation = reconciliation_tables(output)
     validate_reconciliation(reconciliation)
-    output_path = OUTPUT_ROOT / run_date / "gate_values_point_in_time.csv.gz"
     sha256 = write_deterministic_gzip_csv(output, output_path)
     write_report(
         run_date=run_date,
         output_path=output_path,
         output=output,
+        previous_output=previous_output,
         sha256=sha256,
         reconciliation=reconciliation,
         formula_inputs=formula_inputs,

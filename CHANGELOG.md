@@ -3,6 +3,7 @@
 ## 2026-07-27
 
 - Build the Sprint 9-4C as-of gate table for the 243-ticker annual PIT universe across the 28 walk-forward dates plus one reconciliation-only date, importing the existing accrual, Beneish, distress, F-Score, and Franchise functions; retain UNSCORED and TEV-collapse-flagged rows, add only the TEV-collapse configuration key, reconcile against the committed single-date outputs, and add no portfolio, ranking, return, or backtest.
+- On owner approval dated 2026-07-27, add `DISTRESS_REQUIRE_HOSE_WARNING` so the Sprint 9-4C point-in-time distress gate can score from accumulated loss and negative equity when historical HoSE warning data is absent, while the Step 1 production default remains three-signal.
 
 ## 2026-07-26
 
