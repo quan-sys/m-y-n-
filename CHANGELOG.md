@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-27
+
+- Build the Sprint 9-4C as-of gate table for the 243-ticker annual PIT universe across the 28 walk-forward dates plus one reconciliation-only date, importing the existing accrual, Beneish, distress, F-Score, and Franchise functions; retain UNSCORED and TEV-collapse-flagged rows, add only the TEV-collapse configuration key, reconcile against the committed single-date outputs, and add no portfolio, ranking, return, or backtest.
+
 ## 2026-07-26
 
 - Build the Sprint 9-4B annual quasi point-in-time fundamentals table for the 243 screener-relevant tickers from the existing FinanceClient annual extended-history path, with dedicated resumable run-state cache, 32 emitted items (REQUIRED_ITEMS v1 plus `common_shares` for Piotroski F-Score), raw-VND units, and gate-input buildability measurements only.
