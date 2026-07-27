@@ -638,3 +638,43 @@ Every row carries the label `VALUE-ONLY BASKET — no fraud, distress or
 quality gate has been applied; this is NOT the final screener basket.` No
 portfolio, return, trading-cost, cleaning, quality, distress, or momentum
 result is represented by this table.
+
+## Sprint 9-4B annual quasi point-in-time fundamentals
+
+`data/fundamentals/annual_pit/<RUN_DATE>/annual_items_point_in_time.csv.gz`
+contains one row for each provider-returned `(ticker, fiscal_year, item_id)`
+among the 32 emitted items: the existing REQUIRED_ITEMS v1 whitelist plus
+`common_shares` for the Piotroski F-Score input, for the 243
+`SCREENER_RELEVANT` tickers. An absent item produces no row and is never
+filled with zero.
+
+The exact column order is:
+
+```text
+ticker
+fiscal_year
+period_end
+available_from
+statement_type
+item_id
+value
+currency
+source
+as_of
+data_status
+```
+
+The unique key is `ticker | fiscal_year | item_id`. Rows are sorted by
+`ticker`, ascending `fiscal_year`, then `item_id`. `period_end` is 31
+December of `fiscal_year`, and `available_from` is `period_end` plus the
+imported annual reporting lag.
+
+`value` is the provider statement value in raw VND and is never rescaled.
+The table is quasi point-in-time: availability is modelled, but historical
+values are today's as-restated values. It is suitable only for relative
+walk-forward comparison and contains no derived gate, score, ratio, ranking,
+basket, portfolio, or backtest result.
+
+The resumable normalized cache and status records live under
+`data/fundamentals/run_state/<RUN_DATE>/annual/`. That whole run-state tree is
+ignored by Git and is not part of the committed data contract.
