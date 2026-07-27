@@ -643,7 +643,8 @@ result is represented by this table.
 
 `data/fundamentals/annual_pit/<RUN_DATE>/annual_items_point_in_time.csv.gz`
 contains one row for each provider-returned `(ticker, fiscal_year, item_id)`
-among the existing REQUIRED_ITEMS v1 whitelist for the 243
+among the 32 emitted items: the existing REQUIRED_ITEMS v1 whitelist plus
+`common_shares` for the Piotroski F-Score input, for the 243
 `SCREENER_RELEVANT` tickers. An absent item produces no row and is never
 filled with zero.
 

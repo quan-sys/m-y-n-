@@ -1,14 +1,17 @@
 from datetime import date, timedelta
 
 import pandas as pd
+import pytest
 
 from scripts.build_sprint9_4b_annual_pit import (
     OUTPUT_COLUMNS,
     assemble_output,
     derive_annual_dates,
+    emitted_item_ids,
     gate_buildability,
     internal_gap_years,
     select_required_item_rows,
+    validate_gate_items_in_emitted_set,
 )
 from src.data.finance_client import LAG_ANNUAL, NORMALIZED_COLUMNS
 
@@ -129,3 +132,22 @@ def test_output_columns_and_sort_order_are_exact():
         ["AAA", "2023", "current_assets"],
         ["AAA", "2024", "total_assets"],
     ]
+
+
+def test_common_shares_is_in_the_emitted_item_set():
+    assert "common_shares" in emitted_item_ids()
+
+
+def test_gate_item_guard_raises_when_an_emitted_item_is_missing():
+    definitions = {
+        "FIXTURE_GATE": {
+            "roles": {"not_emitted": {0}},
+            "source": "fixture",
+            "history": "N only",
+        }
+    }
+
+    with pytest.raises(RuntimeError, match="emitted item set omits gate inputs"):
+        validate_gate_items_in_emitted_set(
+            definitions, emitted_items=("current_assets",)
+        )

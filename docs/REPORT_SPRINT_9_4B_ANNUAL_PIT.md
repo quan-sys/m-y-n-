@@ -21,6 +21,7 @@
 
 ## A2 — REQUIRED_ITEMS v1 presence
 
+- Emitted set: REQUIRED_ITEMS v1 plus `common_shares`.
 - Source: `scripts/verify_required_items_v1_sample_sprint3.py:40-78`.
 
 ```python
@@ -315,6 +316,14 @@ REQUIRED_ITEMS = {
 | proceeds_from_issue_of_shares | 2023 | 241 | 243 | 99.176955% |
 | proceeds_from_issue_of_shares | 2024 | 243 | 243 | 100.000000% |
 | proceeds_from_issue_of_shares | 2025 | 242 | 243 | 99.588477% |
+| common_shares | 2018 | 229 | 231 | 99.134199% |
+| common_shares | 2019 | 229 | 230 | 99.565217% |
+| common_shares | 2020 | 233 | 233 | 100.000000% |
+| common_shares | 2021 | 238 | 238 | 100.000000% |
+| common_shares | 2022 | 243 | 243 | 100.000000% |
+| common_shares | 2023 | 243 | 243 | 100.000000% |
+| common_shares | 2024 | 243 | 243 | 100.000000% |
+| common_shares | 2025 | 243 | 243 | 100.000000% |
 
 - Items below 90 percent in at least one year: NONE
 
@@ -385,6 +394,7 @@ REQUIRED_ITEMS = {
 | FRANCHISE_POWER | 2025 | 233 | 243 | 95.884774% | 233 |
 
 This section measures input presence only; it computes no gate value, score or ratio.
+Buildability is measured on the full provider response; the emitted table is verified to contain every item named by every gate.
 
 ## A4 — Earliest gated rebalance date
 
@@ -457,10 +467,11 @@ Adding all gates costs `20` rebalance periods versus the Sprint 9-4A start.
 | depreciation_and_amortization | 1626632382351 | 2116245292358 |
 | net_cash_inflows_outflows_from_operating_activities | 8140239032649 | 8668137048520 |
 | proceeds_from_issue_of_shares | 0 | 7200000000 |
+| common_shares | 17416877930000 | 20899554450000 |
 
 ## A9 — Output identity
 
 - RUN_DATE: `2026-07-26`.
 - Output path: `data/fundamentals/annual_pit/2026-07-26/annual_items_point_in_time.csv.gz`.
-- Row count: `58954`.
-- SHA-256: `2c780f3a3f11e9f6a8e5123b1a351784e3b3e5d63fefe20eb303bf911ae90501`.
+- Row count: `60856`.
+- SHA-256: `f5e59f3d3de66419e4f36bff75d09ced24b2be060a10415603eb9f942aed38ad`.

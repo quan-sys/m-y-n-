@@ -17,9 +17,13 @@ here. Do NOT use the `ratio` endpoint. Do NOT call vnstock directly.
 `src.data.finance_client`. Do NOT hard-type 90. `period_end` is 31 December of the fiscal year. The
 provider exposes no publication date.
 
-9-4B-5 ITEMS. Exactly the REQUIRED_ITEMS v1 whitelist already defined in
-`scripts/verify_required_items_v1_sample_sprint3.py`. Read that list FROM THE FILE and reproduce it
-verbatim in the report; do NOT retype it from memory and do NOT add or remove an item.
+9-4B-5 ITEMS. The emitted item set is the REQUIRED_ITEMS v1 whitelist defined in
+`scripts/verify_required_items_v1_sample_sprint3.py`, PLUS `common_shares`. Read the whitelist FROM
+THE FILE and reproduce it verbatim in the report; do NOT retype it from memory. `common_shares` is
+added because it is a Piotroski F-Score input named explicitly in `scripts/build_sprint6_fscore.py`
+while not being a member of REQUIRED_ITEMS v1; omitting it would make the F-Score gate unbuildable
+from this table even though the provider returns the value. `paid_in_capital` is NOT a substitute
+for it. No other item is added or removed.
 
 9-4B-6 RESTATED LIMITATION (verbatim). "Data fetched today is AS-RESTATED, not as-originally-
 reported. For past years this is an unfixable look-ahead bias that `available_from` does NOT remove:

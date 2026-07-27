@@ -177,6 +177,19 @@ def required_item_ids() -> tuple[str, ...]:
     )
 
 
+def emitted_item_ids() -> tuple[str, ...]:
+    return (*required_item_ids(), "common_shares")
+
+
+def emitted_item_ids_by_statement() -> dict[str, tuple[str, ...]]:
+    items = {
+        statement_type: tuple(item_ids)
+        for statement_type, item_ids in REQUIRED_ITEMS.items()
+    }
+    items["BALANCE_SHEET"] = (*items["BALANCE_SHEET"], "common_shares")
+    return items
+
+
 def relevant_tickers() -> list[str]:
     universe = classify_universe(pd.read_csv(UNIVERSE_PATH))
     tickers = sorted(
@@ -343,6 +356,7 @@ def select_required_item_rows(
     statement_frames: dict[str, pd.DataFrame],
 ) -> pd.DataFrame:
     selected: list[pd.DataFrame] = []
+    item_ids_by_statement = emitted_item_ids_by_statement()
     for statement_name, method in STATEMENT_METHODS.items():
         frame = statement_frames.get(statement_name, pd.DataFrame())
         if frame.empty:
@@ -353,7 +367,7 @@ def select_required_item_rows(
                 f"{statement_name} normalized cache missing columns: {missing}"
             )
         statement_type = method.__name__.removeprefix("get_").upper()
-        required = REQUIRED_ITEMS.get(statement_type, ())
+        required = item_ids_by_statement.get(statement_type, ())
         rows = frame.loc[
             frame["period_type"].astype(str).eq("ANNUAL")
             & frame["item_id"].astype(str).isin(required)
@@ -573,6 +587,31 @@ def gate_definitions() -> dict[str, dict[str, Any]]:
     }
 
 
+def validate_gate_items_in_emitted_set(
+    definitions: dict[str, dict[str, Any]],
+    *,
+    emitted_items: Iterable[str] | None = None,
+) -> list[str]:
+    if emitted_items is None:
+        emitted_items = emitted_item_ids()
+    emitted = {str(item_id) for item_id in emitted_items}
+    missing_by_gate = {
+        gate: sorted(set(definition["roles"]) - emitted)
+        for gate, definition in definitions.items()
+    }
+    missing_by_gate = {
+        gate: missing
+        for gate, missing in missing_by_gate.items()
+        if missing
+    }
+    if missing_by_gate:
+        raise RuntimeError(
+            "STOP: emitted item set omits gate inputs: "
+            + json.dumps(missing_by_gate, sort_keys=True)
+        )
+    return list(definitions)
+
+
 def _presence_index(rows: pd.DataFrame) -> set[tuple[str, int, str]]:
     usable = rows.loc[pd.to_numeric(rows["value"], errors="coerce").notna()]
     return {
@@ -720,7 +759,7 @@ def _required_presence_rows(
     )
     rows: list[list[Any]] = []
     below: set[str] = set()
-    for item_id in required_item_ids():
+    for item_id in emitted_item_ids():
         item = output.loc[
             output["item_id"].eq(item_id)
             & pd.to_numeric(output["value"], errors="coerce").notna()
@@ -846,7 +885,7 @@ def _vnm_rows(output: pd.DataFrame) -> tuple[list[str], list[list[str]]]:
     selected = [years[0], years[-1]]
     pivot = vnm.pivot(index="item_id", columns="fiscal_year", values="value")
     rows = []
-    for item_id in required_item_ids():
+    for item_id in emitted_item_ids():
         rows.append(
             [
                 item_id,
@@ -936,6 +975,7 @@ def write_report(
         "",
         "## A2 — REQUIRED_ITEMS v1 presence",
         "",
+        "- Emitted set: REQUIRED_ITEMS v1 plus `common_shares`.",
         f"- Source: `scripts/verify_required_items_v1_sample_sprint3.py:{required_start}-{required_end}`.",
         "",
         "```python",
@@ -984,6 +1024,7 @@ def write_report(
         ),
         "",
         "This section measures input presence only; it computes no gate value, score or ratio.",
+        "Buildability is measured on the full provider response; the emitted table is verified to contain every item named by every gate.",
         "",
         "## A4 — Earliest gated rebalance date",
         "",
@@ -1076,10 +1117,16 @@ def main(argv: list[str] | None = None) -> int:
     if not args.assemble_only:
         fetch_all(tickers, paths)
     frames, statuses = load_run_state(tickers, paths)
+    definitions = gate_definitions()
+    checked_gates = validate_gate_items_in_emitted_set(definitions)
+    for gate in checked_gates:
+        print(f"GATE_ITEM_SET={gate}: PASS", flush=True)
     output = assemble_output(tickers, frames)
     validate_stop_gates(output, tickers, statuses)
     all_rows = _all_normalized_rows(frames)
-    buildability, definitions = gate_buildability(all_rows, tickers)
+    buildability, definitions = gate_buildability(
+        all_rows, tickers, definitions=definitions
+    )
     sha256 = write_deterministic_gzip_csv(output, paths["output"])
     write_report(
         run_date=run_date,
