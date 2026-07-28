@@ -917,6 +917,87 @@ backward fill, benchmark, synthetic index, new factor, or investment
 recommendation is present. Historical figures inherit survivorship, restatement,
 and estimated-trading-friction biases and are not expected returns.
 
+## Benchmark comparison diagnostics
+
+`data/backtest/walk_forward/<RUN_DATE>/benchmark_comparison.csv.gz` is a
+diagnostic-only, one-row-per-period comparison of each in-window
+walk-forward configuration with the committed VNINDEX daily series.  Its
+unique key is `config_id | evaluation_date`; rows are ordered by `config_id`
+and current `evaluation_date`.  The exact column order is:
+
+```text
+config_id
+previous_evaluation_date
+evaluation_date
+previous_execution_date
+execution_date
+previous_portfolio_value
+portfolio_value
+portfolio_return
+previous_benchmark_index_level
+benchmark_index_level
+benchmark_return
+diagnostic_label
+previous_nominal_date_resolved
+nominal_date_resolved
+previous_diagnostic_index_level
+diagnostic_index_level
+benchmark_return_diag
+excess_return
+excess_return_diag
+source
+as_of
+data_status
+```
+
+The primary `benchmark_return` and `excess_return` use consecutive observed
+`execution_date` values, which are configuration-specific execution sessions.
+Both corresponding VNINDEX sessions must exist exactly; a missing execution
+session stops the build without filling, interpolation, substitution, or a
+provider call.  `portfolio_value` is the engine's total NAV, including cash,
+not a holdings-only value.  `portfolio_return`, `benchmark_return`, and
+`excess_return` are decimal returns, not percentage strings.
+
+The nominal-date fields and `benchmark_return_diag` resolve each
+`evaluation_date` to the final observed VNINDEX session on or before that
+nominal date.  Every row has
+`diagnostic_label = DIAGNOSTIC_ONLY_NOT_FOR_CONCLUSIONS`; this secondary series
+is a data-alignment diagnostic only and cannot support a conclusion, ranking,
+configuration selection, recommendation, or replacement of the primary
+execution-date comparison.
+
+`data/backtest/walk_forward/<RUN_DATE>/benchmark_comparison_summary.csv` has
+one row per `config_id`, ordered by `config_id`, with this exact column order:
+
+```text
+config_id
+period_count
+cumulative_portfolio_growth
+cumulative_benchmark_growth
+cumulative_excess
+cumulative_benchmark_growth_diag
+cumulative_excess_diag
+diagnostic_label
+source
+as_of
+data_status
+```
+
+Each cumulative growth is a separately chained geometric return.  The primary
+`cumulative_excess` is `(1 + cumulative_portfolio_growth) / (1 +
+cumulative_benchmark_growth) - 1`; period `excess_return` values are never
+summed.  The diagnostic cumulative fields obey the same geometric rule and
+retain the same mandatory diagnostic label.  `source` identifies both
+committed input artifacts, `as_of` is the comparison run date, and
+`data_status = OK` means the required observed inputs were present and the
+calculation completed.
+
+VNINDEX levels are `INDEX_POINTS`, have no currency, are never multiplied by
+1,000, and are never compared directly with VND.  This comparison uses returns
+only.  VNINDEX is a price index that excludes dividends, while the portfolio
+price history is `ADJUSTED_OBSERVED`; the resulting systematic dividend and
+historical survivorship/restatement biases are reported rather than repaired.
+
 ## Forward-test measurements
 
 `data/forward_test/measurements/<measurement_date>/` records a measurement of
