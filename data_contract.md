@@ -819,3 +819,78 @@ emitted rows are `data_status = OK`, while `source` records the committed input
 artifacts and volume-session eligibility path. The table is quasi
 point-in-time and inherits the committed inputs' restatement and survivorship
 caveats. It contains no price, return, portfolio value, or performance result.
+
+## Sprint 9-5B walk-forward diagnostics
+
+`data/backtest/walk_forward/<RUN_DATE>/` contains four diagnostic-only
+artifacts produced from the committed Sprint 9-5A target table and the local
+daily close history. It never reselects, reranks, refilters, or reweights a
+target basket. The point-in-time `evaluation_date` is retained, while
+`execution_date` is configuration-specific: it is the first market session on
+or after `evaluation_date` at which every ticker carried from that
+configuration's preceding rebalance has a positive-volume, positive-price
+observation. The search stops rather than proceeding if it would advance more
+than eight market sessions. A newly selected ticker does not delay execution;
+if it has no exact traded price, the engine records that in the rebalance and
+trade logs while its intended allocation remains cash.
+
+`value_series.csv.gz` has these columns in order:
+
+```text
+config_id
+evaluation_date
+execution_date
+portfolio_value
+cash
+status
+missing_tickers
+in_window
+```
+
+`rebalance_log.csv.gz` begins with `config_id`, `evaluation_date`, and
+`execution_date`, retains every column emitted by the shared engine rebalance
+log (`date`, `eligible_count`, `selected_count`, `candidate_pool_size`,
+`selection_ratio`, `period_flags`, `excluded_tickers`, `cost_paid`, `status`,
+`portfolio_value_before`, `cash_before`, `portfolio_value_after`, and
+`cash_after`), and ends with `in_window`.
+
+`trade_log.csv.gz` begins with `config_id`, `evaluation_date`, and
+`execution_date`, then retains every shared engine trade-log column:
+`rebalance_date`, `ticker`, `side`, `entry_price`, `gross_value`,
+`cost_paid`, `shares`, `settlement_date`, and `status`.
+
+`metrics_summary.csv` has these columns in order:
+
+```text
+config_id
+scope
+window_start_date
+n_periods
+cagr
+annualised_volatility
+sharpe
+sortino
+max_drawdown
+max_drawdown_magnitude
+periods_per_year
+rf_annual
+diagnostic_only
+sample_flag
+statuses
+```
+
+The unique diagnostic keys are `config_id | evaluation_date` for value and
+rebalance rows and `config_id | evaluation_date | ticker | side` for trade
+rows. `scope` is `ALL_DATES` or `IN_WINDOW`; `in_window` is determined from
+the shared `compute_backtest_window` result using the committed target-table
+candidate-pool series. Every metrics-summary row is diagnostic only. A row
+with fewer than 12 periods carries `SAMPLE_TOO_SMALL_FOR_INFERENCE`.
+
+The shared engine reports `PRICE_UNAVAILABLE` in its rebalance and trade logs
+rather than filling a missing execution-date price. `value_series.status` is a
+valuation-status field: it is `OK` whenever the portfolio value is numeric,
+including when a newly selected unpriced ticker is separately recorded by the
+engine and its allocation remains cash. No interpolation, forward fill,
+backward fill, benchmark, synthetic index, new factor, or investment
+recommendation is present. Historical figures inherit survivorship, restatement,
+and estimated-trading-friction biases and are not expected returns.
