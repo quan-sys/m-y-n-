@@ -1,0 +1,2 @@
+measurement_type,ticker,fill_session_date,entry_close_adjusted_stored,entry_close_adjusted_refetched,refetch_drift_pct,measurement_session_date,measurement_close,benchmark_return_pct,measurement_status,price_source,price_provider,price_as_of,source,as_of,data_status
+DRY_RUN_NOT_A_QUARTERLY_MEASUREMENT,VNINDEX,2026-07-21,1730.56,1730.56,0.0,2026-07-24,1686.11,-2.5685327292899407,FILLED,vnstock.Quote.history,VCI,2026-07-28,data/forward_test/snapshots/2026-07-21/benchmark.csv,2026-07-21,OK
