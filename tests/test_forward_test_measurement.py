@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -10,6 +10,7 @@ from scripts.build_forward_test_measurement import (
     BENCHMARK_TICKER,
     FutureMeasurementDateError,
     MANIFEST_FILES,
+    MeasurementFetchError,
     NO_SESSION_ON_OR_BEFORE,
     build_measurement,
     select_measurement_session,
@@ -24,6 +25,27 @@ class FixturePriceClient:
     def fetch_price_history(self, ticker: str, months: int = 1) -> pd.DataFrame:
         self.calls.append(ticker)
         return self.histories[ticker].copy()
+
+
+class WindowedFixturePriceClient:
+    """Fixture-only provider window: 31 * months + 10 days back from run_date."""
+
+    def __init__(self, run_date: date) -> None:
+        self.run_date = run_date
+        self.calls: list[tuple[str, int]] = []
+        self.returned_histories: list[pd.DataFrame] = []
+
+    def fetch_price_history(self, ticker: str, months: int = 1) -> pd.DataFrame:
+        self.calls.append((ticker, months))
+        first_session = self.run_date - timedelta(days=31 * months + 10)
+        rows: list[tuple[str, float]] = [(first_session.isoformat(), 90.0)]
+        snapshot_fill_session = date(2026, 7, 21)
+        if first_session <= snapshot_fill_session <= self.run_date:
+            rows.append((snapshot_fill_session.isoformat(), 100.0))
+        rows.append((self.run_date.isoformat(), 110.0))
+        history = _history(rows)
+        self.returned_histories.append(history)
+        return history
 
 
 def _history(rows: list[tuple[str, float]]) -> pd.DataFrame:
@@ -179,3 +201,90 @@ def test_manifest_hashes_exactly_the_other_measurement_files(tmp_path: Path) -> 
     assert "MANIFEST.csv" not in set(result.manifest["file"])
     assert set(result.manifest["measurement_type"]) == {"DRY_RUN_NOT_A_QUARTERLY_MEASUREMENT"}
     assert all(b"\r\n" not in path.read_bytes() for path in result.output_directory.iterdir())
+
+
+def test_lookback_reaches_snapshot_fill_session_for_first_quarterly_measurement(tmp_path: Path) -> None:
+    _write_snapshot(tmp_path, [_fill_row("AAA", "100")])
+    run_date = date(2026, 9, 30)
+    client = WindowedFixturePriceClient(run_date)
+
+    result = build_measurement(
+        tmp_path,
+        client,
+        measurement_date=run_date,
+        mode="quarterly",
+        run_date=run_date,
+        created_at_utc=datetime(2026, 9, 30, tzinfo=timezone.utc),
+        main_sha="d" * 40,
+    )
+
+    assert result.positions.loc[0, "entry_close_adjusted_refetched"] == 100.0
+    assert client.calls == [("AAA", 5), (BENCHMARK_TICKER, 5)]
+    assert all(
+        "2026-07-21" in set(history["time"])
+        for history in client.returned_histories
+    )
+    portfolio = result.portfolio_returns.loc[0]
+    assert portfolio["as_of"] == "2026-07-21"
+    assert (tmp_path / str(portfolio["source"])).is_file()
+
+
+def test_requested_lookback_months_grows_with_run_date_gap(tmp_path: Path) -> None:
+    _write_snapshot(tmp_path, [_fill_row("AAA", "100")])
+    september_run_date = date(2026, 9, 30)
+    september_client = WindowedFixturePriceClient(september_run_date)
+    build_measurement(
+        tmp_path,
+        september_client,
+        measurement_date=september_run_date,
+        mode="quarterly",
+        run_date=september_run_date,
+        created_at_utc=datetime(2026, 9, 30, tzinfo=timezone.utc),
+        main_sha="e" * 40,
+    )
+
+    december_root = tmp_path / "december"
+    _write_snapshot(december_root, [_fill_row("AAA", "100")])
+    december_run_date = date(2026, 12, 31)
+    december_client = WindowedFixturePriceClient(december_run_date)
+    build_measurement(
+        december_root,
+        december_client,
+        measurement_date=december_run_date,
+        mode="quarterly",
+        run_date=december_run_date,
+        created_at_utc=datetime(2026, 12, 31, tzinfo=timezone.utc),
+        main_sha="f" * 40,
+    )
+
+    september_months = september_client.calls[0][1]
+    december_months = december_client.calls[0][1]
+    assert december_months > september_months
+
+
+def test_missing_snapshot_fill_session_in_wide_series_stops_with_ticker(tmp_path: Path) -> None:
+    _write_snapshot(tmp_path, [_fill_row("AAA", "100")])
+    run_date = date(2026, 9, 30)
+    client = FixturePriceClient(
+        {
+            "AAA": _history([("2026-06-01", 90.0), ("2026-09-30", 110.0)]),
+            BENCHMARK_TICKER: _history([("2026-06-01", 1700.0), ("2026-09-30", 1710.0)]),
+        }
+    )
+
+    with pytest.raises(
+        MeasurementFetchError,
+        match=(
+            r"AAA: .*requested_months=5; earliest_session=2026-06-01; "
+            r"latest_session=2026-09-30; session_count=2"
+        ),
+    ):
+        build_measurement(
+            tmp_path,
+            client,
+            measurement_date=run_date,
+            mode="quarterly",
+            run_date=run_date,
+            created_at_utc=datetime(2026, 9, 30, tzinfo=timezone.utc),
+            main_sha="g" * 40,
+        )

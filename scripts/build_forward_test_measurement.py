@@ -177,6 +177,14 @@ def _history_dates_and_closes(history: pd.DataFrame, ticker: str) -> pd.DataFram
     )
 
 
+def _required_lookback_months(run_date: date, snapshot_fill_session_dates: list[str]) -> int:
+    if not snapshot_fill_session_dates:
+        raise ValueError("snapshot has no fill session date")
+    oldest_fill_session = min(date.fromisoformat(value) for value in snapshot_fill_session_dates)
+    span_days = max(0, (run_date - oldest_fill_session).days)
+    return max(3, math.ceil(span_days / 30) + 2)
+
+
 def select_measurement_session(
     history: pd.DataFrame,
     measurement_date: date,
@@ -209,14 +217,19 @@ def _price_observation(
     history: pd.DataFrame,
     fill_session_date: str,
     measurement_date: date,
+    requested_months: int,
 ) -> PriceObservation | None:
     rows = _history_dates_and_closes(history, ticker)
     fill_day = pd.Timestamp(fill_session_date).normalize()
     latest = pd.Timestamp(rows["session_date"].max()).normalize()
-    if latest.date() < SNAPSHOT_DATE:
+    earliest = pd.Timestamp(rows["session_date"].min()).normalize()
+    session_count = len(rows)
+    if latest < fill_day:
         raise MeasurementFetchError(
             f"{ticker}: latest session {latest.date().isoformat()} is earlier than snapshot fill session "
-            f"{SNAPSHOT_DATE.isoformat()}"
+            f"{fill_session_date}; requested_months={requested_months}; "
+            f"earliest_session={earliest.date().isoformat()}; latest_session={latest.date().isoformat()}; "
+            f"session_count={session_count}"
         )
     resolved = select_measurement_session(history, measurement_date)
     if resolved is None:
@@ -224,7 +237,9 @@ def _price_observation(
     entry_rows = rows.loc[rows["session_date"].eq(fill_day)]
     if entry_rows.empty:
         raise MeasurementFetchError(
-            f"{ticker}: fetched series has no close for snapshot fill session {fill_session_date}"
+            f"{ticker}: fetched series has no close for snapshot fill session {fill_session_date}; "
+            f"requested_months={requested_months}; earliest_session={earliest.date().isoformat()}; "
+            f"latest_session={latest.date().isoformat()}; session_count={session_count}"
         )
     entry_close = float(entry_rows.iloc[-1]["close"])
     measurement_session_date, measurement_close = resolved
@@ -262,11 +277,14 @@ def _read_snapshot(snapshot_directory: Path) -> tuple[pd.DataFrame, pd.DataFrame
 def _fetch_once_per_symbol(
     client: PriceClient,
     symbols: list[str],
+    months: int,
 ) -> tuple[dict[str, pd.DataFrame], int]:
     histories: dict[str, pd.DataFrame] = {}
     for ticker in symbols:
         try:
-            history = client.fetch_price_history(ticker, months=1)
+            # The provider window is 31 * months + 10 days back from TODAY (the
+            # run date), not from the measurement date, so the span uses run_date.
+            history = client.fetch_price_history(ticker, months=months)
         except BaseException as error:  # noqa: BLE001
             raise MeasurementFetchError(f"{ticker}: {error}") from error
         if history.empty:
@@ -326,7 +344,12 @@ def _position_row(
     }
 
 
-def _portfolio_return_rows(positions: pd.DataFrame, measurement_type: str) -> pd.DataFrame:
+def _portfolio_return_rows(
+    positions: pd.DataFrame,
+    measurement_type: str,
+    snapshot_as_of: str,
+    positions_source: str,
+) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for portfolio_id, frame in positions.groupby("portfolio_id", sort=True):
         weights = pd.to_numeric(frame["target_weight"], errors="raise")
@@ -353,8 +376,8 @@ def _portfolio_return_rows(positions: pd.DataFrame, measurement_type: str) -> pd
                 "filled_position_count": int(filled.sum()),
                 "excluded_position_count": int((~filled).sum()),
                 "measurement_status": status,
-                "source": "data/forward_test/measurements/positions.csv",
-                "as_of": "",
+                "source": positions_source,
+                "as_of": snapshot_as_of,
                 "data_status": data_status,
             }
         )
@@ -464,6 +487,7 @@ def build_measurement(
     run_date: date | None = None,
     created_at_utc: datetime | None = None,
     main_sha: str | None = None,
+    overwrite: bool = False,
 ) -> MeasurementResult:
     current_date = run_date or date.today()
     if measurement_date > current_date:
@@ -475,8 +499,15 @@ def build_measurement(
     snapshot_directory = repo_root / SNAPSHOT_DIRECTORY
     fills, snapshot_benchmark = _read_snapshot(snapshot_directory)
     output_directory = repo_root / MEASUREMENTS_DIRECTORY / measurement_date.isoformat()
-    if output_directory.exists():
+    expected_output_files = {*MANIFEST_FILES, "MANIFEST.csv"}
+    if output_directory.exists() and not overwrite:
         raise MeasurementExistsError(f"refusing to overwrite existing measurement directory: {output_directory}")
+    if output_directory.exists():
+        actual_output_files = {path.name for path in output_directory.iterdir()}
+        if actual_output_files != expected_output_files:
+            raise MeasurementExistsError(
+                f"refusing to overwrite unexpected measurement directory contents: {output_directory}"
+            )
 
     fills["ticker"] = fills["ticker"].astype(str).str.strip().str.upper()
     benchmark_row = snapshot_benchmark.iloc[0]
@@ -484,7 +515,12 @@ def build_measurement(
     if benchmark_ticker != BENCHMARK_TICKER:
         raise ValueError(f"snapshot benchmark ticker must be {BENCHMARK_TICKER}")
     symbols = sorted(set(fills["ticker"])) + [benchmark_ticker]
-    histories, fetch_count = _fetch_once_per_symbol(client, symbols)
+    snapshot_fill_session_dates = [
+        *fills["fill_session_date"].astype(str).tolist(),
+        *snapshot_benchmark["fill_session_date"].astype(str).tolist(),
+    ]
+    requested_months = _required_lookback_months(current_date, snapshot_fill_session_dates)
+    histories, fetch_count = _fetch_once_per_symbol(client, symbols, requested_months)
 
     observations: dict[str, PriceObservation | None] = {}
     for ticker, ticker_rows in fills.groupby("ticker", sort=True):
@@ -496,12 +532,14 @@ def build_measurement(
             histories[ticker],
             str(fill_dates[0]),
             measurement_date,
+            requested_months,
         )
     benchmark_observation = _price_observation(
         benchmark_ticker,
         histories[benchmark_ticker],
         str(benchmark_row["fill_session_date"]),
         measurement_date,
+        requested_months,
     )
 
     position_rows = [
@@ -509,13 +547,18 @@ def build_measurement(
         for _, snapshot_row in fills.iterrows()
     ]
     positions = pd.DataFrame(position_rows, columns=POSITION_COLUMNS)
-    portfolio_returns = _portfolio_return_rows(positions, measurement_type)
+    portfolio_returns = _portfolio_return_rows(
+        positions,
+        measurement_type,
+        str(benchmark_row["fill_session_date"]),
+        (MEASUREMENTS_DIRECTORY / measurement_date.isoformat() / "positions.csv").as_posix(),
+    )
     benchmark = pd.DataFrame(
         [_benchmark_row(benchmark_row, benchmark_observation, measurement_type)],
         columns=BENCHMARK_COLUMNS,
     )
 
-    output_directory.mkdir(parents=True)
+    output_directory.mkdir(parents=True, exist_ok=overwrite)
     positions.to_csv(output_directory / "positions.csv", index=False, lineterminator="\n")
     portfolio_returns.to_csv(output_directory / "portfolio_returns.csv", index=False, lineterminator="\n")
     benchmark.to_csv(output_directory / "benchmark.csv", index=False, lineterminator="\n")
@@ -568,12 +611,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Measure the immutable 2026-07-21 forward-test snapshot.")
     parser.add_argument("--measurement-date", type=date.fromisoformat, required=True)
     parser.add_argument("--mode", choices=tuple(MEASUREMENT_TYPES), required=True)
+    parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args(argv)
     result = build_measurement(
         REPO_ROOT,
         LiveVciPriceClient(),
         measurement_date=args.measurement_date,
         mode=args.mode,
+        overwrite=args.overwrite,
     )
     positions = result.positions
     ticker_counts = positions.groupby("ticker")["portfolio_id"].nunique()
@@ -595,7 +640,16 @@ def main(argv: list[str] | None = None) -> int:
     for ticker in ("SJD", "NCT", "PTB"):
         stored = positions.loc[positions["ticker"].eq(ticker), "entry_close_adjusted_stored"].iloc[0]
         print(f"STORED_CLOSE_{ticker}={stored}")
+    nct = positions.loc[positions["ticker"].eq("NCT")].iloc[0]
+    print(f"NCT_REFETCH_DRIFT_PCT={nct['refetch_drift_pct']}")
+    print(f"NCT_TICKER_RETURN_PCT={nct['ticker_return_pct']}")
+    for portfolio_id in ("EBIT_TEV", "EP"):
+        portfolio_return = result.portfolio_returns.loc[
+            result.portfolio_returns["portfolio_id"].eq(portfolio_id), "portfolio_return_pct"
+        ].iloc[0]
+        print(f"{portfolio_id}_PORTFOLIO_RETURN_PCT={portfolio_return}")
     print(f"BENCHMARK_ENTRY_CLOSE_ADJUSTED_STORED={result.benchmark.loc[0, 'entry_close_adjusted_stored']}")
+    print(f"BENCHMARK_RETURN_PCT={result.benchmark.loc[0, 'benchmark_return_pct']}")
     print("ALL_OUTPUT_ROWS_MEASUREMENT_TYPE=" + measurement_type)
     print(f"MANIFEST_EXCLUDES_ITSELF={'MANIFEST.csv' not in set(result.manifest['file'])}")
     _print_intermediates(result)
