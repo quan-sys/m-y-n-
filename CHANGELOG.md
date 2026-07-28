@@ -2,6 +2,7 @@
 
 ## 2026-07-28
 
+- Build observed VNINDEX execution-date benchmark-comparison diagnostics from the committed walk-forward NAV series and benchmark-history probe output, including a separately labelled nominal-date alignment diagnostic and geometric cumulative excess only; no ranking, selection, recommendation, or risk-adjusted performance metric.
 - Probe VCI VNINDEX daily-history availability with one full-range request, one request per calendar year, and one widest-range request; record the returned 2004-01-05 to 2026-07-24 index-points series and no performance comparison.
 - Add the Sprint 9 forward-test measurement step: one refetch per distinct ticker reads both adjusted prices from the same series, records audit drift and missing sessions without price filling, and writes a separately labelled dry-run measurement with no performance conclusion.
 - Relabel the Sprint 9-4C six-condition count as tickers clearing four exclusion gates with computable F-Score and Franchise values; no gate predicate, threshold, or output number changes.
