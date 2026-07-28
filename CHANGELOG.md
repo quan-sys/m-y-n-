@@ -2,6 +2,7 @@
 
 ## 2026-07-28
 
+- Add the Sprint 9 forward-test measurement step: one refetch per distinct ticker reads both adjusted prices from the same series, records audit drift and missing sessions without price filling, and writes a separately labelled dry-run measurement with no performance conclusion.
 - Relabel the Sprint 9-4C six-condition count as tickers clearing four exclusion gates with computable F-Score and Franchise values; no gate predicate, threshold, or output number changes.
 - Build the Sprint 9-5A point-in-time rebalance target table across eight value/gate configurations, applying volume-session eligibility before the existing-rank cut and retaining pool diagnostics, with no price, return, portfolio-value, or performance result.
 - Build Sprint 9-5B walk-forward engine and imported-metrics diagnostics from the committed 9-5A target table, retaining the settled evaluation grid; execution waits up to eight market sessions for every carried holding to trade, while a newly selected unpriced name remains cash and is reported without interpolation or any investment recommendation.

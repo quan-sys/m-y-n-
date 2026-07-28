@@ -43,3 +43,38 @@ Forward-test data from 2026-07-21 onward is free of survivorship bias and of res
 ## Reordering decision
 
 Sprint 9 item 2 is executed ahead of Sprint 8 by owner decision on 2026-07-21; Sprint 8 scope is unchanged and still pending.
+
+## FT8. Measurement session resolution
+
+Measurement resolves the session date, never assumes it: the measurement session is the LAST
+session with a traded close on or before the requested measurement date, obtained from the
+fetched series. If the requested date is in the future relative to the run, STOP.
+
+## FT9. Single-fetch measurement constraint
+
+Single-fetch rule, restated as an implementation constraint: for each ticker exactly ONE
+provider call is made during a measurement run, and BOTH the entry close and the measurement
+close are read out of THAT ONE fetched series. The value stored in the snapshot
+(`fills.csv` column `close_adjusted`) is audit material ONLY and must NEVER be used as an
+arithmetic input to a return. Every position row records
+`entry_close_adjusted_stored`, `entry_close_adjusted_refetched`, and
+`refetch_drift_pct = (refetched - stored) / stored * 100`. Non-zero drift is expected
+evidence of a corporate action, not a bug, and never blocks the run.
+
+## FT10. Dry-run separation
+
+Every output row carries `measurement_type`, either `QUARTERLY` or
+`DRY_RUN_NOT_A_QUARTERLY_MEASUREMENT`. A dry-run output may never be read by, merged into, or
+counted as part of the quarterly track record.
+
+## FT11. Missing data
+
+Missing data is recorded, never fabricated: if a ticker has no session in the fetched series
+on or before the measurement date, the row gets `measurement_status = NO_SESSION_ON_OR_BEFORE`,
+empty prices, empty return, and it is EXCLUDED from the portfolio return with its weight
+reported in `excluded_weight`. Do not redistribute weight; do not substitute a price.
+
+## FT12. Reporting limit
+
+Any report generated from a measurement must quote FT1 verbatim and state no
+performance conclusion, no winner between the two portfolios, and no buy or sell view.

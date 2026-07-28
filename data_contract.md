@@ -894,3 +894,97 @@ engine and its allocation remains cash. No interpolation, forward fill,
 backward fill, benchmark, synthetic index, new factor, or investment
 recommendation is present. Historical figures inherit survivorship, restatement,
 and estimated-trading-friction biases and are not expected returns.
+
+## Forward-test measurements
+
+`data/forward_test/measurements/<measurement_date>/` records a measurement of
+the immutable `2026-07-21` forward-test snapshot. The requested
+`measurement_date` is a date boundary, while each row's
+`measurement_session_date` is the last fetched positive close on or before
+that boundary. A run stops if the requested date is in the future. The fetched
+series is the only arithmetic source for both the refetched entry close and the
+measurement close; the snapshot close is retained only as audit evidence.
+
+`positions.csv` has these columns in order:
+
+```text
+measurement_type
+portfolio_id
+ticker
+fill_session_date
+target_weight
+entry_close_adjusted_stored
+entry_close_adjusted_refetched
+refetch_drift_pct
+measurement_session_date
+measurement_close
+ticker_return_pct
+weighted_contribution_pct
+excluded_weight
+measurement_status
+price_source
+price_provider
+price_as_of
+source
+as_of
+data_status
+```
+
+Its key is `portfolio_id | ticker`. `ticker_return_pct` uses only the two
+prices read from the same measurement-date fetch. `refetch_drift_pct` compares
+the refetched entry close to the stored audit close and can be non-zero after a
+corporate action without blocking the measurement. A
+`NO_SESSION_ON_OR_BEFORE` row has blank refetched and measurement prices and
+returns, with its unredistributed `target_weight` recorded in `excluded_weight`.
+
+`portfolio_returns.csv` has these columns in order:
+
+```text
+measurement_type
+portfolio_id
+portfolio_return_pct
+included_weight
+excluded_weight
+position_count
+filled_position_count
+excluded_position_count
+measurement_status
+source
+as_of
+data_status
+```
+
+`portfolio_return_pct` is the target-weighted average of only `FILLED`
+position returns, divided by their `included_weight`; excluded weight is never
+redistributed. The two portfolio rows are independent diagnostic records and
+contain no winner declaration or comparison.
+
+`benchmark.csv` has these columns in order:
+
+```text
+measurement_type
+ticker
+fill_session_date
+entry_close_adjusted_stored
+entry_close_adjusted_refetched
+refetch_drift_pct
+measurement_session_date
+measurement_close
+benchmark_return_pct
+measurement_status
+price_source
+price_provider
+price_as_of
+source
+as_of
+data_status
+```
+
+It contains one `VNINDEX` row. Its prices are index points, not currency, and
+its return uses the identical single-fetch arithmetic. `MANIFEST.csv` has one
+row per other measurement file (`positions.csv`, `portfolio_returns.csv`, and
+`benchmark.csv`) with `measurement_type`, `file`, `sha256`,
+`hash_convention`, `main_commit_sha`, and `created_at_utc`; it excludes itself
+and hashes LF-only bytes. `measurement_type` is `QUARTERLY` for a real
+quarterly measurement or `DRY_RUN_NOT_A_QUARTERLY_MEASUREMENT` for a dry-run;
+dry-run rows are not part of the quarterly track record.
