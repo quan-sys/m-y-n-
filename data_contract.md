@@ -409,6 +409,28 @@ but it must not be combined with historical share counts for raw historical
 market capitalization. Sprint 3 market-cap proxy logic remains limited to the
 current price and current shares, with price multiplied by `1000` exactly once.
 
+## VNINDEX Benchmark Daily Close
+
+`data/price_history/2026-07-28/benchmark_daily_close.csv.gz` is the read-only
+VCI benchmark-history probe output. Its columns, in order, are:
+
+```text
+ticker
+date
+close_adjusted
+close_adjusted_unit
+volume
+source
+as_of
+data_status
+```
+
+`ticker` is `VNINDEX`, `close_adjusted_unit` is `INDEX_POINTS`, `source` is
+`vnstock.Quote.history`, and `data_status` is `OK` only for an observed provider
+session. This index series carries no currency, must never be multiplied by
+`1000`, and must never be compared directly against a VND figure. No missing
+session is filled, interpolated, or fabricated.
+
 ## VNM Manual Unit Check
 
 The 2026-07-14 VCI quarterly income-statement response reported VNM `net_sales`
