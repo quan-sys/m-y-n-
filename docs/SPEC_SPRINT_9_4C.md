@@ -80,3 +80,8 @@ retained earnings or equity will be acquitted by this gate. This is a change to 
 DEFINITION, approved by the repository owner on 2026-07-27, and it is confined to the
 point-in-time path; the Step 1 production pipeline keeps the three-signal requirement through
 the `require_hose_warning=True` default.
+
+9-4C-11 NO THRESHOLD ON F-SCORE OR FRANCHISE. The owner decided on 2026-07-28 NOT to impose a
+Piotroski or Franchise threshold at this stage, because those cut-offs were calibrated on United
+States data and the master plan requires Vietnamese walk-forward evidence before any threshold is
+fixed. The decision is deferred to Sprint 9-5B, which will run both baskets in parallel.
