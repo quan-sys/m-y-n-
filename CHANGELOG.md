@@ -2,6 +2,7 @@
 
 ## 2026-07-28
 
+- Correct the interest-sign diagnosis selected-basket impact to use each target's committed four-quarter TTM window, separate flag exposure from the EBIT/TEV harm channel, and add HAG sensitivity-only evidence without changing production data, formulas, thresholds, or configuration.
 - Diagnose all committed quarterly rows where absolute interest expense exceeds absolute financial expense, record raw-sign evidence, selected-basket exposure, the four previously unexplained cases, and HQC FY2024 non-positive net sales without changing any production data, formula, threshold, or configuration.
 - Build observed VNINDEX execution-date benchmark-comparison diagnostics from the committed walk-forward NAV series and benchmark-history probe output, including a separately labelled nominal-date alignment diagnostic and geometric cumulative excess only; no ranking, selection, recommendation, or risk-adjusted performance metric.
 - Probe VCI VNINDEX daily-history availability with one full-range request, one request per calendar year, and one widest-range request; record the returned 2004-01-05 to 2026-07-24 index-points series and no performance comparison.

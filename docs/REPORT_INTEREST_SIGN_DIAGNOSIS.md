@@ -32,189 +32,21 @@ Bucket arithmetic: 47 + 1 + 1 + 0 + 496 = 545.
 ## Step 3 - Selected-basket impact
 
 - Target source file: data/screener/targets_pit/2026-07-28/rebalance_targets_point_in_time.csv.gz; committed target rows read: 2880.
-- Affected ticker-quarters that appear at least once in targets: 61 of 545.
-- Target rows for affected ticker-quarters: 165.
+- Valuation source file: data/valuation/2026-07-26/historical_valuation_point_in_time.csv.gz; targets join on (ticker, rebalance_date) = (ticker, evaluation_date), then each target is checked against all four pipe-separated ttm_quarters.
+- CONTAMINATED target rows: 509 of 2880.
+- A target is CONTAMINATED when any of its four TTM quarters is in the 545-row flagged population for the same ticker; no row, formula, threshold, or configuration is changed.
+- financial_expenses is read only by interest_anomalies(); it does not enter ebit_proxy_vas or e_p.
 
-| configuration | target rows for affected ticker-quarters |
-| --- | --- |
-| ALL__e_p__VALUE_ONLY | 31 |
-| ALL__e_p__VALUE_PLUS_GATES | 10 |
-| ALL__ebit_tev__VALUE_ONLY | 27 |
-| ALL__ebit_tev__VALUE_PLUS_GATES | 11 |
-| PRICE_OK__e_p__VALUE_ONLY | 36 |
-| PRICE_OK__e_p__VALUE_PLUS_GATES | 10 |
-| PRICE_OK__ebit_tev__VALUE_ONLY | 29 |
-| PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 11 |
+| metric | CONTAMINATED target rows | harm channel from build_sprint9_3_historical_valuation.py |
+| --- | --- | --- |
+| ebit_tev | 222 | ebit_proxy_vas = ttm_pbt + _sum_item(..., "interest_expenses", absolute=True) |
+| e_p | 287 | e_p = ttm_parent / market_cap_vnd; no interest term |
 
-Every selected target hit, including its configuration and rank, follows:
+The e_p rows are flag-exposed but cannot be affected by an interest-expense defect by construction: e_p = ttm_parent / market_cap_vnd contains no interest term.
 
-| ticker | quarter | configuration | rank_in_population | diagnosis bucket |
-| --- | --- | --- | --- | --- |
-| TIG | 2019Q1 | ALL__e_p__VALUE_ONLY | 3 | UNEXPLAINED |
-| TIG | 2019Q1 | ALL__ebit_tev__VALUE_ONLY | 6 | UNEXPLAINED |
-| DTD | 2019Q2 | ALL__e_p__VALUE_ONLY | 20 | UNEXPLAINED |
-| DTD | 2019Q2 | ALL__ebit_tev__VALUE_ONLY | 12 | UNEXPLAINED |
-| EVG | 2019Q2 | ALL__ebit_tev__VALUE_ONLY | 21 | SIGN_CONVENTION |
-| REE | 2019Q2 | PRICE_OK__e_p__VALUE_ONLY | 17 | UNEXPLAINED |
-| TCM | 2019Q2 | PRICE_OK__e_p__VALUE_ONLY | 18 | UNEXPLAINED |
-| VIP | 2019Q2 | ALL__ebit_tev__VALUE_ONLY | 20 | UNEXPLAINED |
-| VIP | 2019Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 11 | UNEXPLAINED |
-| ASM | 2019Q3 | ALL__e_p__VALUE_ONLY | 20 | UNEXPLAINED |
-| HAH | 2019Q3 | PRICE_OK__e_p__VALUE_ONLY | 16 | UNEXPLAINED |
-| HAH | 2019Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 20 | UNEXPLAINED |
-| IDI | 2019Q3 | ALL__e_p__VALUE_ONLY | 3 | UNEXPLAINED |
-| IDI | 2019Q3 | PRICE_OK__e_p__VALUE_ONLY | 2 | UNEXPLAINED |
-| IDI | 2019Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 19 | UNEXPLAINED |
-| VIT | 2019Q3 | ALL__e_p__VALUE_ONLY | 9 | UNEXPLAINED |
-| ASP | 2019Q4 | ALL__e_p__VALUE_ONLY | 15 | UNEXPLAINED |
-| ASP | 2019Q4 | PRICE_OK__e_p__VALUE_ONLY | 8 | UNEXPLAINED |
-| HAH | 2019Q4 | PRICE_OK__e_p__VALUE_ONLY | 14 | UNEXPLAINED |
-| HAH | 2019Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 19 | UNEXPLAINED |
-| PVC | 2019Q4 | ALL__ebit_tev__VALUE_ONLY | 19 | UNEXPLAINED |
-| TCM | 2019Q4 | PRICE_OK__e_p__VALUE_ONLY | 20 | UNEXPLAINED |
-| ASP | 2020Q2 | PRICE_OK__e_p__VALUE_ONLY | 17 | UNEXPLAINED |
-| HAH | 2020Q2 | ALL__e_p__VALUE_ONLY | 19 | UNEXPLAINED |
-| HAH | 2020Q2 | PRICE_OK__e_p__VALUE_ONLY | 11 | UNEXPLAINED |
-| HAH | 2020Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 17 | UNEXPLAINED |
-| HDG | 2020Q2 | ALL__e_p__VALUE_ONLY | 8 | UNEXPLAINED |
-| HDG | 2020Q2 | PRICE_OK__e_p__VALUE_ONLY | 3 | UNEXPLAINED |
-| HDG | 2020Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 19 | UNEXPLAINED |
-| VGS | 2020Q2 | ALL__e_p__VALUE_ONLY | 12 | UNEXPLAINED |
-| VGS | 2020Q2 | PRICE_OK__e_p__VALUE_ONLY | 6 | UNEXPLAINED |
-| NTL | 2020Q3 | PRICE_OK__e_p__VALUE_ONLY | 21 | SIGN_CONVENTION |
-| NTL | 2020Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 18 | SIGN_CONVENTION |
-| SRA | 2020Q3 | ALL__e_p__VALUE_ONLY | 15 | UNEXPLAINED |
-| VGS | 2020Q3 | ALL__e_p__VALUE_ONLY | 18 | UNEXPLAINED |
-| VGS | 2020Q3 | PRICE_OK__e_p__VALUE_ONLY | 10 | UNEXPLAINED |
-| VOS | 2020Q4 | PRICE_OK__e_p__VALUE_ONLY | 11 | UNEXPLAINED |
-| TV2 | 2021Q1 | ALL__ebit_tev__VALUE_ONLY | 13 | UNEXPLAINED |
-| TV2 | 2021Q1 | PRICE_OK__e_p__VALUE_ONLY | 20 | UNEXPLAINED |
-| TV2 | 2021Q1 | PRICE_OK__ebit_tev__VALUE_ONLY | 10 | UNEXPLAINED |
-| PVP | 2021Q2 | ALL__e_p__VALUE_ONLY | 13 | UNEXPLAINED |
-| PVP | 2021Q2 | ALL__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| PVP | 2021Q2 | PRICE_OK__e_p__VALUE_ONLY | 9 | UNEXPLAINED |
-| PVP | 2021Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 5 | UNEXPLAINED |
-| TLG | 2021Q2 | ALL__ebit_tev__VALUE_ONLY | 18 | SIGN_CONVENTION |
-| TLG | 2021Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 11 | SIGN_CONVENTION |
-| DPG | 2021Q3 | PRICE_OK__e_p__VALUE_ONLY | 12 | UNEXPLAINED |
-| DPG | 2021Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 15 | UNEXPLAINED |
-| SMC | 2021Q3 | ALL__e_p__VALUE_ONLY | 2 | UNEXPLAINED |
-| SMC | 2021Q3 | ALL__ebit_tev__VALUE_ONLY | 3 | UNEXPLAINED |
-| C32 | 2022Q1 | ALL__e_p__VALUE_ONLY | 11 | UNEXPLAINED |
-| C32 | 2022Q1 | ALL__ebit_tev__VALUE_ONLY | 14 | UNEXPLAINED |
-| C32 | 2022Q1 | PRICE_OK__e_p__VALUE_ONLY | 7 | UNEXPLAINED |
-| C32 | 2022Q1 | PRICE_OK__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| HSG | 2022Q1 | ALL__e_p__VALUE_ONLY | 2 | UNEXPLAINED |
-| HSG | 2022Q1 | ALL__ebit_tev__VALUE_ONLY | 2 | UNEXPLAINED |
-| HSG | 2022Q1 | PRICE_OK__e_p__VALUE_ONLY | 1 | UNEXPLAINED |
-| HSG | 2022Q1 | PRICE_OK__ebit_tev__VALUE_ONLY | 2 | UNEXPLAINED |
-| ASM | 2022Q3 | PRICE_OK__e_p__VALUE_ONLY | 17 | UNEXPLAINED |
-| SGR | 2022Q4 | ALL__ebit_tev__VALUE_ONLY | 14 | UNEXPLAINED |
-| DCM | 2023Q2 | ALL__e_p__VALUE_ONLY | 9 | SIGN_CONVENTION |
-| DCM | 2023Q2 | ALL__ebit_tev__VALUE_ONLY | 9 | SIGN_CONVENTION |
-| DCM | 2023Q2 | PRICE_OK__e_p__VALUE_ONLY | 9 | SIGN_CONVENTION |
-| DCM | 2023Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 9 | SIGN_CONVENTION |
-| HAH | 2023Q2 | ALL__e_p__VALUE_ONLY | 6 | UNEXPLAINED |
-| HAH | 2023Q2 | ALL__ebit_tev__VALUE_ONLY | 11 | UNEXPLAINED |
-| HAH | 2023Q2 | PRICE_OK__e_p__VALUE_ONLY | 6 | UNEXPLAINED |
-| HAH | 2023Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 10 | UNEXPLAINED |
-| KHG | 2023Q2 | ALL__e_p__VALUE_ONLY | 17 | UNEXPLAINED |
-| KHG | 2023Q2 | ALL__ebit_tev__VALUE_ONLY | 15 | UNEXPLAINED |
-| KHG | 2023Q2 | PRICE_OK__e_p__VALUE_ONLY | 15 | UNEXPLAINED |
-| KHG | 2023Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 13 | UNEXPLAINED |
-| OCH | 2023Q4 | ALL__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| OCH | 2023Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 7 | UNEXPLAINED |
-| SIP | 2023Q4 | ALL__e_p__VALUE_ONLY | 17 | UNEXPLAINED |
-| SIP | 2023Q4 | ALL__ebit_tev__VALUE_ONLY | 13 | UNEXPLAINED |
-| SIP | 2023Q4 | PRICE_OK__e_p__VALUE_ONLY | 12 | UNEXPLAINED |
-| SIP | 2023Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 11 | UNEXPLAINED |
-| HAH | 2024Q1 | PRICE_OK__e_p__VALUE_PLUS_GATES | 36 | UNEXPLAINED |
-| IJC | 2024Q1 | ALL__e_p__VALUE_PLUS_GATES | 29 | UNEXPLAINED |
-| IJC | 2024Q1 | ALL__ebit_tev__VALUE_PLUS_GATES | 35 | UNEXPLAINED |
-| OCH | 2024Q1 | PRICE_OK__e_p__VALUE_ONLY | 18 | UNEXPLAINED |
-| LHC | 2024Q2 | ALL__ebit_tev__VALUE_ONLY | 17 | UNEXPLAINED |
-| LHC | 2024Q2 | ALL__ebit_tev__VALUE_PLUS_GATES | 17 | UNEXPLAINED |
-| LHC | 2024Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 15 | UNEXPLAINED |
-| LHC | 2024Q2 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 15 | UNEXPLAINED |
-| MST | 2024Q2 | ALL__e_p__VALUE_ONLY | 1 | UNEXPLAINED |
-| MST | 2024Q2 | ALL__ebit_tev__VALUE_ONLY | 3 | UNEXPLAINED |
-| MST | 2024Q2 | PRICE_OK__e_p__VALUE_ONLY | 1 | UNEXPLAINED |
-| MST | 2024Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 3 | UNEXPLAINED |
-| NTL | 2024Q2 | ALL__e_p__VALUE_ONLY | 12 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | ALL__e_p__VALUE_PLUS_GATES | 12 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | ALL__ebit_tev__VALUE_ONLY | 6 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | ALL__ebit_tev__VALUE_PLUS_GATES | 6 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | PRICE_OK__e_p__VALUE_ONLY | 8 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | PRICE_OK__e_p__VALUE_PLUS_GATES | 8 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 4 | MISSING_OR_ZERO_TOTAL |
-| NTL | 2024Q2 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 4 | MISSING_OR_ZERO_TOTAL |
-| SBT | 2024Q2 | ALL__ebit_tev__VALUE_PLUS_GATES | 22 | UNEXPLAINED |
-| SBT | 2024Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 18 | UNEXPLAINED |
-| SBT | 2024Q2 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 18 | UNEXPLAINED |
-| DST | 2024Q3 | ALL__e_p__VALUE_ONLY | 10 | UNEXPLAINED |
-| DST | 2024Q3 | ALL__ebit_tev__VALUE_ONLY | 12 | UNEXPLAINED |
-| DST | 2024Q3 | PRICE_OK__e_p__VALUE_ONLY | 7 | UNEXPLAINED |
-| DST | 2024Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| HAG | 2024Q4 | ALL__e_p__VALUE_ONLY | 10 | UNEXPLAINED |
-| HAG | 2024Q4 | ALL__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| HAG | 2024Q4 | PRICE_OK__e_p__VALUE_ONLY | 6 | UNEXPLAINED |
-| HAG | 2024Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 6 | UNEXPLAINED |
-| HAH | 2024Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 41 | UNEXPLAINED |
-| IPA | 2024Q4 | ALL__e_p__VALUE_ONLY | 15 | UNEXPLAINED |
-| ITC | 2024Q4 | ALL__ebit_tev__VALUE_PLUS_GATES | 42 | UNEXPLAINED |
-| ITC | 2024Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 31 | UNEXPLAINED |
-| PSD | 2025Q1 | ALL__e_p__VALUE_ONLY | 21 | UNEXPLAINED |
-| PSD | 2025Q1 | ALL__e_p__VALUE_PLUS_GATES | 21 | UNEXPLAINED |
-| PSD | 2025Q1 | PRICE_OK__e_p__VALUE_ONLY | 18 | UNEXPLAINED |
-| PSD | 2025Q1 | PRICE_OK__e_p__VALUE_PLUS_GATES | 18 | UNEXPLAINED |
-| BNA | 2025Q2 | ALL__e_p__VALUE_ONLY | 10 | UNEXPLAINED |
-| BNA | 2025Q2 | PRICE_OK__e_p__VALUE_ONLY | 9 | UNEXPLAINED |
-| DTD | 2025Q2 | ALL__ebit_tev__VALUE_ONLY | 5 | SIGN_CONVENTION |
-| DTD | 2025Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 5 | SIGN_CONVENTION |
-| LHC | 2025Q2 | ALL__ebit_tev__VALUE_PLUS_GATES | 27 | SIGN_CONVENTION |
-| LHC | 2025Q2 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 24 | SIGN_CONVENTION |
-| LHG | 2025Q3 | ALL__e_p__VALUE_ONLY | 11 | UNEXPLAINED |
-| LHG | 2025Q3 | ALL__e_p__VALUE_PLUS_GATES | 11 | UNEXPLAINED |
-| LHG | 2025Q3 | ALL__ebit_tev__VALUE_ONLY | 9 | UNEXPLAINED |
-| LHG | 2025Q3 | ALL__ebit_tev__VALUE_PLUS_GATES | 9 | UNEXPLAINED |
-| LHG | 2025Q3 | PRICE_OK__e_p__VALUE_ONLY | 10 | UNEXPLAINED |
-| LHG | 2025Q3 | PRICE_OK__e_p__VALUE_PLUS_GATES | 10 | UNEXPLAINED |
-| LHG | 2025Q3 | PRICE_OK__ebit_tev__VALUE_ONLY | 8 | UNEXPLAINED |
-| LHG | 2025Q3 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 8 | UNEXPLAINED |
-| PSD | 2025Q3 | ALL__e_p__VALUE_PLUS_GATES | 24 | UNEXPLAINED |
-| PSD | 2025Q3 | PRICE_OK__e_p__VALUE_PLUS_GATES | 23 | UNEXPLAINED |
-| ABT | 2025Q4 | ALL__e_p__VALUE_ONLY | 22 | UNEXPLAINED |
-| ABT | 2025Q4 | ALL__e_p__VALUE_PLUS_GATES | 22 | UNEXPLAINED |
-| ABT | 2025Q4 | ALL__ebit_tev__VALUE_PLUS_GATES | 28 | UNEXPLAINED |
-| ABT | 2025Q4 | PRICE_OK__e_p__VALUE_ONLY | 21 | UNEXPLAINED |
-| ABT | 2025Q4 | PRICE_OK__e_p__VALUE_PLUS_GATES | 21 | UNEXPLAINED |
-| ABT | 2025Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 25 | UNEXPLAINED |
-| ADS | 2025Q4 | ALL__e_p__VALUE_PLUS_GATES | 32 | UNEXPLAINED |
-| ADS | 2025Q4 | PRICE_OK__e_p__VALUE_PLUS_GATES | 31 | UNEXPLAINED |
-| CIG | 2025Q4 | ALL__e_p__VALUE_ONLY | 5 | UNEXPLAINED |
-| CIG | 2025Q4 | ALL__ebit_tev__VALUE_ONLY | 6 | UNEXPLAINED |
-| CIG | 2025Q4 | PRICE_OK__e_p__VALUE_ONLY | 4 | UNEXPLAINED |
-| CIG | 2025Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 6 | UNEXPLAINED |
-| DBC | 2025Q4 | ALL__e_p__VALUE_ONLY | 15 | UNEXPLAINED |
-| DBC | 2025Q4 | ALL__e_p__VALUE_PLUS_GATES | 15 | UNEXPLAINED |
-| DBC | 2025Q4 | PRICE_OK__e_p__VALUE_ONLY | 14 | UNEXPLAINED |
-| DBC | 2025Q4 | PRICE_OK__e_p__VALUE_PLUS_GATES | 14 | UNEXPLAINED |
-| IDC | 2025Q4 | ALL__e_p__VALUE_PLUS_GATES | 28 | UNEXPLAINED |
-| IDC | 2025Q4 | ALL__ebit_tev__VALUE_PLUS_GATES | 27 | UNEXPLAINED |
-| IDC | 2025Q4 | PRICE_OK__e_p__VALUE_PLUS_GATES | 27 | UNEXPLAINED |
-| IDC | 2025Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 24 | UNEXPLAINED |
-| LHG | 2025Q4 | ALL__e_p__VALUE_ONLY | 13 | UNEXPLAINED |
-| LHG | 2025Q4 | ALL__e_p__VALUE_PLUS_GATES | 13 | UNEXPLAINED |
-| LHG | 2025Q4 | ALL__ebit_tev__VALUE_ONLY | 12 | UNEXPLAINED |
-| LHG | 2025Q4 | ALL__ebit_tev__VALUE_PLUS_GATES | 12 | UNEXPLAINED |
-| LHG | 2025Q4 | PRICE_OK__e_p__VALUE_ONLY | 12 | UNEXPLAINED |
-| LHG | 2025Q4 | PRICE_OK__e_p__VALUE_PLUS_GATES | 12 | UNEXPLAINED |
-| LHG | 2025Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 11 | UNEXPLAINED |
-| LHG | 2025Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 11 | UNEXPLAINED |
-| VTO | 2025Q4 | ALL__ebit_tev__VALUE_ONLY | 1 | UNEXPLAINED |
-| VTO | 2025Q4 | ALL__ebit_tev__VALUE_PLUS_GATES | 1 | UNEXPLAINED |
-| VTO | 2025Q4 | PRICE_OK__ebit_tev__VALUE_ONLY | 1 | UNEXPLAINED |
-| VTO | 2025Q4 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 1 | UNEXPLAINED |
+- Narrower positive-interest population: 74 ticker-quarters where interest_expenses > 0.
+- Positive-interest overlap with the 545-row flagged population: 24 ticker-quarters.
+- ebit_tev target rows with at least one positive interest_expenses quarter in their TTM window: 75.
 
 ### Four previously UNEXPLAINED named rows
 
@@ -227,20 +59,16 @@ The earlier UNEXPLAINED label was a causal conclusion from the narrower Sprint 6
 | DTD | 2025Q2 | 1183805814.0 | POSITIVE | -470961543.0 | NEGATIVE | SIGN_CONVENTION |
 | LHC | 2025Q2 | -601699315.0 | NEGATIVE | 548201515.0 | POSITIVE | SIGN_CONVENTION |
 
-- Named affected ticker-quarters in targets: 2 of 4.
-- Target rows for the four named cases: 4.
+### HAG sensitivity only, not a correction
 
-| ticker | quarter | configuration | rank_in_population |
-| --- | --- | --- | --- |
-| DTD | 2025Q2 | ALL__ebit_tev__VALUE_ONLY | 5 |
-| DTD | 2025Q2 | PRICE_OK__ebit_tev__VALUE_ONLY | 5 |
-| LHC | 2025Q2 | ALL__ebit_tev__VALUE_PLUS_GATES | 27 |
-| LHC | 2025Q2 | PRICE_OK__ebit_tev__VALUE_PLUS_GATES | 24 |
+The committed formulas copied from build_sprint9_3_historical_valuation.py are ebit_proxy_vas = ttm_pbt + _sum_item(..., "interest_expenses", absolute=True) and e_p = ttm_parent / market_cap_vnd; the final column below changes only positive raw interest_expenses from add to subtract for sensitivity inspection, not as a data or production correction.
 
-### HQC separately
-
-- HQC target rows in the committed target file: 0.
-- HQC 2024Q4 target rows: 0.
+| rebalance_date | ttm_quarters | interest_expenses raw VND (four values with signs) | ttm_interest_magnitude | ttm_pbt | ebit_proxy_vas | tev | ebit_tev as committed | rank_in_population (all target configurations) | SENSITIVITY_ONLY_NOT_A_CORRECTION |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2024-03-31 | 2023Q1\|2023Q2\|2023Q3\|2023Q4 | 2023Q1=-167570764000 (NEGATIVE); 2023Q2=-314531352000 (NEGATIVE); 2023Q3=-195939081000 (NEGATIVE); 2023Q4=951800507000 (POSITIVE) | 1629841704000 | 1805587076000 | 3435428780000 | 20290120174350.00038147 | 0.169315349070378530289164235312896997345946089423 | ALL__e_p__VALUE_ONLY: 11; ALL__ebit_tev__VALUE_ONLY: 11; PRICE_OK__e_p__VALUE_ONLY: 8; PRICE_OK__ebit_tev__VALUE_ONLY: 9 | 0.07549623919608315117719127468 |
+| 2024-06-30 | 2023Q2\|2023Q3\|2023Q4\|2024Q1 | 2023Q2=-314531352000 (NEGATIVE); 2023Q3=-195939081000 (NEGATIVE); 2023Q4=951800507000 (POSITIVE); 2024Q1=-167705183000 (NEGATIVE) | 1629976123000 | 1728214757000 | 3358190880000 | 19499953681699.998855591 | 0.17221532598569916925613335140150824665239658788459 | ALL__e_p__VALUE_ONLY: 11; ALL__ebit_tev__VALUE_ONLY: 8; PRICE_OK__e_p__VALUE_ONLY: 7; PRICE_OK__ebit_tev__VALUE_ONLY: 6 | 0.07459452928675825375494746484 |
+| 2024-09-30 | 2023Q3\|2023Q4\|2024Q1\|2024Q2 | 2023Q3=-195939081000 (NEGATIVE); 2023Q4=951800507000 (POSITIVE); 2024Q1=-167705183000 (NEGATIVE); 2024Q2=-159255761000 (NEGATIVE) | 1474700532000 | 1919856287000 | 3394556819000 | 17417079114949.998855591 | 0.19489816843550263286870263336623580068680326127432 | ALL__e_p__VALUE_ONLY: 9; ALL__ebit_tev__VALUE_ONLY: 9; PRICE_OK__e_p__VALUE_ONLY: 6; PRICE_OK__ebit_tev__VALUE_ONLY: 6 | 0.08560309080299427993412414701 |
+| 2024-12-31 | 2023Q4\|2024Q1\|2024Q2\|2024Q3 | 2023Q4=951800507000 (POSITIVE); 2024Q1=-167705183000 (NEGATIVE); 2024Q2=-159255761000 (NEGATIVE); 2024Q3=-144399040000 (NEGATIVE) | 1423160491000 | 1928890440000 | 3352050931000 | 18951961970350.00038147 | 0.17687091902380464257921465716652226193226694929942 | ALL__e_p__VALUE_ONLY: 10; ALL__ebit_tev__VALUE_ONLY: 9; PRICE_OK__e_p__VALUE_ONLY: 6; PRICE_OK__ebit_tev__VALUE_ONLY: 6 | 0.07642743897787857196734166689 |
 
 ## Step 4 - Named raw case details
 
