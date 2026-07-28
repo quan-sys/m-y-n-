@@ -111,10 +111,11 @@ TCD is the only mismatched ticker. Its latest as-of annual year is 2025, but tha
 
 ## G4. All six gates simultaneously
 
-A pass requires both accrual gates and M-Score to be SCORED and unflagged, distress to be SCORED and not high risk, F-Score to be SCORED, and Franchise to be SCORED.
-The calendar-year count is the maximum simultaneous count at a single scheduled evaluation date, which is the relevant count for a portfolio at one rebalance.
+The count requires both accrual gates and M-Score to be SCORED and unflagged, distress to be SCORED and not high risk, F-Score to be SCORED, and Franchise to be SCORED.
+Four gates exclude names — high accruals, Beneish M-Score, financial distress, and the SCORED requirement on the accrual pair — while F-Score and Franchise are pass-through checks that only confirm the score could be computed, so this count is a data-availability count and not a quality count.
+The calendar-year count is the maximum simultaneous count at a single scheduled evaluation date.
 
-| calendar_year | maximum tickers passing all six at one date |
+| calendar_year | maximum tickers clearing 4 exclusion gates and with F-Score and Franchise computable at one date |
 | --- | --- |
 | 2019 | 0 |
 | 2020 | 0 |
@@ -126,7 +127,7 @@ The calendar-year count is the maximum simultaneous count at a single scheduled 
 
 Detailed scheduled-date counts:
 
-| calendar_year | evaluation_date | tickers passing all six |
+| calendar_year | evaluation_date | tickers clearing 4 exclusion gates and with F-Score and Franchise computable |
 | --- | --- | --- |
 | 2019 | 2019-03-31 | 0 |
 | 2019 | 2019-06-30 | 0 |
@@ -157,7 +158,7 @@ Detailed scheduled-date counts:
 | 2025 | 2025-09-30 | 139 |
 | 2025 | 2025-12-31 | 139 |
 
-At least one calendar-year maximum reaches the 20 to 25 names a portfolio needs; the table shows the exact years and counts.
+At least one calendar-year maximum reaches the 20 to 25 names for a basket as a data-availability count; the table shows the exact years and counts.
 
 ## G5. M-Score and STA distributions
 
@@ -385,15 +386,17 @@ No public-site cross-check and no live API call were used.
 
 ## G10. Distress gate relaxation
 
+Four gates exclude names — high accruals, Beneish M-Score, financial distress, and the SCORED requirement on the accrual pair — while F-Score and Franchise are pass-through checks that only confirm the score could be computed, so this count is a data-availability count and not a quality count.
+
 ### T2. Preserved high-risk rows
 
 | old distress_high_risk=True | new distress_high_risk=True | old AND new True |
 | --- | --- | --- |
 | 306 | 306 | 306 |
 
-### T7. Tickers passing all six gates at each WALK_FORWARD date
+### T7. Tickers clearing 4 exclusion gates and with F-Score and Franchise computable at each WALK_FORWARD date
 
-| calendar_year | evaluation_date | tickers passing all six |
+| calendar_year | evaluation_date | tickers clearing 4 exclusion gates and with F-Score and Franchise computable |
 | --- | --- | --- |
 | 2019 | 2019-03-31 | 0 |
 | 2019 | 2019-06-30 | 0 |

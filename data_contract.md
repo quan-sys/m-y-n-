@@ -764,3 +764,58 @@ UNSCORED gate, missing valuation input, or `tev_collapse_flag` never removes a
 ticker-date row. The table is quasi point-in-time because the committed annual
 inputs may contain later restatements; it is not a portfolio, return, ranking,
 or backtest result.
+
+## Sprint 9-5A rebalance targets
+
+`data/screener/targets_pit/<RUN_DATE>/rebalance_targets_point_in_time.csv.gz`
+contains the selected point-in-time rebalance targets. It has one row for each
+selected `config_id | rebalance_date | ticker` key, sorted by the specified
+configuration grid, then `rebalance_date`, numeric `rank_in_population`, and
+`ticker`. A date with no selected names has no output row but remains present
+in the accompanying target-table diagnostics.
+
+The exact column order is:
+
+```text
+config_id
+population_id
+metric
+gate_setting
+rebalance_date
+ticker
+rank_in_population
+weight
+selected_count
+candidate_pool_size
+pool_threshold
+meets_pool_threshold
+THIN_CANDIDATE_POOL
+SHORT_BASKET
+dropped_ineligible_count
+source
+as_of
+data_status
+```
+
+`config_id` is the double-underscore join of `population_id`, `metric`, and
+`gate_setting`. The grid contains `ALL` and `PRICE_OK`, `ebit_tev` and `e_p`,
+and `VALUE_ONLY` and `VALUE_PLUS_GATES`. `rank_in_population` is copied from
+Sprint 9-4A and is never recomputed. `weight` is a dimensionless equal weight
+within each non-empty configuration/date basket.
+
+`selected_count`, `candidate_pool_size`, `pool_threshold`,
+`meets_pool_threshold`, `THIN_CANDIDATE_POOL`, `SHORT_BASKET`, and
+`dropped_ineligible_count` are group-level diagnostics repeated on every
+selected row for that configuration/date. `candidate_pool_size` is measured
+after volume-session eligibility. `pool_threshold`, `meets_pool_threshold`,
+and the stateful `THIN_CANDIDATE_POOL` flag are obtained from the shared
+`compute_backtest_window` implementation; a pre-start pool that does not meet
+the threshold is not automatically a thin-pool flag. `SHORT_BASKET` means
+fewer than `HOLDING_COUNT` names were selected; the table is never padded.
+
+`VALUE_PLUS_GATES` uses the imported Sprint 9-4C `_all_six_pass` predicate;
+F-Score and Franchise are computability checks without a new threshold. All
+emitted rows are `data_status = OK`, while `source` records the committed input
+artifacts and volume-session eligibility path. The table is quasi
+point-in-time and inherits the committed inputs' restatement and survivorship
+caveats. It contains no price, return, portfolio value, or performance result.

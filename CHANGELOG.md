@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-28
+
+- Relabel the Sprint 9-4C six-condition count as tickers clearing four exclusion gates with computable F-Score and Franchise values; no gate predicate, threshold, or output number changes.
+- Build the Sprint 9-5A point-in-time rebalance target table across eight value/gate configurations, applying volume-session eligibility before the existing-rank cut and retaining pool diagnostics, with no price, return, portfolio-value, or performance result.
+
 ## 2026-07-27
 
 - Build the Sprint 9-4C as-of gate table for the 243-ticker annual PIT universe across the 28 walk-forward dates plus one reconciliation-only date, importing the existing accrual, Beneish, distress, F-Score, and Franchise functions; retain UNSCORED and TEV-collapse-flagged rows, add only the TEV-collapse configuration key, reconcile against the committed single-date outputs, and add no portfolio, ranking, return, or backtest.

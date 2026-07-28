@@ -839,10 +839,14 @@ def validate_config_diff() -> None:
         for key in set(base_values) & set(current_values)
         if base_values[key] != current_values[key]
     }
-    if extra != {
-        "DISTRESS_REQUIRE_HOSE_WARNING",
-        "TEV_MIN_FRACTION_OF_MARKET_CAP",
-    } or missing or changed:
+    permitted_extra_sets = (
+        set(),
+        {
+            "DISTRESS_REQUIRE_HOSE_WARNING",
+            "TEV_MIN_FRACTION_OF_MARKET_CAP",
+        },
+    )
+    if extra not in permitted_extra_sets or missing or changed:
         raise RuntimeError("STOP: config differs beyond permitted key")
 
 
@@ -1317,18 +1321,19 @@ def write_report(
             "",
             "## G4. All six gates simultaneously",
             "",
-            "A pass requires both accrual gates and M-Score to be SCORED and unflagged, distress to be SCORED and not high risk, F-Score to be SCORED, and Franchise to be SCORED.",
-            "The calendar-year count is the maximum simultaneous count at a single scheduled evaluation date, which is the relevant count for a portfolio at one rebalance.",
+            "The count requires both accrual gates and M-Score to be SCORED and unflagged, distress to be SCORED and not high risk, F-Score to be SCORED, and Franchise to be SCORED.",
+            "Four gates exclude names — high accruals, Beneish M-Score, financial distress, and the SCORED requirement on the accrual pair — while F-Score and Franchise are pass-through checks that only confirm the score could be computed, so this count is a data-availability count and not a quality count.",
+            "The calendar-year count is the maximum simultaneous count at a single scheduled evaluation date.",
             "",
-            _markdown_table(["calendar_year", "maximum tickers passing all six at one date"], all_six_year_rows),
+            _markdown_table(["calendar_year", "maximum tickers clearing 4 exclusion gates and with F-Score and Franchise computable at one date"], all_six_year_rows),
             "",
             "Detailed scheduled-date counts:",
             "",
-            _markdown_table(["calendar_year", "evaluation_date", "tickers passing all six"], all_six_date_rows),
+            _markdown_table(["calendar_year", "evaluation_date", "tickers clearing 4 exclusion gates and with F-Score and Franchise computable"], all_six_date_rows),
             "",
-            "Every calendar-year maximum is below 20 names, so none reaches the 20 to 25 names a portfolio needs."
+            "Every calendar-year maximum is below 20 names, so none reaches the 20 to 25 names for a basket even as a data-availability count."
             if all_six_shortfall
-            else "At least one calendar-year maximum reaches the 20 to 25 names a portfolio needs; the table shows the exact years and counts.",
+            else "At least one calendar-year maximum reaches the 20 to 25 names for a basket as a data-availability count; the table shows the exact years and counts.",
             "",
             "## G5. M-Score and STA distributions",
             "",
@@ -1376,6 +1381,8 @@ def write_report(
             "",
             "## G10. Distress gate relaxation",
             "",
+            "Four gates exclude names — high accruals, Beneish M-Score, financial distress, and the SCORED requirement on the accrual pair — while F-Score and Franchise are pass-through checks that only confirm the score could be computed, so this count is a data-availability count and not a quality count.",
+            "",
             "### T2. Preserved high-risk rows",
             "",
             _markdown_table(
@@ -1383,10 +1390,10 @@ def write_report(
                 distress_relaxation_rows,
             ),
             "",
-            "### T7. Tickers passing all six gates at each WALK_FORWARD date",
+            "### T7. Tickers clearing 4 exclusion gates and with F-Score and Franchise computable at each WALK_FORWARD date",
             "",
             _markdown_table(
-                ["calendar_year", "evaluation_date", "tickers passing all six"],
+                ["calendar_year", "evaluation_date", "tickers clearing 4 exclusion gates and with F-Score and Franchise computable"],
                 all_six_date_rows,
             ),
             "",
