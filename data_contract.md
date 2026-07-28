@@ -678,3 +678,89 @@ basket, portfolio, or backtest result.
 The resumable normalized cache and status records live under
 `data/fundamentals/run_state/<RUN_DATE>/annual/`. That whole run-state tree is
 ignored by Git and is not part of the committed data contract.
+
+## Sprint 9-4C as-of gate values
+
+`data/screener/gates_pit/<RUN_DATE>/gate_values_point_in_time.csv.gz` contains
+one retained row for every annual-PIT-universe ticker at every scheduled
+evaluation date. Its unique key is `evaluation_date | ticker`, and rows are
+sorted by those two columns. `grid_role = WALK_FORWARD` denotes the historical
+walk-forward grid; `grid_role = RECONCILIATION` denotes the separately retained
+single-date comparison row set and is excluded from walk-forward summaries.
+
+The exact column order is:
+
+```text
+evaluation_date
+grid_role
+ticker
+annual_n
+annual_n_minus_1
+annual_n_minus_2
+annual_n_available_from
+sta
+sta_status
+sta_percentile
+snoa
+snoa_status
+snoa_percentile
+high_accrual_flag
+dsri
+gmi
+aqi
+sgi
+depi
+sgai
+lvgi
+tata
+m_score
+m_score_status
+m_score_percentile
+m_score_flag
+distress_accumulated_loss
+distress_negative_equity
+distress_high_risk
+distress_status
+distress_confidence
+fscore_total
+fscore_scored_count
+fscore_status
+franchise_roc_years_used
+franchise_roc_arithmetic_mean
+franchise_margin_stability
+franchise_status
+tev_to_market_cap
+tev_collapse_flag
+source
+as_of
+data_status
+```
+
+| Column(s) | Unit or type |
+| --- | --- |
+| `evaluation_date`, `annual_n_available_from`, `as_of` | ISO calendar date (`YYYY-MM-DD`). |
+| `grid_role` | Enum: `WALK_FORWARD` or `RECONCILIATION`; no numerical unit. |
+| `ticker` | Uppercase ticker text; no numerical unit. |
+| `annual_n`, `annual_n_minus_1`, `annual_n_minus_2` | Fiscal-year integer; blank when unavailable. |
+| `sta`, `snoa`, `dsri`, `gmi`, `aqi`, `sgi`, `depi`, `sgai`, `lvgi`, `tata` | Dimensionless ratios or indices returned by the imported formula functions; blank when unscored. |
+| `sta_status`, `snoa_status`, `m_score_status`, `distress_status`, `fscore_status`, `franchise_status` | Status/reason text; no numerical unit. |
+| `distress_confidence` | `FULL` when the supplied HoSE warning is a boolean; `NO_WARNING_DATA` when the supplied warning is `None`. |
+| `sta_percentile`, `snoa_percentile`, `m_score_percentile` | Dimensionless tied rank percentile on `[0, 1]`, computed only within `evaluation_date`; blank when the raw gate is unavailable. |
+| `high_accrual_flag`, `m_score_flag`, `distress_accumulated_loss`, `distress_negative_equity`, `distress_high_risk`, `tev_collapse_flag` | Boolean flag; blank only where the underlying signal is insufficient. |
+| `m_score` | Dimensionless Beneish score returned by the imported function; blank when unscored. |
+| `fscore_total` | Integer Piotroski points; blank when the required consecutive history is unavailable. |
+| `fscore_scored_count` | Integer count of F-Score criteria with usable inputs. |
+| `franchise_roc_years_used` | Integer count of usable annual ROC observations. |
+| `franchise_roc_arithmetic_mean` | Dimensionless arithmetic mean of annual ROC ratios. |
+| `franchise_margin_stability` | Dimensionless mean-to-population-standard-deviation ratio of gross-margin observations; blank when undefined. |
+| `tev_to_market_cap` | Dimensionless ratio, raw-VND TEV divided by raw-VND market capitalization; blank when either input is unavailable or market capitalization is zero. |
+| `source` | Provenance text; no numerical unit. |
+| `data_status` | `OK` only when the annual selection supports STA, SNOA, and M-Score and a TEV-to-market-cap ratio is available; otherwise `MISSING_DATA`. Individual gate status columns retain the more specific reason. |
+
+`common_shares` is consumed only by the imported F-Score implementation in its
+source VND-at-par unit. It is not emitted by this table as a share count and is
+never converted into shares outstanding. All rows remain in the table: an
+UNSCORED gate, missing valuation input, or `tev_collapse_flag` never removes a
+ticker-date row. The table is quasi point-in-time because the committed annual
+inputs may contain later restatements; it is not a portfolio, return, ranking,
+or backtest result.

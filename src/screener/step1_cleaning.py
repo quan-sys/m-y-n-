@@ -472,6 +472,8 @@ def calculate_simple_distress(
     undistributed_earnings_n: float,
     owners_equity_n: float,
     hose_warning: bool | None,
+    *,
+    require_hose_warning: bool = True,
 ) -> DistressResult:
     """Evaluate accumulated loss, negative equity, and a supplied HoSE warning."""
 
@@ -489,7 +491,8 @@ def calculate_simple_distress(
     warning_value: bool | None
     if hose_warning is None:
         warning_value = None
-        invalid.append("hose_warning")
+        if require_hose_warning:
+            invalid.append("hose_warning")
     elif isinstance(hose_warning, bool):
         warning_value = hose_warning
     else:
@@ -507,7 +510,9 @@ def calculate_simple_distress(
     known_signals = (accumulated_loss, negative_equity, warning_value)
     if any(signal is True for signal in known_signals):
         high_risk: bool | None = True
-    elif all(signal is False for signal in known_signals):
+    elif require_hose_warning:
+        high_risk = False if all(signal is False for signal in known_signals) else None
+    elif accumulated_loss is False and negative_equity is False:
         high_risk = False
     else:
         high_risk = None
