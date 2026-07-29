@@ -235,7 +235,10 @@ def _item_value(
 def load_interest_overrides(
     path: Path | None = None,
 ) -> frozenset[tuple[str, str]]:
-    """Return committed SUBTRACT keys, or no keys when the manual file is absent."""
+    """Return committed SUBTRACT keys, or no keys when the manual file is absent.
+
+    SUBTRACT is applied as -abs(value); on an already-negative raw value that would convert a genuine interest expense into a credit, so SUBTRACT is only meaningful on strictly positive raw values.
+    """
     source_path = path or OVERRIDES_PATH
     if not source_path.is_file():
         return frozenset()
@@ -260,6 +263,22 @@ def load_interest_overrides(
     invalid_statuses = sorted(set(overrides["status"]) - VALID_OVERRIDE_STATUSES)
     if invalid_statuses:
         raise ValueError(f"interest overrides contain invalid statuses: {invalid_statuses}")
+    for row in overrides.loc[
+        overrides["override_action"].eq("SUBTRACT"),
+        ["ticker", "quarter", "raw_interest_expenses"],
+    ].itertuples(index=False):
+        try:
+            raw_interest = to_decimal(row.raw_interest_expenses)
+        except ValueError as exc:
+            raise ValueError(
+                "SUBTRACT raw_interest_expenses must be strictly positive for "
+                f"{row.ticker} {row.quarter}"
+            ) from exc
+        if raw_interest is None or raw_interest <= 0:
+            raise ValueError(
+                "SUBTRACT raw_interest_expenses must be strictly positive for "
+                f"{row.ticker} {row.quarter}"
+            )
     return frozenset(
         (row.ticker, row.quarter)
         for row in overrides.loc[

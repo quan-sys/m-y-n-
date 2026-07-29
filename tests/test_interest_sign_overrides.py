@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 import pandas as pd
+import pytest
 
 from scripts import build_sprint9_3_historical_valuation as valuation
 
@@ -83,3 +84,60 @@ def test_hag_2023q4_subtract_override_changes_hag_ebit_and_ebit_tev(
         row["ebit_tev"] - Decimal("0.0754962391960831511771912")
     ) <= Decimal("1e-12")
     assert row.get("interest_override_applied") == "HAG:2023Q4"
+
+
+def test_data_contract_output_columns_match_valuation_output_columns():
+    contract = (valuation.ROOT / "data_contract.md").read_text(encoding="utf-8")
+    sprint_section = contract.split(
+        "## Sprint 9-3 historical valuation diagnostics", 1
+    )[1].split("\n## ", 1)[0]
+    column_block = sprint_section.split(
+        "The exact column order is:\n\n```text\n", 1
+    )[1].split("\n```", 1)[0]
+
+    assert tuple(column_block.splitlines()) == valuation.OUTPUT_COLUMNS
+
+
+def test_subtract_override_rejects_negative_raw_interest(monkeypatch, tmp_path):
+    _force_override_file(
+        monkeypatch,
+        tmp_path,
+        [
+            {
+                "ticker": "AAA",
+                "quarter": "2024Q1",
+                "raw_interest_expenses": "-5000",
+                "override_action": "SUBTRACT",
+                "status": "VERIFIED_INCOME",
+                "evidence_url": "",
+                "published_date": "",
+                "recorded_at": "2026-07-29",
+                "note": "test fixture",
+            }
+        ],
+    )
+
+    with pytest.raises(ValueError, match="AAA"):
+        valuation.load_interest_overrides()
+
+
+def test_subtract_override_returns_hag_key(monkeypatch, tmp_path):
+    _force_override_file(
+        monkeypatch,
+        tmp_path,
+        [
+            {
+                "ticker": "HAG",
+                "quarter": "2023Q4",
+                "raw_interest_expenses": "951800507000.0",
+                "override_action": "SUBTRACT",
+                "status": "VERIFIED_INCOME",
+                "evidence_url": "",
+                "published_date": "",
+                "recorded_at": "2026-07-29",
+                "note": "test fixture",
+            }
+        ],
+    )
+
+    assert valuation.load_interest_overrides() == frozenset({("HAG", "2023Q4")})
