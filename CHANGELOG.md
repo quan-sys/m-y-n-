@@ -2,6 +2,7 @@
 
 ## 2026-07-28
 
+- Restore the HQC zero-target evidence, add direct production-path coverage for TTM contamination, and document the positive-interest harm channel without changing production data, formulas, thresholds, or configuration.
 - Correct the interest-sign diagnosis selected-basket impact to use each target's committed four-quarter TTM window, separate flag exposure from the EBIT/TEV harm channel, and add HAG sensitivity-only evidence without changing production data, formulas, thresholds, or configuration.
 - Diagnose all committed quarterly rows where absolute interest expense exceeds absolute financial expense, record raw-sign evidence, selected-basket exposure, the four previously unexplained cases, and HQC FY2024 non-positive net sales without changing any production data, formula, threshold, or configuration.
 - Build observed VNINDEX execution-date benchmark-comparison diagnostics from the committed walk-forward NAV series and benchmark-history probe output, including a separately labelled nominal-date alignment diagnostic and geometric cumulative excess only; no ranking, selection, recommendation, or risk-adjusted performance metric.
