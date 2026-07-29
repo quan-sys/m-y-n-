@@ -43,6 +43,7 @@ MARKET_CAP_PATH = (
 )
 REPORT_PATH = ROOT / "docs" / "REPORT_SPRINT_9_3_HISTORICAL_VALUATION.md"
 OUTPUT_ROOT = ROOT / "data" / "valuation"
+OVERRIDES_PATH = ROOT / "manual_inputs" / "interest_sign_overrides.csv"
 TIME_ZONE = ZoneInfo("Asia/Ho_Chi_Minh")
 UNIT_BRIDGE_RATIO = Decimal("1000")
 MAX_OUTPUT_ROWS = 7_776
@@ -55,6 +56,7 @@ OUTPUT_COLUMNS = (
     "stock_quarter",
     "ttm_pbt",
     "ttm_interest_magnitude",
+    "interest_override_applied",
     "ebit_proxy_vas",
     "ttm_attributable_to_parent_company",
     "market_cap_thousand_vnd",
@@ -102,6 +104,23 @@ VALID_STATUSES = {
     "INSUFFICIENT_TTM",
     "NO_MARKET_CAP",
     "NON_POSITIVE_TEV",
+}
+OVERRIDE_COLUMNS = (
+    "ticker",
+    "quarter",
+    "raw_interest_expenses",
+    "override_action",
+    "status",
+    "evidence_url",
+    "published_date",
+    "recorded_at",
+    "note",
+)
+VALID_OVERRIDE_ACTIONS = {"ABS", "SUBTRACT"}
+VALID_OVERRIDE_STATUSES = {
+    "VERIFIED_INCOME",
+    "SUSPECTED_SIGN_ERROR",
+    "UNVERIFIED",
 }
 
 
@@ -213,20 +232,83 @@ def _item_value(
     return to_decimal(rows.iloc[0]) if len(rows) == 1 else None
 
 
+def load_interest_overrides(
+    path: Path | None = None,
+) -> frozenset[tuple[str, str]]:
+    """Return committed SUBTRACT keys, or no keys when the manual file is absent."""
+    source_path = path or OVERRIDES_PATH
+    if not source_path.is_file():
+        return frozenset()
+    overrides = pd.read_csv(source_path, dtype=str, keep_default_na=False)
+    if tuple(overrides.columns) != OVERRIDE_COLUMNS:
+        raise ValueError(
+            "interest overrides must use exactly these columns: "
+            + ", ".join(OVERRIDE_COLUMNS)
+        )
+    overrides = overrides.copy()
+    overrides["ticker"] = overrides["ticker"].str.strip().str.upper()
+    overrides["quarter"] = overrides["quarter"].map(normalize_quarter)
+    overrides["override_action"] = overrides["override_action"].str.strip().str.upper()
+    overrides["status"] = overrides["status"].str.strip().str.upper()
+    if overrides.duplicated(["ticker", "quarter"]).any():
+        raise ValueError("interest overrides contain duplicate ticker/quarter rows")
+    invalid_actions = sorted(
+        set(overrides["override_action"]) - VALID_OVERRIDE_ACTIONS
+    )
+    if invalid_actions:
+        raise ValueError(f"interest overrides contain invalid actions: {invalid_actions}")
+    invalid_statuses = sorted(set(overrides["status"]) - VALID_OVERRIDE_STATUSES)
+    if invalid_statuses:
+        raise ValueError(f"interest overrides contain invalid statuses: {invalid_statuses}")
+    return frozenset(
+        (row.ticker, row.quarter)
+        for row in overrides.loc[
+            overrides["override_action"].eq("SUBTRACT"), ["ticker", "quarter"]
+        ].itertuples(index=False)
+    )
+
+
+def _interest_override_keys(
+    ticker: str,
+    quarters: Iterable[str],
+    interest_overrides: frozenset[tuple[str, str]],
+) -> tuple[str, ...]:
+    ticker_key = str(ticker).strip().upper()
+    return tuple(
+        f"{ticker_key}:{normalize_quarter(quarter)}"
+        for quarter in quarters
+        if (ticker_key, normalize_quarter(quarter)) in interest_overrides
+    )
+
+
 def _sum_item(
     ticker_fundamentals: pd.DataFrame,
     quarters: Iterable[str],
     item_id: str,
     *,
     absolute: bool = False,
+    interest_overrides: frozenset[tuple[str, str]] = frozenset(),
 ) -> Decimal | None:
-    values = [
-        _item_value(ticker_fundamentals, quarter, item_id)
-        for quarter in quarters
-    ]
+    window = tuple(quarters)
+    values = [_item_value(ticker_fundamentals, quarter, item_id) for quarter in window]
     if any(value is None for value in values):
         return None
-    usable = [abs(value) if absolute else value for value in values if value is not None]
+    if absolute and item_id == "interest_expenses":
+        tickers = ticker_fundamentals["ticker"].str.strip().str.upper().unique()
+        if len(tickers) != 1:
+            raise ValueError("interest overrides require exactly one ticker per valuation")
+        ticker = str(tickers[0])
+        usable = [
+            -abs(value)
+            if (ticker, normalize_quarter(quarter)) in interest_overrides
+            else abs(value)
+            for quarter, value in zip(window, values, strict=True)
+            if value is not None
+        ]
+    else:
+        usable = [
+            abs(value) if absolute else value for value in values if value is not None
+        ]
     return sum(usable, Decimal("0")).normalize()
 
 
@@ -235,8 +317,14 @@ def build_valuation_row(
     ticker_fundamentals: pd.DataFrame,
     *,
     run_date: str,
+    interest_overrides: frozenset[tuple[str, str]] | None = None,
 ) -> dict[str, Any]:
-    ticker = str(market_row["ticker"])
+    ticker = str(market_row["ticker"]).strip().upper()
+    active_interest_overrides = (
+        load_interest_overrides()
+        if interest_overrides is None
+        else interest_overrides
+    )
     quarter = normalize_quarter(str(market_row["quarter"]))
     evaluation_date = str(market_row["measurement_date"])
     market_cap_status = str(market_row["market_cap_status"])
@@ -271,6 +359,7 @@ def build_valuation_row(
             ttm_quarters,
             "interest_expenses",
             absolute=True,
+            interest_overrides=active_interest_overrides,
         )
         if stock_quarter
         else None
@@ -288,6 +377,13 @@ def build_valuation_row(
         (ttm_pbt + ttm_interest).normalize()
         if ttm_pbt is not None and ttm_interest is not None
         else None
+    )
+    interest_override_applied = "|".join(
+        _interest_override_keys(
+            ticker,
+            ttm_quarters,
+            active_interest_overrides,
+        )
     )
 
     short_debt = (
@@ -362,6 +458,7 @@ def build_valuation_row(
         "stock_quarter": stock_quarter,
         "ttm_pbt": ttm_pbt,
         "ttm_interest_magnitude": ttm_interest,
+        "interest_override_applied": interest_override_applied,
         "ebit_proxy_vas": ebit_proxy,
         "ttm_attributable_to_parent_company": ttm_parent,
         "market_cap_thousand_vnd": market_cap_thousand,
@@ -428,6 +525,7 @@ def build_output(
     *,
     run_date: str,
 ) -> pd.DataFrame:
+    interest_overrides = load_interest_overrides()
     fundamental_keys = fundamentals.loc[:, ["ticker", "quarter"]].drop_duplicates()
     grid = market_cap.merge(
         fundamental_keys,
@@ -444,6 +542,7 @@ def build_output(
             market_row,
             grouped[str(market_row["ticker"])],
             run_date=run_date,
+            interest_overrides=interest_overrides,
         )
         for market_row in grid.to_dict(orient="records")
     ]
