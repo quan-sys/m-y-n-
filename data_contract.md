@@ -576,6 +576,7 @@ ttm_quarters
 stock_quarter
 ttm_pbt
 ttm_interest_magnitude
+interest_override_applied
 ebit_proxy_vas
 ttm_attributable_to_parent_company
 market_cap_thousand_vnd
@@ -597,6 +598,8 @@ source
 as_of
 data_status
 ```
+
+`interest_override_applied` is a pipe-delimited list of `TICKER:QUARTER` keys from `manual_inputs/interest_sign_overrides.csv` whose `override_action` is `SUBTRACT` and which fall inside that row's TTM window; it is blank when no override applies.
 
 The unique key is `ticker | quarter`, and rows are sorted by that key.
 `evaluation_date` is the market-cap `measurement_date`; `ttm_quarters` lists

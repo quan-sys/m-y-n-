@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-29
+
+- Add a reviewable interest-sign override input, apply only the verified HAG 2023Q4 SUBTRACT treatment in Sprint 9-3 valuation builds, and retain the default absolute-interest behavior for all other committed rows.
+
 ## 2026-07-28
 
 - Restore the HQC zero-target evidence, add direct production-path coverage for TTM contamination, and document the positive-interest harm channel without changing production data, formulas, thresholds, or configuration.
