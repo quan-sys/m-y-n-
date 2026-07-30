@@ -490,6 +490,8 @@ def build_measurement(
     overwrite: bool = False,
 ) -> MeasurementResult:
     current_date = run_date or date.today()
+    if isinstance(client, LiveVciPriceClient):
+        client.as_of_date = current_date
     if measurement_date > current_date:
         raise FutureMeasurementDateError(
             f"measurement date {measurement_date.isoformat()} is in the future relative to run date "

@@ -76,7 +76,7 @@ class MissingCloseError(RuntimeError):
 class LiveVciPriceClient:
     """Use the repository's existing VnstockClient -> VCI Quote.history path."""
 
-    def __init__(self) -> None:
+    def __init__(self, as_of_date: date | None = None) -> None:
         self._client = object.__new__(VnstockClient)
         settings = {
             "source": "vnstock",
@@ -86,10 +86,19 @@ class LiveVciPriceClient:
             "min_sleep_seconds": 2.8,
             "max_sleep_seconds": 3.6,
             "use_cache": False,
+            "as_of_date": as_of_date,
             "_terminal_api_error": None,
         }
         for name, value in settings.items():
             setattr(self._client, name, value)
+
+    @property
+    def as_of_date(self) -> date | None:
+        return self._client.as_of_date
+
+    @as_of_date.setter
+    def as_of_date(self, value: date | None) -> None:
+        self._client.as_of_date = value
 
     def fetch_price_history(self, ticker: str, months: int = 1) -> pd.DataFrame:
         _import_vnstock_without_upgrade_check()
@@ -315,8 +324,12 @@ def build_snapshot(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Open the immutable 2026-07-21 forward-test snapshot.")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
+    parser.add_argument("--run-date", type=date.fromisoformat)
     args = parser.parse_args()
-    fills, benchmark, observations = build_snapshot(args.repo_root.resolve(), LiveVciPriceClient())
+    fills, benchmark, observations = build_snapshot(
+        args.repo_root.resolve(),
+        LiveVciPriceClient(as_of_date=args.run_date),
+    )
     print(pd.concat([fills, benchmark], ignore_index=True).to_csv(index=False), end="")
     print("MAGNITUDE_SANITY")
     for ticker in SANITY_SYMBOLS:
