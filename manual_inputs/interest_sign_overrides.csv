@@ -20,7 +20,7 @@ EVG,2022Q2,1643836.0,ABS,UNVERIFIED,,,2026-07-29,
 EVG,2024Q2,7434725797.0,ABS,UNVERIFIED,,,2026-07-29,
 GIL,2025Q4,11121369041.0,ABS,UNVERIFIED,,,2026-07-29,
 HAG,2023Q4,951800507000.0,SUBTRACT,VERIFIED_INCOME,https://thitruongtaichinhtiente.vn/hoang-anh-gia-lai-cong-bo-tat-toan-khoan-vay-eximbank-750-ty-dong-duoc-mien-lai-hon-1-400-ty-dong-54959.html,,2026-07-29,"Eximbank waived 1,424.8 billion VND of interest and penalties; loan settled 2023-12-12; HAG reversed roughly 1,000 billion VND of financial expenses in Q4 2023."
-HAG,2026Q1,582851166000.0,ABS,UNVERIFIED,,,2026-07-29,
+HAG,2026Q1,582851166000.0,SUBTRACT,VERIFIED_INCOME,https://cafef.vn/hoang-anh-gia-lai-bao-lai-quy-1-hon-1000-ty-tang-gap-3-dieu-gi-da-xay-ra-188260430134608107.chn,2026-04-30,2026-07-29,"Q1 2026 interest and bond interest waived by 750 billion VND; reported financial expenses were a net credit of 576.5 billion VND, matching committed financial_expenses of +576523827000; interest_expenses of +582851166000 is therefore income, not cost."
 HPX,2018Q4,9562470707.0,ABS,UNVERIFIED,,,2026-07-29,
 HSL,2025Q4,20608290.0,ABS,UNVERIFIED,,,2026-07-29,
 IDI,2025Q2,38092546961.0,ABS,UNVERIFIED,,,2026-07-29,

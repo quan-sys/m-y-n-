@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-30
+
+- Reclassify HAG 2026Q1 as a verified SUBTRACT override using the 2026-04-30 CafeF evidence that identifies the waived interest and the matching committed net financial-expense credit.
+
 ## 2026-07-29
 
 - Add a reviewable interest-sign override input, apply only the verified HAG 2023Q4 SUBTRACT treatment in Sprint 9-3 valuation builds, and retain the default absolute-interest behavior for all other committed rows.
