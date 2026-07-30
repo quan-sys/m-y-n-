@@ -23,6 +23,7 @@ gross_margin_t = gross_profit_t / net_sales_t
 
 from __future__ import annotations
 
+import argparse
 from collections import Counter
 import csv
 from dataclasses import dataclass
@@ -55,6 +56,7 @@ from scripts.audit_sprint6_readiness import (  # noqa: E402
     item_value_status,
     latest_annual_frame,
 )
+from src.screener.artifact_archive import archive_artifact  # noqa: E402
 
 
 FSCORE_PATH = ROOT / "data" / "screener" / "sprint6_fscore.csv"
@@ -363,7 +365,7 @@ def _display(value: Any) -> str:
     return str(value).replace("|", "\\|")
 
 
-def build() -> tuple[
+def build(as_of: str = EVALUATION_DATE) -> tuple[
     pd.DataFrame,
     dict[str, dict[str, Any]],
     list[tuple[str, int, str]],
@@ -508,6 +510,7 @@ def build() -> tuple[
         raise AssertionError("composite denominator outside {1,2,3}")
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     output.to_csv(OUTPUT_PATH, index=False, lineterminator="\n")
+    archive_artifact(OUTPUT_PATH, as_of, repo_root=ROOT)
     fscore_difference_count = add_fscore_settled_case(settled_cases)
     return output, evidence, roc_drops, margin_drops, fscore_difference_count
 
@@ -753,9 +756,12 @@ def validation_summary(output: pd.DataFrame) -> dict[str, Any]:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--as-of", default="2026-07-20", metavar="YYYY-MM-DD")
+    args = parser.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    output, evidence, roc_drops, margin_drops, fscore_difference_count = build()
+    output, evidence, roc_drops, margin_drops, fscore_difference_count = build(args.as_of)
     REPORT_PATH.write_text(
         render_report(output, evidence, roc_drops, margin_drops, fscore_difference_count),
         encoding="utf-8",

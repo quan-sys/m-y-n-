@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 from dataclasses import dataclass
 from datetime import date
 import json
@@ -17,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.screener.artifact_archive import archive_artifact
 from src.screener.step1_pipeline import load_simple_config
 
 
@@ -600,6 +602,9 @@ def _markdown_table(frame: pd.DataFrame, columns: list[str]) -> str:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--as-of", default=EVALUATION_DATE, metavar="YYYY-MM-DD")
+    args = parser.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
@@ -611,8 +616,11 @@ def main() -> int:
         "float_format": "%.17g",
     }
     result.all_rows.to_csv(ALL_OUTPUT_PATH, **csv_options)
+    archive_artifact(ALL_OUTPUT_PATH, args.as_of, repo_root=ROOT)
     result.ebit_tev_candidates.to_csv(EBIT_TEV_OUTPUT_PATH, **csv_options)
+    archive_artifact(EBIT_TEV_OUTPUT_PATH, args.as_of, repo_root=ROOT)
     result.ep_candidates.to_csv(EP_OUTPUT_PATH, **csv_options)
+    archive_artifact(EP_OUTPUT_PATH, args.as_of, repo_root=ROOT)
     print(json.dumps(result.summary, ensure_ascii=False, sort_keys=True))
     hand_columns = [
         "ticker", "icb2",
