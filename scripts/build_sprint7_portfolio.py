@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import argparse
 from collections import Counter
+from datetime import date
 import math
 from pathlib import Path
 import sys
@@ -25,30 +27,47 @@ CONFIG_PATH = ROOT / "config" / "screener.yaml"
 QUALITY_PATH = ROOT / "data" / "screener" / "sprint6_franchise_quality.csv"
 SURVIVORS_PATH = ROOT / "data" / "screener" / "step1_survivors.csv"
 FSCORE_PATH = ROOT / "data" / "screener" / "sprint6_fscore.csv"
-REPORT_ROOT = ROOT / "reports" / AS_OF
-CANDIDATE_CONTRACTS = {
-    "EBIT_TEV": {
-        "path": ROOT / "data" / "screener" / "step2_candidates_ebit_tev.csv",
-        "value_column": "ebit_tev",
-        "value_rank_column": "ebit_tev_rank",
-        "quality_rank_column": "ebit_tev_quality_rank",
-        "csv_path": REPORT_ROOT / "portfolio_ebit_tev.csv",
-        "md_path": REPORT_ROOT / "PORTFOLIO_EBIT_TEV.md",
-    },
-    "EP": {
-        "path": ROOT / "data" / "screener" / "step2_candidates_ep.csv",
-        "value_column": "ep",
-        "value_rank_column": "ep_rank",
-        "quality_rank_column": "ep_quality_rank",
-        "csv_path": REPORT_ROOT / "portfolio_ep.csv",
-        "md_path": REPORT_ROOT / "PORTFOLIO_EP.md",
-    },
-}
 QUALITY_COMPONENT_COLUMNS = (
     "fscore_completion_ratio_percentile",
     "roc_arithmetic_mean_percentile",
     "margin_stability_percentile",
 )
+
+
+def _as_of_argument(value: str) -> str:
+    date.fromisoformat(value)
+    return value
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Build the Sprint 7 snapshot portfolios.")
+    parser.add_argument("--as-of", type=_as_of_argument, default=AS_OF, metavar="YYYY-MM-DD")
+    return parser.parse_args(argv)
+
+
+def report_root(as_of: str) -> Path:
+    return ROOT / "reports" / as_of
+
+
+def candidate_contracts(report_root: Path) -> dict[str, dict[str, Any]]:
+    return {
+        "EBIT_TEV": {
+            "path": ROOT / "data" / "screener" / "step2_candidates_ebit_tev.csv",
+            "value_column": "ebit_tev",
+            "value_rank_column": "ebit_tev_rank",
+            "quality_rank_column": "ebit_tev_quality_rank",
+            "csv_path": report_root / "portfolio_ebit_tev.csv",
+            "md_path": report_root / "PORTFOLIO_EBIT_TEV.md",
+        },
+        "EP": {
+            "path": ROOT / "data" / "screener" / "step2_candidates_ep.csv",
+            "value_column": "ep",
+            "value_rank_column": "ep_rank",
+            "quality_rank_column": "ep_quality_rank",
+            "csv_path": report_root / "portfolio_ep.csv",
+            "md_path": report_root / "PORTFOLIO_EP.md",
+        },
+    }
 
 
 def select_portfolio(
@@ -226,6 +245,7 @@ def _finalize_holdings(
     holdings: pd.DataFrame,
     *,
     portfolio_name: str,
+    as_of: str,
     liquidity_adtv_days: float,
     portfolio_capital_vnd: float,
     sector_cycle: dict[str, str],
@@ -234,8 +254,8 @@ def _finalize_holdings(
     output = holdings.copy()
     sector_counts = output["icb2"].astype(str).value_counts()
     position_value = portfolio_capital_vnd / HOLDING_COUNT
-    output["portfolio_id"] = f"SPRINT7_{portfolio_name}_{AS_OF}"
-    output["as_of"] = AS_OF
+    output["portfolio_id"] = f"SPRINT7_{portfolio_name}_{as_of}"
+    output["as_of"] = as_of
     output["target_weight"] = 1 / HOLDING_COUNT
     output["sector_count"] = output["icb2"].astype(str).map(sector_counts)
     output["sector_share"] = output["sector_count"] / HOLDING_COUNT
@@ -379,6 +399,7 @@ def render_report(
     skips: pd.DataFrame,
     sensitivity: pd.DataFrame,
     sectors: pd.DataFrame,
+    as_of: str,
     liquidity_adtv_days: float,
     portfolio_capital_vnd: float,
 ) -> str:
@@ -407,7 +428,7 @@ def render_report(
     lines = [
         f"# Sprint 7 {portfolio_name} initial snapshot",
         "",
-        f"- As of: `{AS_OF}` (off-cycle initial snapshot).",
+        f"- As of: `{as_of}` (off-cycle initial snapshot).",
         f"- Holdings: `{len(holdings)}`; target weight sum: `{format(float(holdings['target_weight'].sum()), '.17g')}`.",
         f"- Portfolio capital: `{int(portfolio_capital_vnd)}` VND; liquidity allowance: `{_display(liquidity_adtv_days)}` ADTV days.",
         "- Momentum is disabled and no momentum value was computed.",
@@ -431,7 +452,7 @@ def render_report(
     return "\n".join(lines) + "\n"
 
 
-def build() -> dict[str, dict[str, pd.DataFrame]]:
+def build(as_of: str) -> dict[str, dict[str, pd.DataFrame]]:
     config = load_simple_config(CONFIG_PATH)
     liquidity_adtv_days = float(config["LIQUIDITY_ADTV_DAYS"])
     portfolio_capital_vnd = float(config["PORTFOLIO_CAPITAL_VND"])
@@ -439,9 +460,10 @@ def build() -> dict[str, dict[str, pd.DataFrame]]:
     survivors = pd.read_csv(SURVIVORS_PATH)
     fscore = pd.read_csv(FSCORE_PATH)
     sector_cycle, sector_cycle_source = _latest_sector_cycle()
-    REPORT_ROOT.mkdir(parents=True, exist_ok=True)
+    resolved_report_root = report_root(as_of)
+    resolved_report_root.mkdir(parents=True, exist_ok=True)
     results: dict[str, dict[str, pd.DataFrame]] = {}
-    for portfolio_name, contract in CANDIDATE_CONTRACTS.items():
+    for portfolio_name, contract in candidate_contracts(resolved_report_root).items():
         pool = _prepare_pool(
             portfolio_name, contract, quality, survivors, fscore
         )
@@ -455,6 +477,7 @@ def build() -> dict[str, dict[str, pd.DataFrame]]:
         holdings = _finalize_holdings(
             selected,
             portfolio_name=portfolio_name,
+            as_of=as_of,
             liquidity_adtv_days=liquidity_adtv_days,
             portfolio_capital_vnd=portfolio_capital_vnd,
             sector_cycle=sector_cycle,
@@ -475,6 +498,7 @@ def build() -> dict[str, dict[str, pd.DataFrame]]:
                 skips,
                 sensitivity,
                 sectors,
+                as_of,
                 liquidity_adtv_days,
                 portfolio_capital_vnd,
             ),
@@ -494,10 +518,11 @@ def _stdout_table(label: str, frame: pd.DataFrame, columns: list[str]) -> None:
     sys.stdout.write(frame[columns].to_csv(index=False, lineterminator="\n"))
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    results = build()
+    args = parse_args(argv)
+    results = build(args.as_of)
     holding_columns = [
         "portfolio_rank",
         "ticker",
