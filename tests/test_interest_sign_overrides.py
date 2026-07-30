@@ -141,3 +141,34 @@ def test_subtract_override_returns_hag_key(monkeypatch, tmp_path):
     )
 
     assert valuation.load_interest_overrides() == frozenset({("HAG", "2023Q4")})
+
+
+def test_hag_2026q1_subtract_changes_ttm_ending_2026q1():
+    fundamentals, _ = valuation.load_inputs()
+    hag_fundamentals = fundamentals.loc[fundamentals["ticker"].eq("HAG")]
+    quarters = ("2025Q2", "2025Q3", "2025Q4", "2026Q1")
+
+    current_behavior = valuation._sum_item(
+        hag_fundamentals,
+        quarters,
+        "interest_expenses",
+        absolute=True,
+        interest_overrides=frozenset(),
+    )
+    subtract_override = valuation._sum_item(
+        hag_fundamentals,
+        quarters,
+        "interest_expenses",
+        absolute=True,
+        interest_overrides=frozenset({("HAG", "2026Q1")}),
+    )
+
+    assert current_behavior == Decimal("1182251572000")
+    assert subtract_override == Decimal("16549240000")
+    assert current_behavior - subtract_override == 2 * Decimal("582851166000")
+
+
+def test_committed_overrides_contain_both_hag_subtract_keys():
+    assert valuation.load_interest_overrides() == frozenset(
+        {("HAG", "2023Q4"), ("HAG", "2026Q1")}
+    )
