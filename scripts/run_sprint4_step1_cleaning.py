@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.screener.step1_data import UNIVERSE_COLUMNS, load_accepted_universe, load_reject_history
+from src.screener.artifact_archive import archive_artifact
 from src.screener.step1_pipeline import (
     FILTER_ORDER,
     FORMULA_NAMES,
@@ -124,7 +125,9 @@ def main() -> int:
         raise RuntimeError("annual cache changed during read-only cleaning run")
     SURVIVORS_PATH.parent.mkdir(parents=True, exist_ok=True)
     result.survivors.to_csv(SURVIVORS_PATH, index=False)
+    archive_artifact(SURVIVORS_PATH, args.evaluation_date, repo_root=ROOT)
     result.rejects.to_csv(REJECTS_PATH, index=False)
+    archive_artifact(REJECTS_PATH, args.evaluation_date, repo_root=ROOT)
     result.sector_a.to_csv(SECTOR_A_PATH, index=False)
     result.sector_b.to_csv(SECTOR_B_PATH, index=False)
     extended.to_csv(REJECT_HISTORY_PATH, index=False)

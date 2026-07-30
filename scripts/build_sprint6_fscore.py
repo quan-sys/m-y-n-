@@ -17,6 +17,7 @@ Formulas copied verbatim from docs/SPEC_SPRINT_6.md section 2:
 
 from __future__ import annotations
 
+import argparse
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -45,6 +46,7 @@ from scripts.audit_sprint6_readiness import (  # noqa: E402
     item_value_status,
     latest_annual_frame,
 )
+from src.screener.artifact_archive import archive_artifact  # noqa: E402
 
 
 OUTPUT_PATH = ROOT / "data" / "screener" / "sprint6_fscore.csv"
@@ -650,11 +652,15 @@ def render_report(
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--as-of", default="2026-07-20", metavar="YYYY-MM-DD")
+    args = parser.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     output, handchecks, fallback_tickers = build()
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     output.to_csv(OUTPUT_PATH, index=False, lineterminator="\n")
+    archive_artifact(OUTPUT_PATH, args.as_of, repo_root=ROOT)
     REPORT_PATH.write_text(
         render_report(output, handchecks, fallback_tickers), encoding="utf-8"
     )
