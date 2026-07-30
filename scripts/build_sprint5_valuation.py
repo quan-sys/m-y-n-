@@ -605,6 +605,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--as-of", default=EVALUATION_DATE, metavar="YYYY-MM-DD")
     args = parser.parse_args()
+    cache_file_count = sum(1 for path in QUARTERLY_CACHE_ROOT.rglob("*") if path.is_file())
+    if not QUARTERLY_CACHE_ROOT.is_dir() or cache_file_count == 0:
+        raise RuntimeError(
+            f"annual cache {QUARTERLY_CACHE_ROOT} is unusable (file_count={cache_file_count}); "
+            "running without the annual cache produces a LOOSER screen rather than an error."
+        )
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
