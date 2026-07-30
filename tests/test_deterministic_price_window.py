@@ -39,11 +39,11 @@ def _request_window(as_of_date: date | None, months: int = 1) -> tuple[str, str]
 
 
 def test_fixed_as_of_date_is_passed_to_quote_history() -> None:
-    assert _request_window(date(2026, 7, 30)) == ("2026-06-19", "2026-07-30")
+    assert _request_window(date(2025, 3, 14)) == ("2025-02-01", "2025-03-14")
 
 
 def test_fixed_as_of_date_produces_identical_windows() -> None:
-    assert _request_window(date(2026, 7, 30), months=3) == _request_window(date(2026, 7, 30), months=3)
+    assert _request_window(date(2025, 3, 14), months=3) == _request_window(date(2025, 3, 14), months=3)
 
 
 def test_unset_as_of_date_uses_today() -> None:
@@ -52,5 +52,9 @@ def test_unset_as_of_date_uses_today() -> None:
 
 
 def test_one_month_window_starts_41_days_before_end() -> None:
-    start, end = _request_window(date(2026, 7, 30))
+    start, end = _request_window(date(2025, 3, 14))
     assert date.fromisoformat(end) - date.fromisoformat(start) == timedelta(days=41)
+
+
+def test_as_of_date_is_not_today() -> None:
+    assert date(2025, 3, 14) < date.today()
