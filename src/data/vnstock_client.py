@@ -53,6 +53,7 @@ class VnstockClient:
         self.min_sleep_seconds = min_sleep_seconds
         self.max_sleep_seconds = max_sleep_seconds
         self.use_cache = use_cache
+        self.as_of_date: date | None = None
         self._terminal_api_error: str | None = None
 
     def list_symbols(self, exchanges: Iterable[str] = ("HOSE", "HNX", "UPCOM")) -> FetchResult:
@@ -230,7 +231,7 @@ class VnstockClient:
             random_agent=True,
             show_log=False,
         )
-        end = date.today()
+        end = self.as_of_date or date.today()
         start = end - timedelta(days=31 * max(months, 1) + 10)
         return self._to_frame(
             self._quiet_call(
