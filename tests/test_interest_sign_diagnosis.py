@@ -99,7 +99,6 @@ def test_diagnose_counts_ttm_flagged_quarters_in_production_path(monkeypatch):
         diagnosis,
         "_hag_sensitivity_rows",
         lambda *_args: [],
-        raising=False,
     )
 
     result = diagnosis.diagnose()
