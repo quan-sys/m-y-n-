@@ -109,8 +109,10 @@ def test_absent_ticker_outside_coverage_is_none(tmp_path: Path):
 
 def test_lowercase_warning_ticker_matches_uppercase_lookup(tmp_path: Path):
     write_inputs(tmp_path, warnings=[warning_row(ticker="aaa")], coverage=[coverage_row()])
+    table = load_warning_table(tmp_path)
 
-    assert load_warning_table(tmp_path).status_for("AAA", "HOSE", "2025-04-01") is True
+    assert table.status_for("AAA", "HOSE", "2025-04-01") is True
+    assert table.status_for(" aaa ", "HOSE", "2025-04-01") is True
 
 
 def test_space_padded_warning_ticker_matches_trimmed_lookup(tmp_path: Path):
