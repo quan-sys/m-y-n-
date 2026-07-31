@@ -12,6 +12,7 @@ import pandas as pd
 
 from src.screener.step1_cleaning import DistressResult, FormulaResult
 from src.screener.step1_data import PreparedTicker, prepare_ticker_from_cache
+from src.screener.hose_warning import WarningTable
 
 
 FILTER_ORDER = (
@@ -159,11 +160,20 @@ def evaluate_formula_stage(
     universe: pd.DataFrame,
     cache_root: str | Path,
     evaluation_date: str,
+    *,
+    warning_table: WarningTable | None = None,
 ) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     for universe_row in universe.to_dict("records"):
+        hose_warning = (
+            None
+            if warning_table is None
+            else warning_table.status_for(
+                universe_row["ticker"], universe_row["exchange"], evaluation_date
+            )
+        )
         prepared = prepare_ticker_from_cache(
-            universe_row, cache_root, evaluation_date, hose_warning=None
+            universe_row, cache_root, evaluation_date, hose_warning=hose_warning
         )
         rows.append(_prepared_row(prepared, universe_row))
     return pd.DataFrame(rows)
@@ -304,10 +314,23 @@ def guardrail(filter_stats: pd.DataFrame, rejects: pd.DataFrame, evaluated: pd.D
     return not triggered.empty, pd.DataFrame(details)
 
 
-def run_cleaning_pipeline(full_universe: pd.DataFrame, cache_root: str | Path, evaluation_date: str, worst_pct: float, mscore_threshold: float) -> PipelineResult:
+def run_cleaning_pipeline(
+    full_universe: pd.DataFrame,
+    cache_root: str | Path,
+    evaluation_date: str,
+    worst_pct: float,
+    mscore_threshold: float,
+    *,
+    warning_table: WarningTable | None = None,
+) -> PipelineResult:
     upstream_keep = ~full_universe["icb2"].isin(FINANCIAL_ICB2) & ~full_universe["exchange"].astype(str).str.upper().eq("UPCOM")
     formula_universe = full_universe.loc[upstream_keep].reset_index(drop=True)
-    evaluated = evaluate_formula_stage(formula_universe, cache_root, evaluation_date)
+    if warning_table is None:
+        evaluated = evaluate_formula_stage(formula_universe, cache_root, evaluation_date)
+    else:
+        evaluated = evaluate_formula_stage(
+            formula_universe, cache_root, evaluation_date, warning_table=warning_table
+        )
     evaluated, cutoffs = add_formula_flags(evaluated, worst_pct, mscore_threshold)
     rejects = assign_primary_rejections(full_universe, evaluated, cutoffs, mscore_threshold)
     rejected = set(rejects["ticker"])

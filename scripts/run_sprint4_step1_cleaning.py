@@ -16,7 +16,9 @@ if str(ROOT) not in sys.path:
 
 from src.screener.step1_data import UNIVERSE_COLUMNS, load_accepted_universe, load_reject_history
 from src.screener.artifact_archive import archive_artifact
+from src.screener.hose_warning import assert_coverage, load_warning_table
 from src.screener.step1_pipeline import (
+    FINANCIAL_ICB2,
     FILTER_ORDER,
     FORMULA_NAMES,
     extend_reject_history,
@@ -110,6 +112,13 @@ def main() -> int:
     if config.get("SECTOR_MODE") != "whole_universe_log":
         raise ValueError("SECTOR_MODE must be whole_universe_log")
     universe = load_accepted_universe(UNIVERSE_PATH)
+    formula_universe = universe.loc[
+        ~universe["icb2"].isin(FINANCIAL_ICB2)
+        & ~universe["exchange"].astype(str).str.upper().eq("UPCOM")
+    ]
+    exchanges_in_formula_universe = set(formula_universe["exchange"])
+    table = load_warning_table(ROOT)
+    assert_coverage(table, exchanges_in_formula_universe, EVALUATION_DATE)
     history = load_reject_history(REJECT_HISTORY_PATH)
     if "filter_stage" in history.columns:
         historical_mask = history["filter_stage"].isna() | history["filter_stage"].astype(str).str.strip().eq("")
@@ -118,6 +127,7 @@ def main() -> int:
     result = run_cleaning_pipeline(
         universe, CACHE_ROOT, EVALUATION_DATE,
         float(config["ACCRUAL_WORST_PCT"]), float(config["MSCORE_THRESHOLD"]),
+        warning_table=table,
     )
     extended, proof = extend_reject_history(history, result.rejects, universe)
     cache_after = cache_manifest(CACHE_ROOT)
