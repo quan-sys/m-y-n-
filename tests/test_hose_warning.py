@@ -172,3 +172,21 @@ def test_evaluate_formula_stage_without_warning_table_keeps_missing_warnings(mon
 
     assert passed_warnings == [None, None]
     assert result["distress_hose_warning"].isna().all()
+
+
+def test_lowercase_lookup_exchange_matches_uppercase_coverage(tmp_path: Path):
+    write_inputs(tmp_path, warnings=[warning_row()], coverage=[coverage_row(exchange="HOSE")])
+
+    assert load_warning_table(tmp_path).status_for("AAA", "hose", "2025-04-01") is True
+
+
+def test_space_padded_lookup_exchange_matches_coverage(tmp_path: Path):
+    write_inputs(tmp_path, warnings=[warning_row()], coverage=[coverage_row(exchange="HOSE")])
+
+    assert load_warning_table(tmp_path).status_for("AAA", " HOSE ", "2025-04-01") is True
+
+
+def test_assert_coverage_normalizes_lookup_exchange(tmp_path: Path):
+    write_inputs(tmp_path, coverage=[coverage_row(exchange="HOSE")])
+
+    assert_coverage(load_warning_table(tmp_path), [" hose "], "2025-04-01")
