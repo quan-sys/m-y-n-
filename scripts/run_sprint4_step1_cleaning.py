@@ -115,6 +115,11 @@ def main() -> int:
         historical_mask = history["filter_stage"].isna() | history["filter_stage"].astype(str).str.strip().eq("")
         history = history.loc[historical_mask, list(UNIVERSE_COLUMNS)].reset_index(drop=True)
     cache_before = cache_manifest(CACHE_ROOT)
+    if not CACHE_ROOT.is_dir() or cache_before["file_count"] == 0:
+        raise RuntimeError(
+            f"annual cache {CACHE_ROOT} is unusable (file_count={cache_before['file_count']}); "
+            "running without the annual cache produces a LOOSER screen rather than an error."
+        )
     result = run_cleaning_pipeline(
         universe, CACHE_ROOT, EVALUATION_DATE,
         float(config["ACCRUAL_WORST_PCT"]), float(config["MSCORE_THRESHOLD"]),
