@@ -46,6 +46,8 @@ class WarningTable:
     def status_for(self, ticker: str, exchange: str, evaluation_date: str) -> bool | None:
         """Return the point-in-time warning status, or None outside coverage."""
 
+        ticker = str(ticker).strip().upper()
+        exchange = str(exchange).strip().upper()
         as_of = _parse_date(evaluation_date, "evaluation_date")
         covered = any(
             row.exchange == exchange
@@ -103,14 +105,18 @@ def load_warning_table(root: Path) -> WarningTable:
         lifted_date = _parse_optional_date(row["lifted_date"], "lifted_date")
         _parse_optional_date(row["published_date"], "published_date")
         _parse_optional_date(row["recorded_at"], "recorded_at")
-        warnings.append(_Warning(row["ticker"], effective_date, lifted_date))
+        warnings.append(
+            _Warning(str(row["ticker"]).strip().upper(), effective_date, lifted_date)
+        )
 
     coverage: list[_Coverage] = []
     for row in coverage_frame.to_dict("records"):
         coverage_start = _parse_date(row["coverage_start"], "coverage_start")
         coverage_end = _parse_optional_date(row["coverage_end"], "coverage_end")
         _parse_optional_date(row["recorded_at"], "recorded_at")
-        coverage.append(_Coverage(row["exchange"], coverage_start, coverage_end))
+        coverage.append(
+            _Coverage(str(row["exchange"]).strip().upper(), coverage_start, coverage_end)
+        )
     return WarningTable(tuple(warnings), tuple(coverage))
 
 

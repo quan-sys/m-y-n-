@@ -78,6 +78,20 @@ def test_nonempty_cache_passes_guard(
     (cache_root / "marker.txt").write_text("present", encoding="utf-8")
 
     if script == "cleaning":
+        from src.screener.hose_warning import COVERAGE_COLUMNS, WARNING_COLUMNS, load_warning_table
+
+        warning_root = tmp_path / "manual_inputs" / "hose_warning"
+        warning_root.mkdir(parents=True)
+        (warning_root / "warnings.csv").write_text(
+            ",".join(WARNING_COLUMNS) + "\n", encoding="utf-8"
+        )
+        (warning_root / "coverage.csv").write_text(
+            ",".join(COVERAGE_COLUMNS)
+            + "\nHOSE,2025-01-01,,,,\nHNX,2025-01-01,,,,\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(module, "load_warning_table", lambda _root: load_warning_table(tmp_path))
+
         def stop_after_guard(*args: object, **kwargs: object) -> None:
             raise ReachedAfterCacheGuard
 

@@ -112,13 +112,6 @@ def main() -> int:
     if config.get("SECTOR_MODE") != "whole_universe_log":
         raise ValueError("SECTOR_MODE must be whole_universe_log")
     universe = load_accepted_universe(UNIVERSE_PATH)
-    formula_universe = universe.loc[
-        ~universe["icb2"].isin(FINANCIAL_ICB2)
-        & ~universe["exchange"].astype(str).str.upper().eq("UPCOM")
-    ]
-    exchanges_in_formula_universe = set(formula_universe["exchange"])
-    table = load_warning_table(ROOT)
-    assert_coverage(table, exchanges_in_formula_universe, EVALUATION_DATE)
     history = load_reject_history(REJECT_HISTORY_PATH)
     if "filter_stage" in history.columns:
         historical_mask = history["filter_stage"].isna() | history["filter_stage"].astype(str).str.strip().eq("")
@@ -129,6 +122,13 @@ def main() -> int:
             f"annual cache {CACHE_ROOT} is unusable (file_count={cache_before['file_count']}); "
             "running without the annual cache produces a LOOSER screen rather than an error."
         )
+    formula_universe = universe.loc[
+        ~universe["icb2"].isin(FINANCIAL_ICB2)
+        & ~universe["exchange"].astype(str).str.upper().eq("UPCOM")
+    ]
+    exchanges_in_formula_universe = set(formula_universe["exchange"])
+    table = load_warning_table(ROOT)
+    assert_coverage(table, exchanges_in_formula_universe, EVALUATION_DATE)
     result = run_cleaning_pipeline(
         universe, CACHE_ROOT, EVALUATION_DATE,
         float(config["ACCRUAL_WORST_PCT"]), float(config["MSCORE_THRESHOLD"]),
