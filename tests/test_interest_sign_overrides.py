@@ -33,7 +33,7 @@ def _hag_2024_03_31_inputs():
 def _force_override_file(monkeypatch, tmp_path, rows):
     path = tmp_path / "interest_sign_overrides.csv"
     pd.DataFrame(rows, columns=OVERRIDE_COLUMNS).to_csv(path, index=False)
-    monkeypatch.setattr(valuation, "OVERRIDES_PATH", path, raising=False)
+    monkeypatch.setattr(valuation, "OVERRIDES_PATH", path)
 
 
 def test_zero_subtract_overrides_keep_current_hag_ebit_behavior(monkeypatch, tmp_path):

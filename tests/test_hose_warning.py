@@ -133,6 +133,14 @@ def test_coverage_start_boundary_is_covered(tmp_path: Path):
     assert load_warning_table(tmp_path).status_for("MISSING", "HOSE", "2025-01-01") is not None
 
 
+def test_coverage_end_boundary_is_covered(tmp_path: Path):
+    write_inputs(tmp_path, coverage=[coverage_row(coverage_end="2025-06-30")])
+    table = load_warning_table(tmp_path)
+
+    assert table.status_for("MISSING", "HOSE", "2025-06-30") is not None
+    assert table.status_for("MISSING", "HOSE", "2025-07-01") is None
+
+
 def test_assert_coverage_names_uncovered_exchange(tmp_path: Path):
     write_inputs(tmp_path, coverage=[coverage_row()])
     table = load_warning_table(tmp_path)

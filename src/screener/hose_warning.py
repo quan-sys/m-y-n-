@@ -25,6 +25,7 @@ ALLOWED_STATUSES = ("WARNING", "CONTROL", "SPECIAL_CONTROL")
 @dataclass(frozen=True)
 class _Warning:
     ticker: str
+    status: str
     effective_date: date
     lifted_date: date | None
 
@@ -43,19 +44,24 @@ class WarningTable:
     warnings: tuple[_Warning, ...]
     coverage: tuple[_Coverage, ...]
 
-    def status_for(self, ticker: str, exchange: str, evaluation_date: str) -> bool | None:
-        """Return the point-in-time warning status, or None outside coverage."""
+    def is_covered(self, exchange: str, evaluation_date: str) -> bool:
+        """Return whether an exchange has coverage at the given date."""
 
-        ticker = str(ticker).strip().upper()
         exchange = str(exchange).strip().upper()
         as_of = _parse_date(evaluation_date, "evaluation_date")
-        covered = any(
+        return any(
             row.exchange == exchange
             and row.coverage_start <= as_of
             and (row.coverage_end is None or as_of <= row.coverage_end)
             for row in self.coverage
         )
-        if not covered:
+
+    def status_for(self, ticker: str, exchange: str, evaluation_date: str) -> bool | None:
+        """Return the point-in-time warning status, or None outside coverage."""
+
+        ticker = str(ticker).strip().upper()
+        as_of = _parse_date(evaluation_date, "evaluation_date")
+        if not self.is_covered(exchange, evaluation_date):
             return None
         return any(
             row.ticker == ticker
@@ -106,7 +112,12 @@ def load_warning_table(root: Path) -> WarningTable:
         _parse_optional_date(row["published_date"], "published_date")
         _parse_optional_date(row["recorded_at"], "recorded_at")
         warnings.append(
-            _Warning(str(row["ticker"]).strip().upper(), effective_date, lifted_date)
+            _Warning(
+                str(row["ticker"]).strip().upper(),
+                row["status"],
+                effective_date,
+                lifted_date,
+            )
         )
 
     coverage: list[_Coverage] = []
@@ -125,7 +136,7 @@ def assert_coverage(table: WarningTable, exchanges: Iterable[str], evaluation_da
 
     uncovered = sorted(
         exchange for exchange in set(exchanges)
-        if table.status_for("", exchange, evaluation_date) is None
+        if not table.is_covered(exchange, evaluation_date)
     )
     if uncovered:
         raise RuntimeError(
