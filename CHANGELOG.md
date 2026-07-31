@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-07-31 — Cổng cảnh báo HOSE/HNX chạy thật lần đầu
+
+- Merge PR #47 (data/hose-warning-inputs). main = 91e9d58, pytest 490.
+- Chạy scripts/run_sprint4_step1_cleaning.py tại EVALUATION_DATE=2026-07-18.
+  Survivors 156 → 153. PFD_HIGH_RISK 10 → 13.
+  Ba mã bị loại CHỈ nhờ cờ cảnh báo: API, DGC, IDJ.
+  FINANCIAL(63)/UPCOM(72)/HIGH_ACCRUAL(42)/M_SCORE(35) không đổi một mã nào.
+- GIỚI HẠN ĐÃ BIẾT: diện cảnh báo của Sở trộn lý do tài chính, công bố thông tin
+  và quản trị. DGC bị loại vì "chưa họp ĐHĐCĐ thường niên quá 6 tháng", không
+  liên quan kiệt quệ tài chính. Quyết định: giữ nguyên, không ngoại lệ theo mã —
+  tạo ngoại lệ là đưa phán đoán chủ quan trở lại máy lọc. warnings.csv chưa có
+  cột lý do nên chưa đo được tỷ lệ "quản trị" trong 19 mã bị cờ.
+- Snapshot forward test 2026-07-21 GIỮ NGUYÊN. Cổng chỉ áp từ kỳ rebalance kế tiếp.
+
 ## 2026-07-30
 
 - Reclassify HAG 2026Q1 as a verified SUBTRACT override using the 2026-04-30 CafeF evidence that identifies the waived interest and the matching committed net financial-expense credit.
