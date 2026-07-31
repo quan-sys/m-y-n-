@@ -17,3 +17,4 @@ src/data/cache/**/*.parquet
 src/data/cache/**/*.csv
 src/data/cache/**/*.json
 !src/data/cache/.gitkeep
+data/screener/archive/
