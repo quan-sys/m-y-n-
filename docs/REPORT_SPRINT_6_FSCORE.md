@@ -1,7 +1,7 @@
 # Sprint 6 production F-Score report
 
 - Evaluation date: `2026-07-20`.
-- `data/screener/sprint6_fscore.csv` data rows: `156`; unique tickers: `156`.
+- `data/screener/sprint6_fscore.csv` data rows: `153`; unique tickers: `153`.
 - These annual figures are restated data usable for ranking today, not point-in-time evidence of what was published then.
 - Franchise Power, ROC, margin stability, percentiles, composite quality, and candidate-list quality ranking computed: `0`.
 - Gross-profit fallback ticker count: `0`.
@@ -15,9 +15,9 @@
 | 2 | 1 |
 | 3 | 10 |
 | 4 | 22 |
-| 5 | 39 |
+| 5 | 37 |
 | 6 | 35 |
-| 7 | 30 |
+| 7 | 29 |
 | 8 | 15 |
 | 9 | 3 |
 
@@ -26,14 +26,14 @@
 | F_SCORE_CRITERIA_SCORED | ticker count |
 |---:|---:|
 | 8 | 30 |
-| 9 | 126 |
+| 9 | 123 |
 
 ## Criterion 7 branch counts
 
 | criterion_7_branch | ticker count |
 |---|---:|
-| `SCORE_1` | 72 |
-| `SCORE_0` | 55 |
+| `SCORE_1` | 70 |
+| `SCORE_0` | 54 |
 | `SHARE_INCREASE_NO_CASH_SUSPECTED` | 28 |
 | `MISSING_INPUT_UNSCORED` | 1 |
 
