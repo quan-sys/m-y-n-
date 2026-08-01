@@ -3,6 +3,16 @@
 
 ## 2026-08-01
 
+- Regenerate the Sprint 5-6 outputs at `--as-of 2026-07-20` on the 153-ticker survivor
+  population so the DEF-6 ticker-set guards pass. Measured, not assumed: across the 153
+  tickers common to the old and new files, `sprint6_fscore.csv` is identical column for
+  column, because the Piotroski criteria are absolute rather than cross-sectional and a
+  smaller population therefore changes no score. The only content change is that DGC
+  leaves both candidate lists and the next-ranked name takes its slot: PVT enters
+  `step2_candidates_ebit_tev.csv` and CTD enters `step2_candidates_ep.csv`, with the
+  counts unchanged at 45 and 44 because the 30 percent target shrinks together with the
+  eligible pool. Neither name appears in the frozen 2026-07-20 portfolios, which are NOT
+  regenerated. No formula, threshold or configuration changed.
 
 - Approve `docs/SPEC_SPRINT_8D.md`. Owner decision closing DEF-5: the 1% materiality threshold applies to BOTH criterion 7 tests, the par-capital increase and the cash proceeds, under one key `CRITERION_7_MATERIALITY_PCT`. Owner's reason: an increase that is too small is not material on either side — a par-capital figure that only nudges is not real dilution, and cash proceeds that only trickle are not a real capital raise. The rule was chosen on what the threshold measures, not on its measured effect. Measured consequence, read and accepted: 21 of 156 rows change branch, 13 to `SCORE_1` and 8 to `UNSCORED`. This entry approves a specification only; no code is implemented by it.
 - Approve `docs/SPEC_SPRINT_8E_POPULATION.md` and register DEF-6. Owner decision: the hard-coded survivor population of 156 is REMOVED from all seven scripts that assert it, rather than changed to 153. Owner's reason: 153 is just another ghost number and the 2026-09-30 rebalance would break the pipeline again in exactly the same way; a script must check that it is consistent with `data/screener/step1_survivors.csv`, whatever population Step 1 produced. Two further decisions recorded: the replacement guard compares the ticker SET rather than the row count, which is deliberately stricter than the guard it replaces and means `build_sprint6_franchise.py` will refuse to run until `data/screener/sprint6_fscore.csv` is regenerated; and the stale provenance line ranges in `scripts/build_sprint9_4b_annual_pit.py` are repaired in this block from measured line numbers, never from guessed ones. Scope was widened beyond the four files identified in session 18 to seven, after `fetch_sprint6_annual_history.py`, `analyze_sprint6_annual_history.py` and `fetch_sprint5_market_cap.py` were found to carry the same literal. This entry approves a specification only; no code is implemented by it.
