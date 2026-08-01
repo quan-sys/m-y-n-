@@ -38,13 +38,14 @@ from scripts.audit_sprint6_readiness import (  # noqa: E402
     CRITERION7_SCORE_1,
     CRITERION7_SHARE_INCREASE_NO_CASH,
     EVALUATION_DATE,
-    EXPECTED_SURVIVORS,
+    assert_matches_survivors,
     FUNDAMENTALS_ROOT,
     SURVIVORS_PATH,
     classify_criterion7_branch,
     eligible_annual_rows,
     item_value_status,
     latest_annual_frame,
+    load_survivors_checked,
 )
 from src.screener.artifact_archive import archive_artifact  # noqa: E402
 
@@ -486,15 +487,7 @@ def compute_ticker(
 
 
 def build() -> tuple[pd.DataFrame, dict[str, dict[int, CriterionResult]], list[str]]:
-    survivors = pd.read_csv(SURVIVORS_PATH)
-    tickers = survivors["ticker"].astype(str).str.strip().str.upper()
-    if len(survivors) != EXPECTED_SURVIVORS or tickers.nunique() != EXPECTED_SURVIVORS:
-        raise ValueError(
-            f"expected {EXPECTED_SURVIVORS} unique survivors; "
-            f"rows={len(survivors)} unique={tickers.nunique()}"
-        )
-    survivors = survivors.copy()
-    survivors["ticker"] = tickers
+    survivors = load_survivors_checked(SURVIVORS_PATH)
     rows: list[dict[str, Any]] = []
     handchecks: dict[str, dict[int, CriterionResult]] = {}
     fallback_tickers: list[str] = []
@@ -518,8 +511,7 @@ def build() -> tuple[pd.DataFrame, dict[str, dict[int, CriterionResult]], list[s
         if fallback:
             fallback_tickers.append(ticker)
     output = pd.DataFrame(rows)
-    if len(output) != EXPECTED_SURVIVORS or output["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("F-Score output is not exactly one row per survivor")
+    assert_matches_survivors(output, survivors, "F-Score output")
     if not output["F_SCORE_CRITERIA_SCORED"].add(
         output["F_SCORE_CRITERIA_UNSCORED"]
     ).eq(9).all():

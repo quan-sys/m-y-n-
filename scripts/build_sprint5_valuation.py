@@ -20,10 +20,10 @@ if str(ROOT) not in sys.path:
 
 from src.screener.artifact_archive import archive_artifact
 from src.screener.step1_pipeline import load_simple_config
+from scripts.audit_sprint6_readiness import load_survivors_checked
 
 
 EVALUATION_DATE = "2026-07-20"
-EXPECTED_SURVIVORS = 156
 SURVIVORS_PATH = ROOT / "data" / "screener" / "step1_survivors.csv"
 MARKET_CAP_PATH = ROOT / "data" / "market_cap" / "2026-07-19" / "universe_market_cap.csv"
 QUARTERLY_CACHE_ROOT = ROOT / "data" / "fundamentals" / "run_state" / "2026-07-17" / "normalized"
@@ -385,15 +385,7 @@ def build_valuation() -> BuildResult:
     if cheapest_pct != 0.30:
         raise ValueError(f"VALUE_CHEAPEST_PCT must equal 0.30; found {cheapest_pct}")
 
-    survivors = pd.read_csv(SURVIVORS_PATH)
-    tickers = survivors["ticker"].astype(str).str.strip().str.upper()
-    if len(survivors) != EXPECTED_SURVIVORS or tickers.nunique() != EXPECTED_SURVIVORS:
-        raise ValueError(
-            f"survivors must contain exactly {EXPECTED_SURVIVORS} unique tickers; "
-            f"rows={len(survivors)} unique={tickers.nunique()}"
-        )
-    survivors = survivors.copy()
-    survivors["ticker"] = tickers
+    survivors = load_survivors_checked(SURVIVORS_PATH)
 
     market = pd.read_csv(MARKET_CAP_PATH)
     if market["ticker"].astype(str).str.upper().duplicated().any():

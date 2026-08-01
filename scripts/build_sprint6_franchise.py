@@ -46,7 +46,7 @@ from scripts.audit_sprint6_readiness import (  # noqa: E402
     CRITERION7_NO_SHARE_INCREASE_CASH,
     CRITERION7_SCORE_0,
     EVALUATION_DATE,
-    EXPECTED_SURVIVORS,
+    assert_matches_survivors,
     FUNDAMENTALS_ROOT,
     PROPOSED_FRANCHISE_MIN_YEARS,
     SURVIVORS_PATH,
@@ -55,6 +55,7 @@ from scripts.audit_sprint6_readiness import (  # noqa: E402
     eligible_annual_rows,
     item_value_status,
     latest_annual_frame,
+    load_survivors_checked,
 )
 from src.screener.artifact_archive import archive_artifact  # noqa: E402
 
@@ -372,12 +373,9 @@ def build(as_of: str = EVALUATION_DATE) -> tuple[
     list[tuple[str, int, str]],
     int,
 ]:
-    survivors = pd.read_csv(SURVIVORS_PATH)
+    survivors = load_survivors_checked(SURVIVORS_PATH)
     fscore = pd.read_csv(FSCORE_PATH)
-    if len(survivors) != EXPECTED_SURVIVORS or survivors["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("survivor input is not exactly 156 unique tickers")
-    if len(fscore) != EXPECTED_SURVIVORS or fscore["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("F-Score input is not exactly 156 unique tickers")
+    assert_matches_survivors(fscore, survivors, "F-Score input")
     fscore_by_ticker = fscore.set_index("ticker")
     rows: list[dict[str, Any]] = []
     evidence: dict[str, dict[str, Any]] = {}
@@ -504,8 +502,7 @@ def build(as_of: str = EVALUATION_DATE) -> tuple[
     output.loc[ep_mask, "ep_quality_rank"] = output.loc[
         ep_mask, "composite_quality"
     ].rank(method="average", ascending=False)
-    if len(output) != EXPECTED_SURVIVORS or output["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("Franchise output is not exactly 156 unique tickers")
+    assert_matches_survivors(output, survivors, "Franchise output")
     if not output["composite_components_used"].isin((1, 2, 3)).all():
         raise AssertionError("composite denominator outside {1,2,3}")
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)

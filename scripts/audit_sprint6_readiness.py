@@ -18,7 +18,6 @@ FUNDAMENTALS_ROOT = (
 OUTPUT_PATH = ROOT / "data" / "screener" / "sprint6_readiness_audit.csv"
 REPORT_PATH = ROOT / "docs" / "SPRINT_6_DATA_READINESS.md"
 EVALUATION_DATE = "2026-07-20"
-EXPECTED_SURVIVORS = 156
 PROPOSED_FRANCHISE_MIN_YEARS = 5
 
 CRITERION7_SCORE_0 = "SCORE_0"
@@ -493,25 +492,73 @@ def audit_survivor(
     )
 
 
+def load_survivors_checked(path: Path = SURVIVORS_PATH) -> pd.DataFrame:
+    """Read step1_survivors.csv without asserting any expected population size.
+
+    The population is whatever Step 1 produced for the current rebalance.
+    Only internal consistency is checked, so a rebalance that legitimately
+    changes the survivor count cannot break a downstream script, and a
+    corrupted survivor file cannot silently pass one.
+    """
+    try:
+        frame = pd.read_csv(path, skip_blank_lines=False)
+    except pd.errors.EmptyDataError as exc:
+        raise ValueError("survivor input is empty") from exc
+    if "ticker" not in frame.columns:
+        raise ValueError("survivor input is missing ticker")
+    if frame.empty:
+        raise ValueError("survivor input is empty")
+    frame = frame.copy()
+    frame["ticker"] = frame["ticker"].fillna("").astype(str).str.strip().str.upper()
+    empty_indexes = frame.index[frame["ticker"].eq("")].tolist()
+    if empty_indexes:
+        raise ValueError(f"survivor input has empty ticker at row index {empty_indexes[0]}")
+    duplicates = sorted(frame.loc[frame["ticker"].duplicated(), "ticker"].unique())
+    if duplicates:
+        raise ValueError(f"survivor input has duplicate tickers: {duplicates}")
+    return frame
+
+
+def assert_matches_survivors(
+    frame: pd.DataFrame, survivors: pd.DataFrame, label: str
+) -> None:
+    """Raise AssertionError unless frame's ticker set equals survivors'.
+
+    Checks, in this order: frame has a ticker column; no frame ticker is
+    duplicated; the frame ticker set equals the survivor ticker set. The
+    message names `label`, the sorted missing tickers and the sorted extra
+    tickers.
+    """
+    survivor_tickers = frozenset(
+        survivors["ticker"].astype(str).str.strip().str.upper()
+    )
+    if "ticker" not in frame.columns:
+        raise AssertionError(
+            f"{label}: missing={sorted(survivor_tickers)}; extra=[]; output has no ticker column"
+        )
+    tickers = frame["ticker"].astype(str).str.strip().str.upper()
+    output_tickers = frozenset(tickers)
+    missing = sorted(survivor_tickers - output_tickers)
+    extra = sorted(output_tickers - survivor_tickers)
+    duplicates = sorted(tickers[tickers.duplicated()].unique())
+    if duplicates:
+        raise AssertionError(
+            f"{label}: missing={missing}; extra={extra}; duplicated={duplicates}"
+        )
+    if output_tickers != survivor_tickers:
+        raise AssertionError(f"{label}: missing={missing}; extra={extra}")
+
+
 def run_audit(
     survivors_path: Path = SURVIVORS_PATH,
     fundamentals_root: Path = FUNDAMENTALS_ROOT,
 ) -> pd.DataFrame:
-    survivors = pd.read_csv(survivors_path)
-    tickers = survivors["ticker"].astype(str).str.strip().str.upper()
-    if len(survivors) != EXPECTED_SURVIVORS or tickers.nunique() != EXPECTED_SURVIVORS:
-        raise ValueError(
-            f"expected {EXPECTED_SURVIVORS} unique survivors; "
-            f"rows={len(survivors)} unique={tickers.nunique()}"
-        )
-    survivors = survivors.copy()
-    survivors["ticker"] = tickers
+    survivors = load_survivors_checked(survivors_path)
     audited = pd.DataFrame(
         audit_survivor(row, fundamentals_root)
         for row in survivors.to_dict("records")
     )
-    if len(audited) != EXPECTED_SURVIVORS or audited["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("audit output is not exactly one row per survivor")
+    assert_matches_survivors(audited, survivors, "sprint6 readiness audit")
     return audited
 
 

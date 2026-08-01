@@ -15,14 +15,16 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts.audit_sprint6_readiness import (
+    assert_matches_survivors,
+    load_survivors_checked,
+)
 from scripts.fetch_sprint6_annual_history import (
-    EXPECTED_SURVIVORS,
     FUNDAMENTALS_ROOT,
     ROOT,
     RUN_DATE,
     RUN_ROOT,
     SURVIVORS_PATH,
-    load_survivors,
 )
 
 
@@ -108,17 +110,16 @@ def coverage_record(
     return record
 
 
-def build_coverage(tickers: list[str]) -> pd.DataFrame:
+def build_coverage(survivors: pd.DataFrame) -> pd.DataFrame:
     records = []
-    for ticker in tickers:
+    for ticker in survivors["ticker"]:
         frames = {
             statement: read_normalized(RUN_ROOT, ticker, statement, RUN_DATE)
             for statement in STATEMENTS
         }
         records.append(coverage_record(ticker, frames))
     output = pd.DataFrame(records)
-    if len(output) != EXPECTED_SURVIVORS or output["ticker"].nunique() != EXPECTED_SURVIVORS:
-        raise AssertionError("coverage output is not exactly one row per survivor")
+    assert_matches_survivors(output, survivors, "annual-history coverage")
     return output
 
 
@@ -234,7 +235,8 @@ def render_coverage_report(coverage: pd.DataFrame) -> str:
             "",
             "## Per-ticker full period lists",
             "",
-            "The authoritative per-ticker lists, total counts, and eligible counts are in `data/screener/sprint6_annual_history_coverage.csv` (exactly 156 rows).",
+            "The authoritative per-ticker lists, total counts, and eligible counts are in `data/screener/sprint6_annual_history_coverage.csv` "
+            f"(exactly {len(coverage)} rows).",
         ]
     )
     return "\n".join(lines) + "\n"
@@ -304,8 +306,9 @@ def render_restatement_report(compared: pd.DataFrame) -> str:
 def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    tickers = load_survivors(SURVIVORS_PATH)
-    coverage = build_coverage(tickers)
+    survivors = load_survivors_checked(SURVIVORS_PATH)
+    tickers = survivors["ticker"].tolist()
+    coverage = build_coverage(survivors)
     COVERAGE_CSV.parent.mkdir(parents=True, exist_ok=True)
     coverage.to_csv(COVERAGE_CSV, index=False, lineterminator="\n")
     COVERAGE_REPORT.write_text(render_coverage_report(coverage), encoding="utf-8")

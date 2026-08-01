@@ -84,7 +84,6 @@ def test_full_universe_resume_reuses_checkpoint_without_live_calls(tmp_path: Pat
     first = run_full_universe(
         survivors_path=survivors,
         output_path=output,
-        expected_count=3,
         sleep_seconds=0,
         sleep_fn=lambda _: None,
         board_fetcher=board,
@@ -99,7 +98,6 @@ def test_full_universe_resume_reuses_checkpoint_without_live_calls(tmp_path: Pat
     second = run_full_universe(
         survivors_path=survivors,
         output_path=output,
-        expected_count=3,
         sleep_seconds=0,
         sleep_fn=lambda _: None,
         board_fetcher=board,
@@ -127,7 +125,6 @@ def test_price_board_batches_never_exceed_50_tickers(tmp_path: Path) -> None:
     result = run_full_universe(
         survivors_path=survivors,
         output_path=output,
-        expected_count=101,
         sleep_seconds=0,
         sleep_fn=lambda _: None,
         board_fetcher=board,
