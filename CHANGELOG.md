@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-07-31
+
+- Add `data/screener/archive/` to `.gitignore`, create `docs/KNOWN_LIMITS_AND_DEFERRED_DEFECTS.md`, and add `tests/test_repo_decision_guards.py`; no deferred item was implemented and no threshold was changed.
+
 ## 2026-07-31 — Cổng cảnh báo HOSE/HNX chạy thật lần đầu
 
 - Merge PR #47 (data/hose-warning-inputs). main = 91e9d58, pytest 490.
