@@ -501,7 +501,7 @@ def load_survivors_checked(path: Path = SURVIVORS_PATH) -> pd.DataFrame:
     corrupted survivor file cannot silently pass one.
     """
     try:
-        frame = pd.read_csv(path, keep_default_na=False, skip_blank_lines=False)
+        frame = pd.read_csv(path, skip_blank_lines=False)
     except pd.errors.EmptyDataError as exc:
         raise ValueError("survivor input is empty") from exc
     if "ticker" not in frame.columns:
@@ -509,7 +509,7 @@ def load_survivors_checked(path: Path = SURVIVORS_PATH) -> pd.DataFrame:
     if frame.empty:
         raise ValueError("survivor input is empty")
     frame = frame.copy()
-    frame["ticker"] = frame["ticker"].astype(str).str.strip().str.upper()
+    frame["ticker"] = frame["ticker"].fillna("").astype(str).str.strip().str.upper()
     empty_indexes = frame.index[frame["ticker"].eq("")].tolist()
     if empty_indexes:
         raise ValueError(f"survivor input has empty ticker at row index {empty_indexes[0]}")

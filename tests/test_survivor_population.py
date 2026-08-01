@@ -74,6 +74,19 @@ def test_load_survivors_checked_normalizes_tickers(tmp_path: Path) -> None:
     assert loaded["ticker"].tolist() == ["VNM", "FPT"]
 
 
+def test_load_survivors_checked_preserves_numeric_nan_dtype(tmp_path: Path) -> None:
+    path = tmp_path / "survivors.csv"
+    pd.DataFrame(
+        {"ticker": ["VNM", "FPT", "VCB"], "numeric_value": [1.5, None, 4.5]}
+    ).to_csv(path, index=False)
+
+    loaded = load_survivors_checked(path)
+
+    assert pd.api.types.is_float_dtype(loaded["numeric_value"])
+    assert pd.isna(loaded.loc[1, "numeric_value"])
+    assert loaded["numeric_value"].dropna().mean() == pytest.approx(3.0)
+
+
 def test_assert_matches_survivors_accepts_different_row_order() -> None:
     survivors = pd.DataFrame({"ticker": ["AAA", "BBB", "CCC"]})
     output = pd.DataFrame({"ticker": ["CCC", "AAA", "BBB"]})
