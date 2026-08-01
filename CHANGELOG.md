@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-01
+
+- Approve `docs/SPEC_SPRINT_8D.md`. Owner decision closing DEF-5: the 1% materiality threshold applies to BOTH criterion 7 tests, the par-capital increase and the cash proceeds, under one key `CRITERION_7_MATERIALITY_PCT`. Owner's reason: an increase that is too small is not material on either side — a par-capital figure that only nudges is not real dilution, and cash proceeds that only trickle are not a real capital raise. The rule was chosen on what the threshold measures, not on its measured effect. Measured consequence, read and accepted: 21 of 156 rows change branch, 13 to `SCORE_1` and 8 to `UNSCORED`. This entry approves a specification only; no code is implemented by it.
+  
 ## 2026-07-31
 
 - Add `data/screener/archive/` to `.gitignore`, create `docs/KNOWN_LIMITS_AND_DEFERRED_DEFECTS.md`, and add `tests/test_repo_decision_guards.py`; no deferred item was implemented and no threshold was changed.
