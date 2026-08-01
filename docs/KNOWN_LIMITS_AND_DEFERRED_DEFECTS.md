@@ -132,6 +132,43 @@ shows NO_SHARE_INCREASE_CASH_POSITIVE_SCORE_0 for 20 tickers.
 The owner has settled a materiality threshold of 1% for this criterion, chosen
 on ECONOMIC grounds and deliberately NOT cut at the gap observed in the data,
 because cutting at an observed gap is data-mining. The number of tickers whose
+
+
+## DEF-6 — Seven scripts assert a literal survivor population of 156
+ 
+Status: OPEN. Specification approved 2026-08-01 as `docs/SPEC_SPRINT_8E_POPULATION.md`.
+Implementation not started.
+ 
+Evidence (OK), measured on `main` = `86c2bc2`: `data/screener/step1_survivors.csv`
+holds 153 rows and 153 unique tickers after the 2026-07-31 HoSE/HNX warning-gate
+run, while `data/screener/sprint6_fscore.csv`, `sprint6_readiness_audit.csv`,
+`sprint6_annual_history_coverage.csv` and `step2_valuation_all.csv` each hold 156.
+The 153 are a strict subset of the 156; the difference is exactly API, DGC and IDJ,
+the three tickers the warning gate removed. Running `scripts/build_sprint6_fscore.py`
+raises `ValueError: expected 156 unique survivors; rows=153 unique=153` at line 493.
+ 
+The literal 156 gates seven scripts: `audit_sprint6_readiness.py` (lines 21, 502,
+513), `build_sprint6_fscore.py` (41, 491, 521), `build_sprint6_franchise.py` (49,
+377, 379, 507), `build_sprint5_valuation.py` (26, 390), `fetch_sprint6_annual_history.py`
+(29, 116), `analyze_sprint6_annual_history.py` (19, 120, 237) and
+`fetch_sprint5_market_cap.py` (325, 338, the default `expected_count` that `main()`
+does not override). Both the Sprint 5 valuation layer and the Sprint 6 quality layer
+are blocked, not only the F-Score build.
+ 
+Evidence (OK) that the guard is untested: setting the constant to a value that makes
+every guard raise unconditionally still leaves the nine test files that import these
+scripts passing, 77 passed 0 failed. No test exercises the guard.
+ 
+The owner's decision is to REMOVE the constant, not to change 156 to 153, because 153
+is another ghost number that the 2026-09-30 rebalance would break again. Do not
+"fix" this entry by introducing `EXPECTED_SURVIVORS = 153`, a `MIN_SURVIVORS`, or any
+other expected-count constant.
+ 
+Out of scope, and deliberately so: `scripts/probe_share_count_history.py` lines
+205-207 and 250-252 gate `data/market_cap/2026-07-19/universe_market_cap.csv`, a
+frozen 157-row probe artifact. That is a different number that merely looks like
+this one.
+ 
 score would change is UNCLEAR — it is not recorded in any artifact in this
 repository and must not be stated as a fact until it is measured.
 
