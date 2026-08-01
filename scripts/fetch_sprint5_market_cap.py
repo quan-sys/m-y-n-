@@ -13,6 +13,13 @@ from typing import Any, Callable
 import pandas as pd
 
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.audit_sprint6_readiness import load_survivors_checked
+
+
 PROBE_TICKERS = ("VNM", "FPT", "VCB")
 PUBLIC_METHODS = (
     ("VCI", "vnstock.api.company.Company", "overview"),
@@ -322,7 +329,6 @@ def run_full_universe(
     *,
     survivors_path: Path,
     output_path: Path,
-    expected_count: int = 156,
     sleep_seconds: float = 1.0,
     max_retries: int = 3,
     backoff_base: float = 1.0,
@@ -331,15 +337,8 @@ def run_full_universe(
     board_fetcher: Callable[[list[str]], pd.DataFrame] | None = None,
     include_probe_tickers: bool = False,
 ) -> dict[str, Any]:
-    survivors = pd.read_csv(survivors_path)
-    if "ticker" not in survivors.columns:
-        raise ValueError("survivor input is missing ticker")
-    survivor_tickers = survivors["ticker"].astype(str).str.strip().str.upper().tolist()
-    if len(survivor_tickers) != expected_count or len(set(survivor_tickers)) != expected_count:
-        raise ValueError(
-            f"survivor input must contain exactly {expected_count} unique tickers; "
-            f"found rows={len(survivor_tickers)} unique={len(set(survivor_tickers))}"
-        )
+    survivors = load_survivors_checked(survivors_path)
+    survivor_tickers = survivors["ticker"].tolist()
     tickers = list(survivor_tickers)
     if include_probe_tickers:
         tickers.extend(ticker for ticker in PROBE_TICKERS if ticker not in tickers)

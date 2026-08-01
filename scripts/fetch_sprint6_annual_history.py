@@ -1,4 +1,4 @@
-"""Checkpointed VCI annual-history fetch for the 156 Sprint 4 survivors."""
+"""Checkpointed VCI annual-history fetch for Sprint 4 survivors."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.audit_sprint6_readiness import load_survivors_checked
 from scripts.probe_annual_history_sources import is_rate_limit_response
 from src.data.finance_client import FinanceClient
 
@@ -26,7 +27,6 @@ RUN_ROOT = FUNDAMENTALS_ROOT / "sprint6_annual_history" / RUN_DATE
 CHECKPOINT_PATH = RUN_ROOT / "checkpoint.csv"
 SUMMARY_PATH = RUN_ROOT / "summary.json"
 BASELINE_HASH_PATH = RUN_ROOT / "protected_baseline_sha256.json"
-EXPECTED_SURVIVORS = 156
 STATEMENTS = (
     ("balance_sheet", "get_balance_sheet"),
     ("income_statement", "get_income_statement"),
@@ -109,16 +109,7 @@ def verify_baseline(baseline: dict[str, str]) -> bool:
 
 
 def load_survivors(path: Path = SURVIVORS_PATH) -> list[str]:
-    frame = pd.read_csv(path)
-    if "ticker" not in frame.columns:
-        raise ValueError("survivor input is missing ticker")
-    tickers = frame["ticker"].astype(str).str.strip().str.upper().tolist()
-    if len(tickers) != EXPECTED_SURVIVORS or len(set(tickers)) != EXPECTED_SURVIVORS:
-        raise ValueError(
-            f"expected {EXPECTED_SURVIVORS} unique survivors; "
-            f"rows={len(tickers)} unique={len(set(tickers))}"
-        )
-    return tickers
+    return load_survivors_checked(path)["ticker"].tolist()
 
 
 def write_checkpoint(rows: list[dict[str, Any]], tickers: list[str]) -> None:

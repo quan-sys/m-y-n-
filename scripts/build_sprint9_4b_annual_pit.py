@@ -567,7 +567,7 @@ def gate_definitions() -> dict[str, dict[str, Any]]:
                 for symbol, offsets in fscore_offsets.items()
             },
             "source": f"scripts/build_sprint6_fscore.py:"
-            f"{fscore_start}-{fscore_end},153-446",
+            f"{fscore_start}-{fscore_end},154-447",
             "history": "three-year run N, N-1 and N-2",
         },
         "FRANCHISE_POWER": {
@@ -576,7 +576,7 @@ def gate_definitions() -> dict[str, dict[str, Any]]:
                 for symbol, offsets in franchise_offsets.items()
             },
             "source": f"scripts/build_sprint6_franchise.py:"
-            f"{franchise_start}-{franchise_end},118-248,398-411",
+            f"{franchise_start}-{franchise_end},119-249,396-409",
             "history": (
                 f"at least {PROPOSED_FRANCHISE_MIN_YEARS} usable overlapping "
                 "ROC/margin years; the code counts usable years and does not "

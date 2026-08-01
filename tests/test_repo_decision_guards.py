@@ -27,6 +27,6 @@ def test_deferred_defect_registry_is_complete():
         encoding="utf-8"
     ).splitlines()
 
-    for identifier in ("LIM-1", "DEF-1", "DEF-2", "DEF-3", "DEF-4", "DEF-5"):
+    for identifier in ("LIM-1", "DEF-1", "DEF-2", "DEF-3", "DEF-4", "DEF-5", "DEF-6"):
         assert any(line.startswith(f"## {identifier}") for line in lines)
     assert sum(line.startswith("Status:") for line in lines) >= 6
